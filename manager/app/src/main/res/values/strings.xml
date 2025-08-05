@@ -241,4 +241,8 @@
     <string name="background_image_fit_mode_summary">Choose how the background image should be displayed</string>
     <string name="background_fit_edge_to_edge">Fit edge to edge</string>
     <string name="background_fit_zoom_to_fit">Zoom to fit screen</string>
+    <string name="crop_background_image">Crop background image</string>
+    <string name="reset_to_fullscreen">Reset to fullscreen</string>
+    <string name="pinch_to_zoom_instruction">Pinch to zoom and drag to position the image</string>
+    <string name="apply">Apply</string>
 </resources>
