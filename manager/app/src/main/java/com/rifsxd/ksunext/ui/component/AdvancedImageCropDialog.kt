@@ -17,10 +17,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -178,7 +183,7 @@ private fun UITemplateOverlay() {
                 topLeft = androidx.compose.ui.geometry.Offset(padding, cardY),
                 size = androidx.compose.ui.geometry.Size(width - 2 * padding, cardHeight),
                 cornerRadius = androidx.compose.ui.geometry.CornerRadius(12.dp.toPx()),
-                style = androidx.compose.ui.graphics.drawscope.Stroke(strokeWidth)
+                style = Stroke(strokeWidth)
             )
         }
         
@@ -197,10 +202,10 @@ private fun UITemplateOverlay() {
             topLeft = androidx.compose.ui.geometry.Offset(padding, bottomY),
             size = androidx.compose.ui.geometry.Size(width - 2 * padding, 120.dp.toPx()),
             cornerRadius = androidx.compose.ui.geometry.CornerRadius(12.dp.toPx()),
-            style = androidx.compose.ui.graphics.drawscope.Stroke(strokeWidth)
+            style = Stroke(strokeWidth)
         )
         
-        // Add text label
+        // Add text label using native canvas
         drawContext.canvas.nativeCanvas.apply {
             val paint = android.graphics.Paint().apply {
                 color = Color.White.copy(alpha = 0.8f).toArgb()
