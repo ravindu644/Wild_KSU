@@ -118,6 +118,10 @@ class MainActivity : ComponentActivity() {
             // Read background image preferences
             val backgroundImageUri = prefs.getString("background_image_uri", null)
             val backgroundFitMode = prefs.getString("background_fit_mode", "edge_to_edge") ?: "edge_to_edge"
+            
+            // Debug logging
+            android.util.Log.d("MainActivity", "Background URI from prefs: $backgroundImageUri")
+            android.util.Log.d("MainActivity", "Background fit mode from prefs: $backgroundFitMode")
 
             val moduleViewModel: ModuleViewModel = viewModel()
             val superUserViewModel: SuperUserViewModel = viewModel()

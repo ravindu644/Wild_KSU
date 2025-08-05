@@ -2,6 +2,7 @@ package com.rifsxd.ksunext.ui.component
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -25,37 +26,44 @@ fun BackgroundImageWrapper(
 ) {
     val context = LocalContext.current
     
+    // Debug logging
+    Log.d("BackgroundImage", "URI: $backgroundImageUri, FitMode: $backgroundFitMode")
+    
     Box(modifier = Modifier.fillMaxSize()) {
         // Display background image if available
         backgroundImageUri?.let { uriString ->
-            val painter = rememberAsyncImagePainter(
-                model = ImageRequest.Builder(context)
-                    .data(Uri.parse(uriString))
-                    .crossfade(true)
-                    .build()
-            )
-            
-            val contentScale = when (backgroundFitMode) {
-                "zoom_to_fit" -> ContentScale.Crop
-                "edge_to_edge" -> ContentScale.FillBounds
-                else -> ContentScale.FillBounds
+            if (uriString.isNotEmpty()) {
+                Log.d("BackgroundImage", "Loading image from URI: $uriString")
+                
+                val painter = rememberAsyncImagePainter(
+                    model = ImageRequest.Builder(context)
+                        .data(Uri.parse(uriString))
+                        .crossfade(true)
+                        .build()
+                )
+                
+                val contentScale = when (backgroundFitMode) {
+                    "zoom_to_fit" -> ContentScale.Crop
+                    "edge_to_edge" -> ContentScale.FillBounds
+                    else -> ContentScale.FillBounds
+                }
+                
+                Image(
+                    painter = painter,
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = contentScale
+                )
+                
+                // Add a very light semi-transparent overlay to ensure content readability
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            MaterialTheme.colorScheme.background.copy(alpha = 0.1f)
+                        )
+                )
             }
-            
-            Image(
-                painter = painter,
-                contentDescription = null,
-                modifier = Modifier.fillMaxSize(),
-                contentScale = contentScale
-            )
-            
-            // Add a semi-transparent overlay to ensure content readability
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        MaterialTheme.colorScheme.background.copy(alpha = 0.85f)
-                    )
-            )
         }
         
         // Content on top of background
