@@ -23,6 +23,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import coil.compose.rememberAsyncImagePainter
@@ -40,17 +41,10 @@ fun AdvancedImageCropDialog(
     val context = LocalContext.current
     val prefs = context.getSharedPreferences("settings", android.content.Context.MODE_PRIVATE)
     
-    // Transformation states
-    var scaleX by remember { mutableFloatStateOf(prefs.getFloat("background_scale_x", 1.0f)) }
-    var scaleY by remember { mutableFloatStateOf(prefs.getFloat("background_scale_y", 1.0f)) }
-    var offsetX by remember { mutableFloatStateOf(prefs.getFloat("background_offset_x", 0.0f)) }
-    var offsetY by remember { mutableFloatStateOf(prefs.getFloat("background_offset_y", 0.0f)) }
-    var rotation by remember { mutableFloatStateOf(prefs.getFloat("background_rotation", 0.0f)) }
-    
-    // UI states
-    var isFullscreen by remember { mutableStateOf(false) }
-    var showControls by remember { mutableStateOf(true) }
-    var selectedTool by remember { mutableStateOf("transform") } // transform, position, zoom, rotate
+    // Simplified transformation states - only scale and position
+    var scale by remember { mutableFloatStateOf(prefs.getFloat("background_scale_x", 1.0f)) }
+    var offsetX by remember { mutableFloatStateOf(prefs.getFloat("background_pos_x", 0.0f)) }
+    var offsetY by remember { mutableFloatStateOf(prefs.getFloat("background_pos_y", 0.0f)) }
     
     val painter = rememberAsyncImagePainter(imageUri)
     val (minScale, maxScale) = ImageCropUtils.getScaleLimits()
@@ -69,38 +63,17 @@ fun AdvancedImageCropDialog(
                 .fillMaxSize()
                 .background(Color.Black)
         ) {
-            // Image preview with transformations
+            // Image preview with simplified transformations (zoom and drag only)
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .pointerInput(selectedTool) {
-                        when (selectedTool) {
-                            "transform" -> {
-                                detectTransformGestures { _, pan, zoom, rotationChange ->
-                                    scaleX = (scaleX * zoom).coerceIn(minScale, maxScale)
-                                    scaleY = (scaleY * zoom).coerceIn(minScale, maxScale)
-                                    offsetX = (offsetX + pan.x).coerceIn(minTranslation, maxTranslation)
-                                    offsetY = (offsetY + pan.y).coerceIn(minTranslation, maxTranslation)
-                                    rotation = (rotation + rotationChange) % 360f
-                                }
-                            }
-                            "position" -> {
-                                detectDragGestures { _, dragAmount ->
-                                    offsetX = (offsetX + dragAmount.x).coerceIn(minTranslation, maxTranslation)
-                                    offsetY = (offsetY + dragAmount.y).coerceIn(minTranslation, maxTranslation)
-                                }
-                            }
-                            "zoom" -> {
-                                detectTransformGestures { _, _, zoom, _ ->
-                                    scaleX = (scaleX * zoom).coerceIn(minScale, maxScale)
-                                    scaleY = (scaleY * zoom).coerceIn(minScale, maxScale)
-                                }
-                            }
-                            "rotate" -> {
-                                detectTransformGestures { _, _, _, rotationChange ->
-                                    rotation = (rotation + rotationChange) % 360f
-                                }
-                            }
+                    .pointerInput(Unit) {
+                        detectTransformGestures { _, pan, zoom, _ ->
+                            // Apply zoom
+                            scale = (scale * zoom).coerceIn(minScale, maxScale)
+                            // Apply pan/drag
+                            offsetX = (offsetX + pan.x).coerceIn(minTranslation, maxTranslation)
+                            offsetY = (offsetY + pan.y).coerceIn(minTranslation, maxTranslation)
                         }
                     },
                 contentAlignment = Alignment.Center
@@ -111,169 +84,60 @@ fun AdvancedImageCropDialog(
                     modifier = Modifier
                         .fillMaxSize()
                         .graphicsLayer(
-                            scaleX = scaleX,
-                            scaleY = scaleY,
+                            scaleX = scale,
+                            scaleY = scale,
                             translationX = offsetX,
-                            translationY = offsetY,
-                            rotationZ = rotation
+                            translationY = offsetY
                         ),
                     contentScale = ContentScale.Fit
                 )
                 
-                // Grid overlay for better positioning
-                if (showControls && !isFullscreen) {
-                    GridOverlay()
-                }
+                // Template overlay showing where UI elements will be
+                UITemplateOverlay()
             }
             
-            // Top toolbar
-            if (showControls) {
-                TopAppBar(
-                    title = { 
-                        Text(
-                            "Advanced Image Editor",
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold
-                        )
-                    },
-                    navigationIcon = {
-                        IconButton(onClick = onDismiss) {
-                            Icon(Icons.Default.Close, contentDescription = "Close", tint = Color.White)
-                        }
-                    },
-                    actions = {
-                        IconButton(onClick = { isFullscreen = !isFullscreen }) {
-                            Icon(
-                                if (isFullscreen) Icons.Default.FullscreenExit else Icons.Default.Fullscreen,
-                                contentDescription = "Toggle Fullscreen",
-                                tint = Color.White
-                            )
-                        }
-                        IconButton(onClick = { showControls = !showControls }) {
-                            Icon(Icons.Default.Visibility, contentDescription = "Toggle Controls", tint = Color.White)
-                        }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = Color.Black.copy(alpha = 0.7f)
+            // Simple bottom controls - only Reset and Confirm buttons
+            Row(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .background(
+                        Color.Black.copy(alpha = 0.8f),
+                        RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
                     )
-                )
-            }
-            
-            // Bottom controls
-            if (showControls && !isFullscreen) {
-                Column(
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .fillMaxWidth()
-                        .background(
-                            Color.Black.copy(alpha = 0.8f),
-                            RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
-                        )
-                        .padding(16.dp)
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                OutlinedButton(
+                    onClick = {
+                        // Reset to defaults
+                        scale = 1.0f
+                        offsetX = 0.0f
+                        offsetY = 0.0f
+                    },
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White)
                 ) {
-                    // Tool selection
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        ToolButton("transform", "Transform", Icons.Default.Transform, selectedTool) { selectedTool = it }
-                        ToolButton("position", "Position", Icons.Default.PanTool, selectedTool) { selectedTool = it }
-                        ToolButton("zoom", "Zoom", Icons.Default.ZoomIn, selectedTool) { selectedTool = it }
-                        ToolButton("rotate", "Rotate", Icons.Default.RotateRight, selectedTool) { selectedTool = it }
-                    }
-                    
-                    Spacer(modifier = Modifier.height(16.dp))
-                    
-                    // Transformation controls
-                    when (selectedTool) {
-                        "transform", "zoom" -> {
-                            TransformationSliders(
-                                scaleX = scaleX,
-                                scaleY = scaleY,
-                                onScaleXChange = { scaleX = it.coerceIn(minScale, maxScale) },
-                                onScaleYChange = { scaleY = it.coerceIn(minScale, maxScale) },
-                                minScale = minScale,
-                                maxScale = maxScale
-                            )
-                        }
-                        "position" -> {
-                            PositionSliders(
-                                offsetX = offsetX,
-                                offsetY = offsetY,
-                                onOffsetXChange = { offsetX = it.coerceIn(minTranslation, maxTranslation) },
-                                onOffsetYChange = { offsetY = it.coerceIn(minTranslation, maxTranslation) },
-                                minTranslation = minTranslation,
-                                maxTranslation = maxTranslation
-                            )
-                        }
-                        "rotate" -> {
-                            RotationSlider(
-                                rotation = rotation,
-                                onRotationChange = { rotation = it % 360f }
-                            )
-                        }
-                    }
-                    
-                    Spacer(modifier = Modifier.height(16.dp))
-                    
-                    // Action buttons
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        OutlinedButton(
-                            onClick = {
-                                // Reset to defaults
-                                scaleX = 1.0f
-                                scaleY = 1.0f
-                                offsetX = 0.0f
-                                offsetY = 0.0f
-                                rotation = 0.0f
-                            },
-                            colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White)
-                        ) {
-                            Icon(Icons.Default.Refresh, contentDescription = null)
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text("Reset")
-                        }
-                        
-                        Button(
-                            onClick = {
-                                // Save transformations
-                                ImageCropUtils.saveConstrainedScale(prefs, "background_scale_x", scaleX)
-                                ImageCropUtils.saveConstrainedScale(prefs, "background_scale_y", scaleY)
-                                ImageCropUtils.saveConstrainedTranslation(prefs, "background_offset_x", offsetX)
-                                ImageCropUtils.saveConstrainedTranslation(prefs, "background_offset_y", offsetY)
-                                ImageCropUtils.saveConstrainedRotation(prefs, "background_rotation", rotation)
-                                onSave()
-                            },
-                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-                        ) {
-                            Icon(Icons.Default.Save, contentDescription = null)
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text("Save")
-                        }
-                    }
+                    Icon(Icons.Default.Refresh, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Reset")
                 }
-            }
-            
-            // Fullscreen toggle hint
-            if (isFullscreen) {
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(16.dp)
-                        .background(
-                            Color.Black.copy(alpha = 0.7f),
-                            RoundedCornerShape(8.dp)
-                        )
-                        .padding(8.dp)
+                
+                Button(
+                    onClick = {
+                        // Save transformations for position_adjust mode
+                        ImageCropUtils.saveConstrainedScale(prefs, "background_scale_x", scale)
+                        ImageCropUtils.saveConstrainedScale(prefs, "background_scale_y", scale)
+                        ImageCropUtils.saveConstrainedTranslation(prefs, "background_pos_x", offsetX)
+                        ImageCropUtils.saveConstrainedTranslation(prefs, "background_pos_y", offsetY)
+                        // Set rotation to 0 since we removed rotation controls
+                        ImageCropUtils.saveConstrainedRotation(prefs, "background_rotation", 0.0f)
+                        onSave()
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                 ) {
-                    Text(
-                        "Tap to show controls",
-                        color = Color.White,
-                        style = MaterialTheme.typography.bodySmall
-                    )
+                    Icon(Icons.Default.Check, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Confirm")
                 }
             }
         }
@@ -281,154 +145,75 @@ fun AdvancedImageCropDialog(
 }
 
 @Composable
-private fun ToolButton(
-    tool: String,
-    label: String,
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    selectedTool: String,
-    onSelect: (String) -> Unit
-) {
-    val isSelected = selectedTool == tool
-    
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        IconButton(
-            onClick = { onSelect(tool) },
-            modifier = Modifier
-                .background(
-                    if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
-                    RoundedCornerShape(8.dp)
-                )
-        ) {
-            Icon(
-                icon,
-                contentDescription = label,
-                tint = if (isSelected) Color.White else Color.Gray
-            )
-        }
-        Text(
-            label,
-            color = if (isSelected) Color.White else Color.Gray,
-            style = MaterialTheme.typography.bodySmall
-        )
-    }
-}
-
-@Composable
-private fun TransformationSliders(
-    scaleX: Float,
-    scaleY: Float,
-    onScaleXChange: (Float) -> Unit,
-    onScaleYChange: (Float) -> Unit,
-    minScale: Float,
-    maxScale: Float
-) {
-    Column {
-        Text("Scale X: ${String.format("%.2f", scaleX)}", color = Color.White)
-        Slider(
-            value = scaleX,
-            onValueChange = onScaleXChange,
-            valueRange = minScale..maxScale,
-            colors = SliderDefaults.colors(thumbColor = MaterialTheme.colorScheme.primary)
-        )
-        
-        Spacer(modifier = Modifier.height(8.dp))
-        
-        Text("Scale Y: ${String.format("%.2f", scaleY)}", color = Color.White)
-        Slider(
-            value = scaleY,
-            onValueChange = onScaleYChange,
-            valueRange = minScale..maxScale,
-            colors = SliderDefaults.colors(thumbColor = MaterialTheme.colorScheme.primary)
-        )
-    }
-}
-
-@Composable
-private fun PositionSliders(
-    offsetX: Float,
-    offsetY: Float,
-    onOffsetXChange: (Float) -> Unit,
-    onOffsetYChange: (Float) -> Unit,
-    minTranslation: Float,
-    maxTranslation: Float
-) {
-    Column {
-        Text("Position X: ${String.format("%.0f", offsetX)}", color = Color.White)
-        Slider(
-            value = offsetX,
-            onValueChange = onOffsetXChange,
-            valueRange = minTranslation..maxTranslation,
-            colors = SliderDefaults.colors(thumbColor = MaterialTheme.colorScheme.primary)
-        )
-        
-        Spacer(modifier = Modifier.height(8.dp))
-        
-        Text("Position Y: ${String.format("%.0f", offsetY)}", color = Color.White)
-        Slider(
-            value = offsetY,
-            onValueChange = onOffsetYChange,
-            valueRange = minTranslation..maxTranslation,
-            colors = SliderDefaults.colors(thumbColor = MaterialTheme.colorScheme.primary)
-        )
-    }
-}
-
-@Composable
-private fun RotationSlider(
-    rotation: Float,
-    onRotationChange: (Float) -> Unit
-) {
-    Column {
-        Text("Rotation: ${String.format("%.0f", rotation)}°", color = Color.White)
-        Slider(
-            value = rotation,
-            onValueChange = onRotationChange,
-            valueRange = 0f..360f,
-            colors = SliderDefaults.colors(thumbColor = MaterialTheme.colorScheme.primary)
-        )
-    }
-}
-
-@Composable
-private fun GridOverlay() {
+private fun UITemplateOverlay() {
     Canvas(
         modifier = Modifier.fillMaxSize()
     ) {
-        val strokeWidth = 1.dp.toPx()
-        val color = Color.White.copy(alpha = 0.3f)
+        val strokeWidth = 2.dp.toPx()
+        val cardColor = Color.White.copy(alpha = 0.4f)
+        val outlineColor = Color.White.copy(alpha = 0.6f)
         
-        // Draw rule of thirds grid
         val width = size.width
         val height = size.height
+        val padding = 32.dp.toPx()
+        val cardHeight = 80.dp.toPx()
+        val cardSpacing = 16.dp.toPx()
         
-        // Vertical lines
-        drawLine(
-            color = color,
-            start = androidx.compose.ui.geometry.Offset(width / 3, 0f),
-            end = androidx.compose.ui.geometry.Offset(width / 3, height),
-            strokeWidth = strokeWidth
+        // Draw template cards to show where UI elements will be positioned
+        // Top area - Status cards
+        var currentY = padding + 60.dp.toPx() // Account for status bar
+        
+        // Draw 3 status cards in top area
+        for (i in 0..2) {
+            val cardY = currentY + (i * (cardHeight + cardSpacing))
+            drawRoundRect(
+                color = cardColor,
+                topLeft = androidx.compose.ui.geometry.Offset(padding, cardY),
+                size = androidx.compose.ui.geometry.Size(width - 2 * padding, cardHeight),
+                cornerRadius = androidx.compose.ui.geometry.CornerRadius(12.dp.toPx())
+            )
+            // Draw outline
+            drawRoundRect(
+                color = outlineColor,
+                topLeft = androidx.compose.ui.geometry.Offset(padding, cardY),
+                size = androidx.compose.ui.geometry.Size(width - 2 * padding, cardHeight),
+                cornerRadius = androidx.compose.ui.geometry.CornerRadius(12.dp.toPx()),
+                style = androidx.compose.ui.graphics.drawscope.Stroke(strokeWidth)
+            )
+        }
+        
+        // Bottom area - Navigation and controls
+        val bottomY = height - 200.dp.toPx()
+        
+        // Bottom navigation area
+        drawRoundRect(
+            color = cardColor,
+            topLeft = androidx.compose.ui.geometry.Offset(padding, bottomY),
+            size = androidx.compose.ui.geometry.Size(width - 2 * padding, 120.dp.toPx()),
+            cornerRadius = androidx.compose.ui.geometry.CornerRadius(12.dp.toPx())
         )
-        drawLine(
-            color = color,
-            start = androidx.compose.ui.geometry.Offset(2 * width / 3, 0f),
-            end = androidx.compose.ui.geometry.Offset(2 * width / 3, height),
-            strokeWidth = strokeWidth
+        drawRoundRect(
+            color = outlineColor,
+            topLeft = androidx.compose.ui.geometry.Offset(padding, bottomY),
+            size = androidx.compose.ui.geometry.Size(width - 2 * padding, 120.dp.toPx()),
+            cornerRadius = androidx.compose.ui.geometry.CornerRadius(12.dp.toPx()),
+            style = androidx.compose.ui.graphics.drawscope.Stroke(strokeWidth)
         )
         
-        // Horizontal lines
-        drawLine(
-            color = color,
-            start = androidx.compose.ui.geometry.Offset(0f, height / 3),
-            end = androidx.compose.ui.geometry.Offset(width, height / 3),
-            strokeWidth = strokeWidth
-        )
-        drawLine(
-            color = color,
-            start = androidx.compose.ui.geometry.Offset(0f, 2 * height / 3),
-            end = androidx.compose.ui.geometry.Offset(width, 2 * height / 3),
-            strokeWidth = strokeWidth
-        )
+        // Add text label
+        drawContext.canvas.nativeCanvas.apply {
+            val paint = android.graphics.Paint().apply {
+                color = Color.White.copy(alpha = 0.8f).toArgb()
+                textSize = 14.sp.toPx()
+                textAlign = android.graphics.Paint.Align.CENTER
+                isAntiAlias = true
+            }
+            drawText(
+                "UI Elements Preview",
+                width / 2,
+                padding + 30.dp.toPx(),
+                paint
+            )
+        }
     }
 }
