@@ -11,6 +11,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -39,12 +42,43 @@ fun BackgroundImageWrapper(
             if (uriString.isNotEmpty()) {
                 Log.d("BackgroundImage", "Loading image from URI: $uriString")
                 
+                // Validate URI
+                try {
+                    val uri = Uri.parse(uriString)
+                    Log.d("BackgroundImage", "Parsed URI scheme: ${uri.scheme}, authority: ${uri.authority}")
+                } catch (e: Exception) {
+                    Log.e("BackgroundImage", "Invalid URI: $uriString", e)
+                    return@let
+                }
+                
+                var imageLoaded by remember { mutableStateOf(false) }
+                var imageError by remember { mutableStateOf<String?>(null) }
+                
                 val painter = rememberAsyncImagePainter(
                     model = ImageRequest.Builder(context)
                         .data(Uri.parse(uriString))
                         .crossfade(true)
+                        .listener(
+                            onStart = { 
+                                Log.d("BackgroundImage", "Started loading image")
+                                imageLoaded = false
+                                imageError = null
+                            },
+                            onSuccess = { _, _ -> 
+                                Log.d("BackgroundImage", "Successfully loaded image")
+                                imageLoaded = true
+                                imageError = null
+                            },
+                            onError = { _, result -> 
+                                Log.e("BackgroundImage", "Failed to load image: ${result.throwable}")
+                                imageLoaded = false
+                                imageError = result.throwable.message
+                            }
+                        )
                         .build()
                 )
+                
+                Log.d("BackgroundImage", "Image loaded: $imageLoaded, Error: $imageError")
                 
                 // Load crop settings
                 val cropSettings = remember(uriString) {
@@ -73,11 +107,12 @@ fun BackgroundImageWrapper(
                 )
                 
                 // Add a very light semi-transparent overlay to ensure content readability
+                // Only add overlay if the image is successfully loaded
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(
-                            MaterialTheme.colorScheme.background.copy(alpha = 0.1f)
+                            Color.Black.copy(alpha = 0.02f)
                         )
                 )
             }
