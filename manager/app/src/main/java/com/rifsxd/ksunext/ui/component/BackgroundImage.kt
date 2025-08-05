@@ -28,14 +28,13 @@ import com.rifsxd.ksunext.ui.util.ImageCropUtils
 fun BackgroundImageWrapper(
     backgroundImageUri: String?,
     backgroundFitMode: String,
-    backgroundTransparency: Float = 1.0f,
     content: @Composable () -> Unit
 ) {
     val context = LocalContext.current
     val prefs = remember { context.getSharedPreferences("settings", Context.MODE_PRIVATE) }
     
     // Debug logging
-    Log.d("BackgroundImage", "URI: $backgroundImageUri, FitMode: $backgroundFitMode, Transparency: $backgroundTransparency")
+    Log.d("BackgroundImage", "URI: $backgroundImageUri, FitMode: $backgroundFitMode")
     
     Box(modifier = Modifier.fillMaxSize()) {
         // Display background image if available
@@ -87,11 +86,9 @@ fun BackgroundImageWrapper(
                     Modifier
                         .fillMaxSize()
                         .let { ImageCropUtils.getSimpleCropTransformation(prefs)(it) }
-                        .graphicsLayer(alpha = backgroundTransparency)
                 } else {
                     Modifier
                         .fillMaxSize()
-                        .graphicsLayer(alpha = backgroundTransparency)
                 }
                 
                 Log.d("BackgroundImage", "Applying transformation for fit mode: $backgroundFitMode")

@@ -156,12 +156,12 @@ class MainActivity : ComponentActivity() {
 
             KernelSUTheme (
                 amoledMode = amoledMode,
-                isCustomBackgroundEnabled = !backgroundImageUri.isNullOrEmpty()
+                isCustomBackgroundEnabled = !backgroundImageUri.isNullOrEmpty(),
+                backgroundTransparency = backgroundTransparency
             ) {
                 BackgroundImageWrapper(
                     backgroundImageUri = backgroundImageUri,
-                    backgroundFitMode = backgroundFitMode,
-                    backgroundTransparency = backgroundTransparency
+                    backgroundFitMode = backgroundFitMode
                 ) {
                 val navController = rememberNavController()
                 val snackBarHostState = remember { SnackbarHostState() }

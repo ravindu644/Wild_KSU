@@ -29,9 +29,9 @@ object ImageCropUtils {
     fun saveImageCropSettings(prefs: SharedPreferences, uri: String, settings: ImageCropSettings) {
         prefs.edit().apply {
             putString("background_image_uri", uri)
-            putFloat("background_crop_scale", settings.scale)
-            putFloat("background_crop_offset_x", settings.offsetX)
-            putFloat("background_crop_offset_y", settings.offsetY)
+            putFloat("background_scale_x", settings.scale)
+            putFloat("background_pos_x", settings.offsetX)
+            putFloat("background_pos_y", settings.offsetY)
             apply()
         }
         Log.d(TAG, "Saved crop settings: scale=${settings.scale}, offsetX=${settings.offsetX}, offsetY=${settings.offsetY}")
@@ -39,9 +39,9 @@ object ImageCropUtils {
     
     fun loadImageCropSettings(prefs: SharedPreferences): ImageCropSettings {
         return ImageCropSettings(
-            scale = prefs.getFloat("background_crop_scale", 1f),
-            offsetX = prefs.getFloat("background_crop_offset_x", 0f),
-            offsetY = prefs.getFloat("background_crop_offset_y", 0f)
+            scale = prefs.getFloat("background_scale_x", 1f),
+            offsetX = prefs.getFloat("background_pos_x", 0f),
+            offsetY = prefs.getFloat("background_pos_y", 0f)
         )
     }
     
