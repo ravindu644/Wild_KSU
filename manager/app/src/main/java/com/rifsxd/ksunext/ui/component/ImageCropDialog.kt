@@ -135,13 +135,7 @@ fun ImageCropDialog(
                     )
                 }
                 
-                // Instructions
-                Text(
-                    text = stringResource(R.string.pinch_to_zoom_instruction),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(16.dp)
-                )
+
                 
                 // Action buttons
                 Row(
@@ -169,7 +163,7 @@ fun ImageCropDialog(
                             modifier = Modifier.size(18.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(stringResource(R.string.apply))
+                        Text(stringResource(R.string.confirm))
                     }
                 }
             }
