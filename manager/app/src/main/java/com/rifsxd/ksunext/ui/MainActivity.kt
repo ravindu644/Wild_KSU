@@ -252,7 +252,7 @@ class MainActivity : ComponentActivity() {
                             BottomBar(navController, moduleUpdateCount)
                         }
                     },
-                    contentWindowInsets = WindowInsets(0, 0, 0, 0)
+                    contentWindowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal)
                 ) { innerPadding ->
                     CompositionLocalProvider(
                         LocalSnackbarHost provides snackBarHostState,

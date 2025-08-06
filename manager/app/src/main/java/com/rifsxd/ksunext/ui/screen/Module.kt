@@ -253,7 +253,7 @@ fun ModuleScreen(navigator: DestinationsNavigator) {
                 }
             }
         },
-        contentWindowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
+
         snackbarHost = { SnackbarHost(hostState = snackBarHost) }
     ) { innerPadding ->
 
