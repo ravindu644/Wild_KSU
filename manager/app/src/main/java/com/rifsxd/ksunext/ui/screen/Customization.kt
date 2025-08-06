@@ -519,23 +519,23 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                     }
                 )
                 
-                // Background Transparency Slider
+                // Background Darkness Slider
                 var backgroundTransparency by rememberSaveable {
                     mutableFloatStateOf(
-                        prefs.getFloat("background_transparency", 1.0f)
+                        prefs.getFloat("background_transparency", 0.0f)
                     )
                 }
                 
                 ListItem(
-                    leadingContent = { Icon(Icons.Filled.Opacity, stringResource(R.string.background_transparency)) },
+                    leadingContent = { Icon(Icons.Filled.Opacity, "Background Darkness") },
                     headlineContent = { Text(
-                        text = stringResource(R.string.background_transparency),
+                        text = "Background Darkness",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold,
                     ) },
                     supportingContent = { 
                         Column {
-                            Text(stringResource(R.string.background_transparency_summary))
+                            Text("Adjust how dark the background appears behind the UI")
                             Spacer(modifier = Modifier.height(8.dp))
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
@@ -547,10 +547,10 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                                     modifier = Modifier.width(32.dp)
                                 )
                                 Slider(
-                                    value = 1.0f - backgroundTransparency,
+                                    value = backgroundTransparency,
                                     onValueChange = { value ->
-                                        backgroundTransparency = 1.0f - value
-                                        prefs.edit().putFloat("background_transparency", backgroundTransparency).apply()
+                                        backgroundTransparency = value
+                                        prefs.edit().putFloat("background_transparency", value).apply()
                                     },
                                     valueRange = 0.0f..1.0f,
                                     modifier = Modifier.weight(1f)
@@ -563,7 +563,60 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                                 )
                             }
                             Text(
-                                text = "${((1.0f - backgroundTransparency) * 100).toInt()}%",
+                                text = "${(backgroundTransparency * 100).toInt()}%",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.align(Alignment.CenterHorizontally)
+                            )
+                        }
+                    }
+                )
+
+                // UI Transparency Slider
+                var uiTransparency by rememberSaveable {
+                    mutableFloatStateOf(
+                        prefs.getFloat("ui_transparency", 1.0f)
+                    )
+                }
+                
+                ListItem(
+                    leadingContent = { Icon(Icons.Filled.Layers, "UI Transparency") },
+                    headlineContent = { Text(
+                        text = "UI Transparency",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                    ) },
+                    supportingContent = { 
+                        Column {
+                            Text("Adjust how transparent the UI elements appear over the background")
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text(
+                                    text = "0%",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    modifier = Modifier.width(32.dp)
+                                )
+                                Slider(
+                                    value = uiTransparency,
+                                    onValueChange = { value ->
+                                        uiTransparency = value
+                                        prefs.edit().putFloat("ui_transparency", value).apply()
+                                    },
+                                    valueRange = 0.0f..1.0f,
+                                    modifier = Modifier.weight(1f)
+                                )
+                                Text(
+                                    text = "100%",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    modifier = Modifier.width(32.dp),
+                                    textAlign = TextAlign.End
+                                )
+                            }
+                            Text(
+                                text = "${(uiTransparency * 100).toInt()}%",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.align(Alignment.CenterHorizontally)
