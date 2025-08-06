@@ -74,6 +74,7 @@ import com.ramcosta.composedestinations.utils.isRouteOnBackStackAsState
 import com.ramcosta.composedestinations.utils.rememberDestinationsNavigator
 import com.rifsxd.ksunext.Natives
 import com.rifsxd.ksunext.ksuApp
+import com.rifsxd.ksunext.R
 import com.rifsxd.ksunext.ui.screen.BottomBarDestination
 import com.rifsxd.ksunext.ui.theme.KernelSUTheme
 import com.rifsxd.ksunext.ui.component.BackgroundImageWrapper
