@@ -119,6 +119,8 @@ class MainActivity : ComponentActivity() {
             val backgroundImageUri by observePreferenceAsState(prefs, "background_image_uri", null)
             val backgroundFitModeState by observePreferenceAsState(prefs, "background_fit_mode", "edge_to_edge")
             val backgroundTransparency by observePreferenceAsState(prefs, "background_transparency", 1.0f)
+            val uiTransparency by observePreferenceAsState(prefs, "ui_transparency", 1.0f)
+            val topBarTransparency by observePreferenceAsState(prefs, "topbar_transparency", 1.0f)
             
             // Ensure non-null values for required parameters
             val backgroundFitMode = backgroundFitModeState ?: "edge_to_edge"
@@ -135,7 +137,10 @@ class MainActivity : ComponentActivity() {
 
             KernelSUTheme (
                 amoledMode = amoledMode,
-                isCustomBackgroundEnabled = !backgroundImageUri.isNullOrEmpty()
+                isCustomBackgroundEnabled = !backgroundImageUri.isNullOrEmpty(),
+                backgroundTransparency = backgroundTransparency,
+                uiTransparency = uiTransparency,
+                topBarTransparency = topBarTransparency
             ) {
                 BackgroundImageWrapper(
                     backgroundImageUri = backgroundImageUri,

@@ -543,6 +543,102 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                     }
                 )
 
+                // UI Transparency Slider
+                val uiTransparency by observePreferenceAsState(prefs, "ui_transparency", 1.0f)
+                
+                ListItem(
+                    leadingContent = { Icon(Icons.Filled.Opacity, stringResource(R.string.ui_transparency)) },
+                    headlineContent = { Text(
+                        text = stringResource(R.string.ui_transparency),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                    ) },
+                    supportingContent = { 
+                        Column {
+                            Text(stringResource(R.string.ui_transparency_summary))
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text(
+                                    text = "0%",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    modifier = Modifier.width(32.dp)
+                                )
+                                Slider(
+                                    value = uiTransparency,
+                                    onValueChange = { value ->
+                                        prefs.edit().putFloat("ui_transparency", value).apply()
+                                    },
+                                    valueRange = 0.0f..1.0f,
+                                    modifier = Modifier.weight(1f)
+                                )
+                                Text(
+                                    text = "100%",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    modifier = Modifier.width(32.dp),
+                                    textAlign = TextAlign.End
+                                )
+                            }
+                            Text(
+                                text = "${(uiTransparency * 100).toInt()}%",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.align(Alignment.CenterHorizontally)
+                            )
+                        }
+                    }
+                )
+
+                // Top Bar Transparency Slider
+                val topBarTransparency by observePreferenceAsState(prefs, "topbar_transparency", 1.0f)
+                
+                ListItem(
+                    leadingContent = { Icon(Icons.Filled.Opacity, stringResource(R.string.topbar_transparency)) },
+                    headlineContent = { Text(
+                        text = stringResource(R.string.topbar_transparency),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                    ) },
+                    supportingContent = { 
+                        Column {
+                            Text(stringResource(R.string.topbar_transparency_summary))
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text(
+                                    text = "0%",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    modifier = Modifier.width(32.dp)
+                                )
+                                Slider(
+                                    value = topBarTransparency,
+                                    onValueChange = { value ->
+                                        prefs.edit().putFloat("topbar_transparency", value).apply()
+                                    },
+                                    valueRange = 0.0f..1.0f,
+                                    modifier = Modifier.weight(1f)
+                                )
+                                Text(
+                                    text = "100%",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    modifier = Modifier.width(32.dp),
+                                    textAlign = TextAlign.End
+                                )
+                            }
+                            Text(
+                                text = "${(topBarTransparency * 100).toInt()}%",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.align(Alignment.CenterHorizontally)
+                            )
+                        }
+                    }
+                )
+
             }
         }
     }

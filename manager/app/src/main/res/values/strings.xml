@@ -252,4 +252,8 @@
     <string name="apply">Apply</string>
     <string name="background_transparency">Background transparency</string>
     <string name="background_transparency_summary">Adjust the transparency of the background image</string>
+    <string name="ui_transparency">UI transparency</string>
+    <string name="ui_transparency_summary">Adjust the transparency of UI elements like cards and containers</string>
+    <string name="topbar_transparency">Top bar transparency</string>
+    <string name="topbar_transparency_summary">Adjust the transparency of the top app bar</string>
 </resources>
