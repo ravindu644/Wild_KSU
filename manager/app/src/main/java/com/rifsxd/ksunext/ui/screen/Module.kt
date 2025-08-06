@@ -843,6 +843,9 @@ fun ModuleItem(
     val viewModel = viewModel<ModuleViewModel>()
 
     ElevatedCard(
+        colors = CardDefaults.elevatedCardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer
+        ),
         modifier = Modifier
             .fillMaxWidth()
             .clip(MaterialTheme.shapes.medium)

@@ -572,7 +572,11 @@ private fun InfoCard(autoExpand: Boolean = false) {
         }
     }   
 
-    ElevatedCard {
+    ElevatedCard(
+        colors = CardDefaults.elevatedCardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer
+        )
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -739,8 +743,11 @@ fun NextCard() {
     val uriHandler = LocalUriHandler.current
     val url = stringResource(R.string.home_next_kernelsu_repo)
 
-    ElevatedCard {
-
+    ElevatedCard(
+        colors = CardDefaults.elevatedCardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer
+        )
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -769,8 +776,11 @@ fun EXperimentalCard() {
     val url = stringResource(R.string.home_experimental_kernelsu_repo)
     */
 
-    ElevatedCard {
-
+    ElevatedCard(
+        colors = CardDefaults.elevatedCardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer
+        )
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -816,7 +826,11 @@ fun IssueReportCard() {
     val githubIssueUrl = stringResource(R.string.issue_report_github_link)
     val telegramUrl = stringResource(R.string.issue_report_telegram_link)
 
-    ElevatedCard {
+    ElevatedCard(
+        colors = CardDefaults.elevatedCardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer
+        )
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
