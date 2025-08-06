@@ -97,7 +97,7 @@ fun BackgroundImageWrapper(
                 
                 val contentScale = when (backgroundFitMode) {
                     "zoom_to_fit" -> ContentScale.Crop
-                    "edge_to_edge" -> ContentScale.FillBounds
+                    "edge_to_edge" -> ContentScale.Crop // Changed from FillBounds to prevent image morphing
                     "custom_crop", "position_adjust" -> ContentScale.Fit // Preserve aspect ratio for custom crop and position adjust
                     else -> ContentScale.Fit // Default to preserving aspect ratio
                 }
