@@ -37,6 +37,7 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
@@ -643,6 +644,11 @@ fun rememberUninstallDialog(onSelected: (UninstallType) -> Unit): DialogHandle {
 private fun TopBar(
     scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
+    // Use derivedStateOf to create a stable container color that reduces flickering
+    val containerColor by remember {
+        derivedStateOf { MaterialTheme.colorScheme.surfaceContainer }
+    }
+    
     TopAppBar(
         title = { Text(
             text = stringResource(R.string.settings),
@@ -652,7 +658,7 @@ private fun TopBar(
         windowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
         scrollBehavior = scrollBehavior,
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainer
+            containerColor = containerColor
         )
     )
 }

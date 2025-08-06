@@ -40,11 +40,11 @@ import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -534,6 +534,11 @@ private fun TopBar(
     onBack: () -> Unit = {},
     scrollBehavior: TopAppBarScrollBehavior? = null
 ) {
+    // Use derivedStateOf to create a stable container color that reduces flickering
+    val containerColor by remember {
+        derivedStateOf { MaterialTheme.colorScheme.surfaceContainer }
+    }
+    
     TopAppBar(
         title = { Text(
                 text = stringResource(R.string.customization),
@@ -547,7 +552,7 @@ private fun TopBar(
         windowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
         scrollBehavior = scrollBehavior,
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainer
+            containerColor = containerColor
         )
     )
 }
