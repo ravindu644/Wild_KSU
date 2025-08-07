@@ -373,7 +373,7 @@ private fun ModuleTopBar(moduleViewModel: ModuleViewModel) {
         },
         searchText = moduleViewModel.search,
         onSearchTextChange = { moduleViewModel.search = it },
-        onClearClick = { moduleViewModel.search = "" },
+                        onClearClick = { moduleViewModel.search = "" },
         dropdownContent = {
             var showDropdown by remember { mutableStateOf(false) }
             IconButton(

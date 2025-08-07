@@ -78,6 +78,9 @@ class ModuleViewModel : ViewModel() {
     private var sortingTrigger by mutableStateOf(0)
 
     val moduleList by derivedStateOf {
+        // Use sortingTrigger to force recomposition
+        sortingTrigger
+        
         val comparator = when {
             sortWebUiFirst -> compareByDescending<ModuleInfo> { it.hasWebUi }
             sortEnabledFirst -> compareByDescending<ModuleInfo> { it.enabled }
@@ -129,8 +132,6 @@ class ModuleViewModel : ViewModel() {
     
     fun triggerSortingRefresh() {
         sortingTrigger++
-        // Force immediate recomposition by updating modules reference
-        modules = modules.toList()
     }
 
     fun fetchModuleList() {
