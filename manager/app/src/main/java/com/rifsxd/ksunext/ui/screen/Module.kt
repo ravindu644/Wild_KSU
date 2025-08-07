@@ -484,7 +484,9 @@ private fun ModuleList(
     ) {
         LazyColumn(
             state = listState,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             when {
                 viewModel.moduleList.isEmpty() -> {
@@ -563,9 +565,6 @@ private fun ModuleList(
                                 expandedModuleId = if (expandedModuleId == module.id) null else module.id
                             }
                         )
-
-                        // fix last item shadow incomplete in LazyColumn
-                        Spacer(Modifier.height(1.dp))
                     }
                 }
             }
