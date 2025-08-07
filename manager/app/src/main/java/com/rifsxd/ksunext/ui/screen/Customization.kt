@@ -295,7 +295,7 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                     summary = stringResource(id = R.string.settings_amoled_mode_summary),
                     checked = enableAmoled
                 ) { checked ->
-                    prefs.edit().putBoolean("enable_amoled", checked).apply()
+                    prefs.edit().putBoolean("enable_amoled", checked).commit()
                     enableAmoled = checked
                 }
             }
@@ -369,7 +369,7 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                 trailingContent = {
                     if (backgroundImageUri != null) {
                         IconButton(onClick = {
-                            prefs.edit().remove("background_image_uri").apply()
+                            prefs.edit().remove("background_image_uri").commit()
                             backgroundImageUri = null
                         }) {
                             Icon(Icons.Filled.Delete, stringResource(R.string.background_image_remove))
@@ -435,7 +435,7 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                                     value = backgroundTransparency,
                                     onValueChange = { value ->
                                         backgroundTransparency = value
-                                        prefs.edit().putFloat("background_transparency", value).apply()
+                                        prefs.edit().putFloat("background_transparency", value).commit()
                                     },
                                     valueRange = 0.0f..1.0f,
                                     modifier = Modifier.weight(1f)
@@ -488,7 +488,7 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                                     value = uiTransparency,
                                     onValueChange = { value ->
                                         uiTransparency = value
-                                        prefs.edit().putFloat("ui_transparency", value).apply()
+                                        prefs.edit().putFloat("ui_transparency", value).commit()
                                     },
                                     valueRange = 0.0f..1.0f,
                                     modifier = Modifier.weight(1f)

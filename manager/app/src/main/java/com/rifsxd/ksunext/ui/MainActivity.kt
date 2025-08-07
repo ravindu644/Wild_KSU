@@ -47,6 +47,7 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -158,7 +159,7 @@ class MainActivity : ComponentActivity() {
             var uiTransparency by remember { mutableStateOf(prefs.getFloat("ui_transparency", 0.0f)) } // Default 0% UI transparency
             
             // Listen for preference changes
-            LaunchedEffect(Unit) {
+            DisposableEffect(Unit) {
                 val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
                     when (key) {
                         "enable_amoled" -> {
@@ -176,6 +177,10 @@ class MainActivity : ComponentActivity() {
                     }
                 }
                 prefs.registerOnSharedPreferenceChangeListener(listener)
+                
+                onDispose {
+                    prefs.unregisterOnSharedPreferenceChangeListener(listener)
+                }
             }
 
             val moduleViewModel: ModuleViewModel = viewModel()
