@@ -29,8 +29,9 @@ class ModuleViewModel : ViewModel() {
 
     companion object {
         private const val TAG = "ModuleViewModel"
-        private var modules by mutableStateOf<List<ModuleInfo>>(emptyList())
     }
+
+    private var modules by mutableStateOf<List<ModuleInfo>>(emptyList())
 
     class ModuleInfo(
         val id: String,
