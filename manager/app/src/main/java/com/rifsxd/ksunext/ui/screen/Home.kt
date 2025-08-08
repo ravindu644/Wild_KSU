@@ -18,7 +18,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
+
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.*
@@ -60,7 +60,7 @@ import com.rifsxd.ksunext.ui.util.*
 import com.rifsxd.ksunext.ui.util.module.LatestVersionInfo
 import com.rifsxd.ksunext.ui.theme.getCardElevation
 import com.rifsxd.ksunext.ui.util.applyUIBlur
-import com.rifsxd.ksunext.ui.util.BackdropBlurCard
+
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -144,9 +144,11 @@ fun HomeScreen(navigator: DestinationsNavigator) {
 @Composable
 private fun SuperuserCard() {
     val count = getSuperuserCount()
-    BackdropBlurCard(
-        backgroundColor = MaterialTheme.colorScheme.secondaryContainer,
-        shape = RoundedCornerShape(12.dp)
+    ElevatedCard(
+        modifier = Modifier.applyUIBlur(),
+        colors = CardDefaults.elevatedCardColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer
+        )
     ) {
         Box(
             modifier = Modifier
@@ -179,9 +181,11 @@ private fun SuperuserCard() {
 @Composable
 private fun ModuleCard() {
     val count = getModuleCount()
-    BackdropBlurCard(
-        backgroundColor = MaterialTheme.colorScheme.secondaryContainer,
-        shape = RoundedCornerShape(12.dp)
+    ElevatedCard(
+        modifier = Modifier.applyUIBlur(),
+        colors = CardDefaults.elevatedCardColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer
+        )
     ) {
         Box(
             modifier = Modifier
