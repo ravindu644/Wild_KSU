@@ -248,4 +248,8 @@
     <string name="crop_background_image">Custom crop</string>
     <string name="background_transparency">Background darkness</string>
     <string name="background_transparency_summary">Adjust the darkness overlay on the background image</string>
+    <string name="icon_theme">Icon theme</string>
+    <string name="icon_theme_summary">Choose an icon pack for superuser app icons</string>
+    <string name="icon_theme_default">System default</string>
+    <string name="icon_theme_none_found">No icon packs found</string>
 </resources>

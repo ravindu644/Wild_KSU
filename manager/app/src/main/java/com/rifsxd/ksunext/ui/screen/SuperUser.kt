@@ -34,6 +34,7 @@ import com.rifsxd.ksunext.Natives
 import com.rifsxd.ksunext.R
 import com.rifsxd.ksunext.ui.viewmodel.SuperUserViewModel
 import com.rifsxd.ksunext.ui.LocalSuperUserViewModel
+import com.rifsxd.ksunext.ui.component.ThemedIcon
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Destination<RootGraph>
@@ -130,11 +131,9 @@ private fun AppItem(
             }
         },
         leadingContent = {
-            AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(app.packageInfo)
-                    .crossfade(true)
-                    .build(),
+            ThemedIcon(
+                packageName = app.packageName,
+                packageInfo = app.packageInfo,
                 contentDescription = app.label,
                 modifier = Modifier
                     .padding(4.dp)

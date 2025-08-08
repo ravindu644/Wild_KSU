@@ -64,6 +64,7 @@ import kotlinx.coroutines.launch
 import com.rifsxd.ksunext.Natives
 import com.rifsxd.ksunext.R
 import com.rifsxd.ksunext.ui.component.SwitchItem
+import com.rifsxd.ksunext.ui.component.ThemedIcon
 import com.rifsxd.ksunext.ui.component.profile.AppProfileConfig
 import com.rifsxd.ksunext.ui.component.profile.RootProfileConfig
 import com.rifsxd.ksunext.ui.component.profile.TemplateConfig
@@ -112,8 +113,9 @@ fun AppProfileScreen(
         packageName = appInfo.packageName,
         appLabel = appInfo.label,
         appIcon = {
-            AsyncImage(
-                model = ImageRequest.Builder(context).data(appInfo.packageInfo).crossfade(true).build(),
+            ThemedIcon(
+                packageName = appInfo.packageName,
+                packageInfo = appInfo.packageInfo,
                 contentDescription = appInfo.label,
                 modifier = Modifier
                     .padding(4.dp)
