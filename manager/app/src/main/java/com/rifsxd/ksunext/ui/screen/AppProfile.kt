@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Android
 import androidx.compose.material.icons.filled.AdminPanelSettings
@@ -31,12 +30,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -48,7 +42,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.nestedscroll.nestedScroll
+
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -57,7 +51,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.dropUnlessResumed
+
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -96,7 +90,6 @@ fun AppProfileScreen(
 ) {
     val context = LocalContext.current
     val snackBarHost = LocalSnackbarHost.current
-    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val scope = rememberCoroutineScope()
     val viewModel = LocalSuperUserViewModel.current
     val failToUpdateAppProfile = stringResource(R.string.failed_to_update_app_profile).format(appInfo.label)
@@ -112,59 +105,53 @@ fun AppProfileScreen(
         mutableStateOf(initialProfile)
     }
 
-    Scaffold(
-        snackbarHost = { SnackbarHost(hostState = snackBarHost) },
-        contentWindowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal)
-    ) { paddingValues ->
-        AppProfileInner(
-            modifier = Modifier
-                .padding(paddingValues)
-                .nestedScroll(scrollBehavior.nestedScrollConnection)
-                .verticalScroll(rememberScrollState()),
-            packageName = appInfo.packageName,
-            appLabel = appInfo.label,
-            appIcon = {
-                AsyncImage(
-                    model = ImageRequest.Builder(context).data(appInfo.packageInfo).crossfade(true).build(),
-                    contentDescription = appInfo.label,
-                    modifier = Modifier
-                        .padding(4.dp)
-                        .width(48.dp)
-                        .height(48.dp)
-                )
-            },
-            profile = profile,
-            onViewTemplate = {
-                getTemplateInfoById(it)?.let { info ->
-                    navigator.navigate(TemplateEditorScreenDestination(info))
-                }
-            },
-            onManageTemplate = {
-                navigator.navigate(AppProfileTemplateScreenDestination())
-            },
-            onProfileChange = {
-                scope.launch {
-                    if (it.allowSu) {
-                        // sync with allowlist.c - forbid_system_uid
-                        if (appInfo.uid < 2000 && appInfo.uid != 1000) {
-                            snackBarHost.showSnackbar(suNotAllowed)
-                            return@launch
-                        }
-                        if (!it.rootUseDefault && it.rules.isNotEmpty() && !setSepolicy(profile.name, it.rules)) {
-                            snackBarHost.showSnackbar(failToUpdateSepolicy)
-                            return@launch
-                        }
+    AppProfileInner(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState()),
+        packageName = appInfo.packageName,
+        appLabel = appInfo.label,
+        appIcon = {
+            AsyncImage(
+                model = ImageRequest.Builder(context).data(appInfo.packageInfo).crossfade(true).build(),
+                contentDescription = appInfo.label,
+                modifier = Modifier
+                    .padding(4.dp)
+                    .width(48.dp)
+                    .height(48.dp)
+            )
+        },
+        profile = profile,
+        onViewTemplate = {
+            getTemplateInfoById(it)?.let { info ->
+                navigator.navigate(TemplateEditorScreenDestination(info))
+            }
+        },
+        onManageTemplate = {
+            navigator.navigate(AppProfileTemplateScreenDestination())
+        },
+        onProfileChange = {
+            scope.launch {
+                if (it.allowSu) {
+                    // sync with allowlist.c - forbid_system_uid
+                    if (appInfo.uid < 2000 && appInfo.uid != 1000) {
+                        snackBarHost.showSnackbar(suNotAllowed)
+                        return@launch
                     }
-                    if (!Natives.setAppProfile(it)) {
-                        snackBarHost.showSnackbar(failToUpdateAppProfile.format(appInfo.uid))
-                    } else {
-                        profile = it
-                        viewModel.updateAppProfile(packageName, it)
+                    if (!it.rootUseDefault && it.rules.isNotEmpty() && !setSepolicy(profile.name, it.rules)) {
+                        snackBarHost.showSnackbar(failToUpdateSepolicy)
+                        return@launch
                     }
                 }
-            },
-        )
-    }
+                if (!Natives.setAppProfile(it)) {
+                    snackBarHost.showSnackbar(failToUpdateAppProfile.format(appInfo.uid))
+                } else {
+                    profile = it
+                    viewModel.updateAppProfile(packageName, it)
+                }
+            }
+        },
+    )
 }
 
 @Composable
@@ -201,9 +188,7 @@ private fun AppProfileInner(
         )
 
         Crossfade(targetState = isRootGranted, label = "") { current ->
-            Column(
-                modifier = Modifier.padding(bottom = 6.dp + 48.dp + 6.dp /* SnackBar height */)
-            ) {
+            Column {
                 if (current) {
                     val initialMode = if (profile.rootUseDefault) {
                         Mode.Default
@@ -263,30 +248,6 @@ private enum class Mode(@StringRes private val res: Int) {
 
     val text: String
         @Composable get() = stringResource(res)
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun TopBar(
-    onBack: () -> Unit,
-    scrollBehavior: TopAppBarScrollBehavior? = null
-) {
-    TopAppBar(
-        title = {
-            Text(
-                text = stringResource(R.string.profile),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Black,
-            )
-        },
-        navigationIcon = {
-            IconButton(
-                onClick = onBack
-            ) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null) }
-        },
-        windowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
-        scrollBehavior = scrollBehavior
-    )
 }
 
 @Composable
