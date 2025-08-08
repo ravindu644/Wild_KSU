@@ -163,7 +163,6 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                         .clickable {
                             navigator.navigate(AppProfileTemplateScreenDestination)
                         }
-                        .applyUIBlur()
                 )
             }
 

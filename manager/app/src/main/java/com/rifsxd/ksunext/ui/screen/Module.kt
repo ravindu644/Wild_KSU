@@ -595,7 +595,6 @@ fun ModuleItem(
             .clickable(
                 onClick = onExpandToggle
             )
-            .applyUIBlur()
     ) {
         Box(
             modifier = Modifier

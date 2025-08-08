@@ -266,7 +266,6 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                     .clickable {
                         languageDialog.show()
                     }
-                    .applyUIBlur()
             )
 
             var useBanner by rememberSaveable {
@@ -338,7 +337,6 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                     .clickable {
                         themeDialog.show()
                     }
-                    .applyUIBlur()
             )
 
             // Background Image Setting
@@ -449,7 +447,6 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                         }
                         selectImageLauncher.launch(intent)
                     }
-                    .applyUIBlur()
             )
 
             // Background Transparency Slider (Darkness) - Always available
@@ -502,8 +499,7 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                             modifier = Modifier.align(Alignment.CenterHorizontally)
                         )
                     }
-                },
-                modifier = Modifier.applyUIBlur()
+                }
             )
 
             // Background Blur Slider
@@ -556,8 +552,7 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                             modifier = Modifier.align(Alignment.CenterHorizontally)
                         )
                     }
-                },
-                modifier = Modifier.applyUIBlur()
+                }
             )
 
             // UI Section Header
@@ -621,8 +616,7 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                             modifier = Modifier.align(Alignment.CenterHorizontally)
                         )
                     }
-                },
-                modifier = Modifier.applyUIBlur()
+                }
             )
 
             // UI Blur Slider
@@ -675,8 +669,7 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                             modifier = Modifier.align(Alignment.CenterHorizontally)
                         )
                     }
-                },
-                modifier = Modifier.applyUIBlur()
+                }
             )
         }
     }
