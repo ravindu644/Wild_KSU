@@ -7,13 +7,18 @@ import androidx.compose.ui.unit.dp
 import com.rifsxd.ksunext.ui.theme.LocalUIBlur
 
 /**
- * Applies UI blur effect to a composable if blur is enabled
+ * Applies UI blur effect that works harmoniously with UI transparency.
+ * The blur is applied more subtly to complement the transparency effect
+ * rather than overwhelming it. This creates a glass-like effect when
+ * combined with UI transparency.
  */
 @Composable
 fun Modifier.applyUIBlur(): Modifier {
     val uiBlur = LocalUIBlur.current
     return if (uiBlur > 0f) {
-        this.blur(uiBlur.dp)
+        // Apply blur with reduced intensity for better integration with transparency
+        // The blur radius is scaled down to create a more subtle effect
+        this.blur(radius = (uiBlur * 0.3f).dp)
     } else {
         this
     }
