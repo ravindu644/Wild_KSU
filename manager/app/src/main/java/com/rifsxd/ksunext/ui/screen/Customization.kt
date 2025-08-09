@@ -21,6 +21,8 @@ import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -43,6 +45,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Switch
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.runtime.Composable
 
 import androidx.compose.runtime.getValue
@@ -606,56 +610,179 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                 }
             )
 
-            // DPI Scale Slider
-            var dpiScale by rememberSaveable {
-                mutableFloatStateOf(
-                    prefs.getFloat("dpi_scale", 1.0f)
+            // DPI Scale Settings
+            val systemDpi = remember { context.resources.displayMetrics.densityDpi }
+            var currentDpi by rememberSaveable { 
+                mutableIntStateOf(
+                    prefs.getInt("app_dpi", systemDpi)
+                )
+            }
+            var tempDpi by remember { mutableIntStateOf(currentDpi) }
+            var showDpiConfirmDialog by remember { mutableStateOf(false) }
+            
+            // DPI confirmation dialog
+            if (showDpiConfirmDialog) {
+                AlertDialog(
+                    onDismissRequest = { 
+                        showDpiConfirmDialog = false
+                        tempDpi = currentDpi // Reset temp value
+                    },
+                    title = { Text(stringResource(R.string.dpi_confirm_title)) },
+                    text = { 
+                        Column {
+                            Text(stringResource(R.string.dpi_confirm_message))
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = stringResource(R.string.dpi_confirm_summary, tempDpi, currentDpi),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    },
+                    confirmButton = {
+                        TextButton(
+                            onClick = {
+                                // Apply DPI setting
+                                prefs.edit().putInt("app_dpi", tempDpi).apply()
+                                
+                                // Calculate scale factor for MainActivity
+                                val scale = tempDpi.toFloat() / systemDpi.toFloat()
+                                prefs.edit().putFloat("dpi_scale", scale).apply()
+                                
+                                currentDpi = tempDpi
+                                showDpiConfirmDialog = false
+                                
+                                // Restart activity to apply changes
+                                (context as? Activity)?.recreate()
+                            }
+                        ) {
+                            Text(stringResource(R.string.confirm))
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(
+                            onClick = { 
+                                showDpiConfirmDialog = false
+                                tempDpi = currentDpi // Reset temp value
+                            }
+                        ) {
+                            Text(stringResource(R.string.cancel))
+                        }
+                    }
                 )
             }
             
             ListItem(
-                leadingContent = { Icon(Icons.Filled.ZoomIn, "DPI Scale") },
+                leadingContent = { Icon(Icons.Filled.ZoomIn, stringResource(R.string.app_dpi_title)) },
                 headlineContent = { Text(
-                    text = "DPI Scale",
+                    text = stringResource(R.string.app_dpi_title),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
                 ) },
                 supportingContent = { 
                     Column {
-                        Text("Adjust the display density (DPI) scale")
+                        Text(stringResource(R.string.app_dpi_summary))
                         Spacer(modifier = Modifier.height(8.dp))
+                        
+                        // Current and System DPI info
+                        Text(
+                            text = stringResource(R.string.dpi_current, currentDpi),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Text(
+                            text = stringResource(R.string.dpi_system, systemDpi),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        
+                        Spacer(modifier = Modifier.height(12.dp))
+                        
+                        // DPI Slider
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Text(
-                                text = "0.5x",
+                                text = "160",
                                 style = MaterialTheme.typography.bodySmall,
                                 modifier = Modifier.width(32.dp)
                             )
                             Slider(
-                                value = dpiScale,
+                                value = tempDpi.toFloat(),
                                 onValueChange = { value ->
-                                    dpiScale = value
-                                    prefs.edit().putFloat("dpi_scale", value).commit()
+                                    tempDpi = value.toInt()
                                 },
-                                valueRange = 0.5f..2.0f,
+                                valueRange = 160f..600f,
                                 modifier = Modifier.weight(1f),
                                 colors = SliderDefaults.colors()
                             )
                             Text(
-                                text = "2.0x",
+                                text = "600",
                                 style = MaterialTheme.typography.bodySmall,
                                 modifier = Modifier.width(32.dp),
                                 textAlign = TextAlign.End
                             )
                         }
+                        
                         Text(
-                            text = "${String.format("%.1f", dpiScale)}x",
+                            text = "$tempDpi DPI",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.align(Alignment.CenterHorizontally)
                         )
+                        
+                        Spacer(modifier = Modifier.height(12.dp))
+                        
+                        // Preset DPI buttons
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            val presets = listOf(
+                                240 to stringResource(R.string.dpi_preset_small),
+                                320 to stringResource(R.string.dpi_preset_normal),
+                                400 to stringResource(R.string.dpi_preset_large),
+                                480 to stringResource(R.string.dpi_preset_xlarge)
+                            )
+                            
+                            presets.forEach { (dpi, label) ->
+                                Button(
+                                    onClick = { tempDpi = dpi },
+                                    modifier = Modifier.weight(1f),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = if (tempDpi == dpi) 
+                                            MaterialTheme.colorScheme.primary 
+                                        else 
+                                            MaterialTheme.colorScheme.surfaceVariant,
+                                        contentColor = if (tempDpi == dpi) 
+                                            MaterialTheme.colorScheme.onPrimary 
+                                        else 
+                                            MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                ) {
+                                    Text(
+                                        text = label,
+                                        style = MaterialTheme.typography.labelSmall
+                                    )
+                                }
+                            }
+                        }
+                        
+                        Spacer(modifier = Modifier.height(12.dp))
+                        
+                        // Apply Settings button
+                        if (tempDpi != currentDpi) {
+                            Button(
+                                onClick = { showDpiConfirmDialog = true },
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.primary
+                                )
+                            ) {
+                                Text(stringResource(R.string.dpi_apply_settings))
+                            }
+                        }
                     }
                 }
             )

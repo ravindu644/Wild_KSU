@@ -178,14 +178,14 @@ class MainActivity : ComponentActivity() {
     
     private fun applyDpiScale(context: Context): Context {
         val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
-        val dpiScale = prefs.getFloat("dpi_scale", 1.0f)
+        val dpiValue = prefs.getInt("app_dpi", 0)
         
-        if (dpiScale == 1.0f) {
+        if (dpiValue == 0) {
             return context
         }
         
         val configuration = context.resources.configuration
-        configuration.densityDpi = (configuration.densityDpi * dpiScale).toInt()
+        configuration.densityDpi = dpiValue
         
         return context.createConfigurationContext(configuration)
     }
@@ -241,8 +241,8 @@ class MainActivity : ComponentActivity() {
 
             var backgroundBlur by remember { mutableStateOf(prefs.getFloat("background_blur", 0.0f)) } // Default 0px blur
             
-            // DPI scale setting
-            var dpiScale by remember { mutableStateOf(prefs.getFloat("dpi_scale", 1.0f)) }
+            // DPI setting
+            var appDpi by remember { mutableStateOf(prefs.getInt("app_dpi", 0)) }
             
             // Icon settings
             var selectedIconType by remember { 
@@ -280,8 +280,8 @@ class MainActivity : ComponentActivity() {
                         "background_blur" -> {
                             backgroundBlur = prefs.getFloat("background_blur", 0.0f)
                         }
-                        "dpi_scale" -> {
-                            dpiScale = prefs.getFloat("dpi_scale", 1.0f)
+                        "app_dpi" -> {
+                            appDpi = prefs.getInt("app_dpi", 0)
                             // Restart activity to apply DPI changes
                             recreate()
                         }
