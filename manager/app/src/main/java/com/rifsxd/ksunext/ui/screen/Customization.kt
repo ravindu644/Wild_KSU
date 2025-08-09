@@ -1198,6 +1198,63 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                                 style = MaterialTheme.typography.bodyMedium,
                                 modifier = Modifier.weight(1f)
                             )
+                            
+                            // Move up button
+                            IconButton(
+                                onClick = {
+                                    if (index > 0) {
+                                        val newOrder = itemOrder.toMutableList()
+                                        val temp = newOrder[index]
+                                        newOrder[index] = newOrder[index - 1]
+                                        newOrder[index - 1] = temp
+                                        itemOrder = newOrder
+                                    }
+                                },
+                                enabled = index > 0
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.KeyboardArrowUp,
+                                    contentDescription = "Move up",
+                                    tint = if (index > 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                            
+                            // Move down button
+                            IconButton(
+                                onClick = {
+                                    if (index < itemOrder.size - 1) {
+                                        val newOrder = itemOrder.toMutableList()
+                                        val temp = newOrder[index]
+                                        newOrder[index] = newOrder[index + 1]
+                                        newOrder[index + 1] = temp
+                                        itemOrder = newOrder
+                                    }
+                                },
+                                enabled = index < itemOrder.size - 1
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.KeyboardArrowDown,
+                                    contentDescription = "Move down",
+                                    tint = if (index < itemOrder.size - 1) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                            
+                            // Move to bottom button (hold functionality)
+                            IconButton(
+                                onClick = {
+                                    val newOrder = itemOrder.toMutableList()
+                                    val item = newOrder.removeAt(index)
+                                    newOrder.add(item)
+                                    itemOrder = newOrder
+                                },
+                                enabled = index < itemOrder.size - 1
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.VerticalAlignBottom,
+                                    contentDescription = "Move to bottom",
+                                    tint = if (index < itemOrder.size - 1) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
                         }
                     }
                 }
@@ -1289,19 +1346,6 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                     )
 
                     Spacer(modifier = Modifier.height(8.dp))
-
-                    // Display items in order with switches
-                    itemOrder.forEach { itemKey ->
-                        val item = infoCardItems.find { it.key == itemKey }
-                        if (item != null) {
-                            SwitchItem(
-                                title = stringResource(item.titleRes),
-                                summary = null,
-                                checked = item.enabled,
-                                onCheckedChange = item.onToggle
-                            )
-                        }
-                    }
                 }
             }
 
