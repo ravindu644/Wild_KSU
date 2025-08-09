@@ -1160,7 +1160,7 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                                     if (item != null) {
                                         val itemIcon = when (item.key) {
                                             "manager_version" -> Icons.Filled.Apps
-                                            "hook_mode" -> Icons.Filled.Hook
+                                            "hook_mode" -> Icons.Filled.Phishing
                                             "mount_system" -> Icons.Filled.Storage
                                             "susfs_status" -> Icons.Filled.Security
                                             "zygisk_status" -> Icons.Filled.Android
