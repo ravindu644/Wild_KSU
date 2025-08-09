@@ -20,6 +20,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.displayCutout
@@ -31,6 +32,7 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -816,17 +818,78 @@ private fun RegularTopBar(
                     )
                 }
                 
-                // Restart icon
-                IconButton(
-                    onClick = {
-                        // Trigger system reboot
-                        reboot()
+                // Restart icon with dropdown menu
+                var showRestartMenu by remember { mutableStateOf(false) }
+                Box {
+                    IconButton(
+                        onClick = {
+                            showRestartMenu = true
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.RestartAlt,
+                            contentDescription = "Restart"
+                        )
                     }
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.RestartAlt,
-                        contentDescription = "Restart"
-                    )
+                    
+                    DropdownMenu(
+                        expanded = showRestartMenu,
+                        onDismissRequest = { showRestartMenu = false }
+                    ) {
+                        // Normal reboot
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.reboot)) },
+                            onClick = {
+                                showRestartMenu = false
+                                reboot()
+                            }
+                        )
+                        
+                        // Soft reboot (userspace)
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.reboot_userspace)) },
+                            onClick = {
+                                showRestartMenu = false
+                                reboot("userspace")
+                            }
+                        )
+                        
+                        // Recovery
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.reboot_recovery)) },
+                            onClick = {
+                                showRestartMenu = false
+                                reboot("recovery")
+                            }
+                        )
+                        
+                        // Bootloader
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.reboot_bootloader)) },
+                            onClick = {
+                                showRestartMenu = false
+                                reboot("bootloader")
+                            }
+                        )
+                        
+                        // Download mode
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.reboot_download)) },
+                            onClick = {
+                                showRestartMenu = false
+                                reboot("download")
+                            }
+                        )
+                        
+                        // EDL mode
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.reboot_edl)) },
+                            onClick = {
+                                showRestartMenu = false
+                                reboot("edl")
+                            }
+                        )
+                    }
                 }
             }
         },
