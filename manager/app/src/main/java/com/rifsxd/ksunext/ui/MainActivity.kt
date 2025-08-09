@@ -55,11 +55,8 @@ import androidx.compose.material.icons.filled.Spa
 import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material.icons.filled.Forest
 import androidx.compose.material.icons.filled.Whatshot
-import androidx.compose.material.icons.filled.LocalFlorist
 import androidx.compose.material.icons.filled.Archive
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.graphics.vector.path
-import androidx.compose.ui.unit.dp
+import androidx.compose.material.icons.filled.Cannabis
 import androidx.compose.material.icons.filled.Adjust
 import androidx.compose.material.icons.filled.Eco
 import androidx.compose.material.icons.filled.Circle
@@ -137,111 +134,6 @@ val LocalModuleViewModel = compositionLocalOf<ModuleViewModel> { error("ModuleVi
 val LocalSuperUserViewModel = compositionLocalOf<SuperUserViewModel> { error("SuperUserViewModel not provided") }
 val LocalFlashViewModel = compositionLocalOf<FlashViewModel> { error("FlashViewModel not provided") }
 
-// Custom Cannabis Icon
-val CannabisIcon: ImageVector
-    get() {
-        if (_cannabisIcon != null) {
-            return _cannabisIcon!!
-        }
-        _cannabisIcon = ImageVector.Builder(
-            name = "Cannabis",
-            defaultWidth = 24.dp,
-            defaultHeight = 24.dp,
-            viewportWidth = 960f,
-            viewportHeight = 960f
-        ).apply {
-            path(
-                fill = androidx.compose.ui.graphics.SolidColor(androidx.compose.ui.graphics.Color.Black)
-            ) {
-                moveTo(440f, -80f)
-                verticalLineToRelative(-167f)
-                quadToRelative(-42f, 27f, -86.5f, 47f)
-                reflectiveQuadTo(260f, -180f)
-                quadToRelative(-63f, 0f, -118.5f, -28.5f)
-                reflectiveQuadTo(40f, -280f)
-                quadToRelative(37f, -34f, 79.5f, -59.5f)
-                reflectiveQuadTo(211f, -375f)
-                quadToRelative(-68f, -55f, -100f, -136f)
-                reflectiveQuadTo(79f, -680f)
-                quadToRelative(72f, 1f, 139f, 23f)
-                reflectiveQuadToRelative(122f, 65f)
-                verticalLineToRelative(-8f)
-                quadToRelative(0f, -91f, 40.5f, -171f)
-                reflectiveQuadTo(480f, -920f)
-                quadToRelative(58f, 69f, 99f, 149f)
-                reflectiveQuadToRelative(41f, 171f)
-                quadToRelative(0f, 2f, -0.5f, 4f)
-                reflectiveQuadToRelative(-0.5f, 4f)
-                quadToRelative(56f, -43f, 123f, -64.5f)
-                reflectiveQuadTo(881f, -680f)
-                quadToRelative(0f, 88f, -32.5f, 169f)
-                reflectiveQuadTo(748f, -375f)
-                quadToRelative(49f, 10f, 91.5f, 35.5f)
-                reflectiveQuadTo(919f, -280f)
-                quadToRelative(-46f, 43f, -101f, 71.5f)
-                reflectiveQuadTo(700f, -180f)
-                quadToRelative(-50f, 0f, -94.5f, -20f)
-                reflectiveQuadTo(520f, -247f)
-                verticalLineToRelative(167f)
-                horizontalLineToRelative(-80f)
-                close()
-                moveTo(384f, -376f)
-                quadToRelative(-11f, -38f, -28.5f, -72.5f)
-                reflectiveQuadTo(310f, -510f)
-                quadToRelative(-28f, -28f, -62.5f, -45.5f)
-                reflectiveQuadTo(175f, -584f)
-                quadToRelative(11f, 38f, 28.5f, 72.5f)
-                reflectiveQuadTo(249f, -449f)
-                quadToRelative(27f, 28f, 62f, 45.5f)
-                reflectiveQuadToRelative(73f, 27.5f)
-                close()
-                moveTo(260f, -260f)
-                quadToRelative(21f, 0f, 41f, -5.5f)
-                reflectiveQuadToRelative(39f, -14.5f)
-                quadToRelative(-19f, -8f, -39f, -14f)
-                reflectiveQuadToRelative(-41f, -6f)
-                quadToRelative(-21f, 0f, -41f, 6f)
-                reflectiveQuadToRelative(-40f, 14f)
-                quadToRelative(19f, 9f, 39.5f, 14.5f)
-                reflectiveQuadTo(260f, -260f)
-                close()
-                moveTo(480f, -412f)
-                quadToRelative(26f, -44f, 43f, -90.5f)
-                reflectiveQuadToRelative(17f, -97.5f)
-                quadToRelative(0f, -51f, -17f, -97.5f)
-                reflectiveQuadTo(480f, -787f)
-                quadToRelative(-26f, 43f, -43f, 89.5f)
-                reflectiveQuadTo(420f, -600f)
-                quadToRelative(0f, 51f, 17f, 98f)
-                reflectiveQuadToRelative(43f, 90f)
-                close()
-                moveTo(576f, -376f)
-                quadToRelative(38f, -10f, 72.5f, -27.5f)
-                reflectiveQuadTo(710f, -449f)
-                quadToRelative(28f, -28f, 45.5f, -62.5f)
-                reflectiveQuadTo(784f, -584f)
-                quadToRelative(-38f, 11f, -72.5f, 28.5f)
-                reflectiveQuadTo(649f, -510f)
-                quadToRelative(-28f, 27f, -45.5f, 61.5f)
-                reflectiveQuadTo(576f, -376f)
-                close()
-                moveTo(700f, -260f)
-                quadToRelative(21f, 0f, 41f, -5.5f)
-                reflectiveQuadToRelative(39f, -14.5f)
-                quadToRelative(-19f, -8f, -39f, -14f)
-                reflectiveQuadToRelative(-41f, -6f)
-                quadToRelative(-21f, 0f, -41f, 6f)
-                reflectiveQuadToRelative(-40f, 14f)
-                quadToRelative(19f, 9f, 39.5f, 14.5f)
-                reflectiveQuadTo(700f, -260f)
-                close()
-            }
-        }.build()
-        return _cannabisIcon!!
-    }
-
-private var _cannabisIcon: ImageVector? = null
-
 // Icon type enum
 enum class IconType(val displayName: String, val icon: ImageVector) {
     SEASONAL("Seasonal", Icons.Filled.Whatshot), // Placeholder, actual icon determined by season
@@ -249,7 +141,7 @@ enum class IconType(val displayName: String, val icon: ImageVector) {
     SPRING("Spring", Icons.Filled.Spa),
     SUMMER("Summer", Icons.Filled.WbSunny),
     FALL("Fall", Icons.Filled.Forest),
-    CANNABIS("Cannabis", CannabisIcon), // Using Grass as cannabis symbol
+    CANNABIS("Cannabis", Icons.Filled.Cannabis), // Using official Cannabis icon
     YIN_YANG("Yin Yang", Icons.Filled.Adjust), // Using Adjust as yin-yang alternative
     ECO("Eco", Icons.Filled.Eco),
     CIRCLE("Circle", Icons.Filled.Circle)
