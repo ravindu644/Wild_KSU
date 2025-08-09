@@ -56,7 +56,6 @@ import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material.icons.filled.Forest
 import androidx.compose.material.icons.filled.Whatshot
 import androidx.compose.material.icons.filled.Archive
-import androidx.compose.material.icons.filled.Cannabis
 import androidx.compose.material.icons.filled.Adjust
 import androidx.compose.material.icons.filled.Eco
 import androidx.compose.material.icons.filled.Circle
@@ -141,7 +140,6 @@ enum class IconType(val displayName: String, val icon: ImageVector) {
     SPRING("Spring", Icons.Filled.Spa),
     SUMMER("Summer", Icons.Filled.WbSunny),
     FALL("Fall", Icons.Filled.Forest),
-    CANNABIS("Cannabis", Icons.Filled.Cannabis), // Using official Cannabis icon
     YIN_YANG("Yin Yang", Icons.Filled.Adjust), // Using Adjust as yin-yang alternative
     ECO("Eco", Icons.Filled.Eco),
     CIRCLE("Circle", Icons.Filled.Circle)
