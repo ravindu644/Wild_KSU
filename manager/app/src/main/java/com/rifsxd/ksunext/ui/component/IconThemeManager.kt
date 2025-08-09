@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
 import com.rifsxd.ksunext.R
@@ -57,25 +58,13 @@ fun IconThemeManagerDialog(
             availableIconPacks = iconPacks
             
             // Load current theme priorities from preferences
-            val currentThemes = prefs.getString("icon_theme_priorities", "default") ?: "default"
-            val enabledThemes = prefs.getStringSet("enabled_icon_themes", setOf("default")) ?: setOf("default")
+            val currentThemes = prefs.getString("icon_theme_priorities", "") ?: ""
+            val enabledThemes = prefs.getStringSet("enabled_icon_themes", setOf()) ?: setOf()
             
-            val themeList = currentThemes.split(",").filter { it.isNotEmpty() }
+            val themeList = currentThemes.split(",").filter { it.isNotEmpty() && it != "default" }
             val items = mutableListOf<IconThemeItem>()
             
-            // Add default theme first
-            items.add(
-                IconThemeItem(
-                    id = "default",
-                    name = context.getString(R.string.icon_theme_default),
-                    packageName = null,
-                    icon = null,
-                    isEnabled = enabledThemes.contains("default"),
-                    priority = themeList.indexOf("default").takeIf { it >= 0 } ?: 0
-                )
-            )
-            
-            // Add icon packs
+            // Add only icon packs (no default option)
             iconPacks.forEachIndexed { index, iconPack ->
                 val iconBitmap = iconPack.icon?.toBitmap()
                 val iconPainter = iconBitmap?.let { BitmapPainter(it.asImageBitmap()) }
@@ -87,7 +76,7 @@ fun IconThemeManagerDialog(
                         packageName = iconPack.packageName,
                         icon = iconPainter,
                         isEnabled = enabledThemes.contains(iconPack.packageName),
-                        priority = themeList.indexOf(iconPack.packageName).takeIf { it >= 0 } ?: (index + 1)
+                        priority = themeList.indexOf(iconPack.packageName).takeIf { it >= 0 } ?: index
                     )
                 )
             }
@@ -221,8 +210,9 @@ private fun IconThemeItemCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             // Icon
             Box(
@@ -247,22 +237,27 @@ private fun IconThemeItemCard(
                 }
             }
             
-            Spacer(modifier = Modifier.width(12.dp))
-            
             // Name and package
             Column(
-                modifier = Modifier.weight(1f)
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(end = 8.dp),
+                verticalArrangement = Arrangement.Center
             ) {
                 Text(
                     text = item.name,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Medium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
                 if (item.packageName != null) {
                     Text(
                         text = item.packageName,
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
             }
