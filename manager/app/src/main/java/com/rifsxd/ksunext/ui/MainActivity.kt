@@ -56,7 +56,7 @@ import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material.icons.filled.Forest
 import androidx.compose.material.icons.filled.Whatshot
 import androidx.compose.material.icons.filled.LocalFlorist
-import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.Archive
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
@@ -922,7 +922,7 @@ private fun RegularTopBar(
                     }
                 ) {
                     Icon(
-                        imageVector = Icons.Filled.Download,
+                        imageVector = Icons.Filled.Archive,
                         contentDescription = "Bake LKM"
                     )
                 }
