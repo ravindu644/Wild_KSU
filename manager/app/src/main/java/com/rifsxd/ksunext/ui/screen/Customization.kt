@@ -576,33 +576,11 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                 ListItem(
                 leadingContent = { Icon(Icons.Filled.BlurCircular, "Background Blur") },
                 headlineContent = { 
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Background Blur",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold,
-                        )
-                        // Reset button
-                        TextButton(
-                            onClick = { 
-                                backgroundBlur = 0.0f
-                                prefs.edit().putFloat("background_blur", 0.0f).commit()
-                            },
-                            colors = ButtonDefaults.textButtonColors(
-                                contentColor = MaterialTheme.colorScheme.primary
-                            )
-                        ) {
-                            Text(
-                                "Reset", 
-                                style = MaterialTheme.typography.labelLarge,
-                                fontSize = 14.sp
-                            )
-                        }
-                    }
+                    Text(
+                        text = "Background Blur",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                    )
                 },
                 supportingContent = { 
                     Column {
@@ -698,33 +676,11 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
             ListItem(
                 leadingContent = { Icon(Icons.Filled.Tune, "UI Transparency") },
                 headlineContent = { 
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "UI Transparency",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold,
-                        )
-                        // Reset button
-                        TextButton(
-                            onClick = { 
-                                uiTransparency = 0.0f
-                                prefs.edit().putFloat("ui_transparency", 0.0f).commit()
-                            },
-                            colors = ButtonDefaults.textButtonColors(
-                                contentColor = MaterialTheme.colorScheme.primary
-                            )
-                        ) {
-                            Text(
-                                "Reset", 
-                                style = MaterialTheme.typography.labelLarge,
-                                fontSize = 14.sp
-                            )
-                        }
-                    }
+                    Text(
+                        text = "UI Transparency",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                    )
                 },
                 supportingContent = { 
                     Column {
