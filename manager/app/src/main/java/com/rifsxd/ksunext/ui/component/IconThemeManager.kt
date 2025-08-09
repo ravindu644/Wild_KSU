@@ -30,7 +30,7 @@ import com.rifsxd.ksunext.R
 import com.rifsxd.ksunext.ksuApp
 import com.rifsxd.ksunext.ui.util.IconPack
 import com.rifsxd.ksunext.ui.util.IconPackHelper
-import com.rifsxd.ksunext.ui.theme.uiBlur
+
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -235,8 +235,7 @@ private fun IconThemeItemCard(
 ) {
     Card(
         modifier = Modifier
-            .fillMaxWidth()
-            .uiBlur(),
+            .fillMaxWidth(),
         colors = CardDefaults.cardColors(
             containerColor = if (item.isEnabled) 
                 MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f) 

@@ -26,7 +26,7 @@ import androidx.compose.ui.window.DialogProperties
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.rifsxd.ksunext.R
-import com.rifsxd.ksunext.ui.theme.uiBlur
+
 
 data class ImageCropSettings(
     val scale: Float = 1f,
@@ -58,8 +58,7 @@ fun ImageCropDialog(
         Card(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp)
-                .uiBlur(),
+                .padding(16.dp),
             shape = RoundedCornerShape(16.dp)
         ) {
             Column(
