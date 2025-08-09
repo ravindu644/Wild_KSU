@@ -116,6 +116,7 @@ import com.rifsxd.ksunext.ui.util.LocaleHelper
 import com.rifsxd.ksunext.ui.util.rootAvailable
 import com.rifsxd.ksunext.ui.util.install
 import com.rifsxd.ksunext.ui.util.isSuCompatDisabled
+import com.rifsxd.ksunext.util.reboot
 
 import com.rifsxd.ksunext.ui.screen.FlashIt
 import com.rifsxd.ksunext.ui.viewmodel.ModuleViewModel
@@ -800,48 +801,31 @@ private fun RegularTopBar(
             }
         },
         actions = {
-            // Show LKM and restart menus only on home screen
+            // Show LKM and restart icons only on home screen
             if (isHomeScreen) {
-                var showDropdown by remember { mutableStateOf(false) }
+                // Bake LKM icon
                 IconButton(
-                    onClick = { showDropdown = true }
+                    onClick = {
+                        // Navigate to Flash screen for LKM baking
+                        navigator.navigate(FlashScreenDestination)
+                    }
                 ) {
                     Icon(
-                        imageVector = Icons.Filled.MoreVert,
-                        contentDescription = "Menu"
+                        imageVector = Icons.Filled.Build,
+                        contentDescription = "Bake LKM"
                     )
                 }
-                DropdownMenu(
-                    expanded = showDropdown,
-                    onDismissRequest = { showDropdown = false },
-                    modifier = Modifier.clip(MaterialTheme.shapes.medium),
-                    shape = MaterialTheme.shapes.medium,
-                    tonalElevation = 0.dp,
-                    shadowElevation = 0.dp,
-                    offset = DpOffset(0.dp, 16.dp)
+                
+                // Restart icon
+                IconButton(
+                    onClick = {
+                        // Trigger system reboot
+                        reboot()
+                    }
                 ) {
-                    // Bake LKM menu
-                    DropdownMenuItem(
-                        text = { Text("Bake LKM") },
-                        leadingIcon = {
-                            Icon(Icons.Filled.Build, "Bake LKM")
-                        },
-                        onClick = {
-                            // TODO: Implement LKM baking functionality
-                            showDropdown = false
-                        }
-                    )
-                    
-                    // Restart menu
-                    DropdownMenuItem(
-                        text = { Text("Restart") },
-                        leadingIcon = {
-                            Icon(Icons.Filled.RestartAlt, "Restart")
-                        },
-                        onClick = {
-                            // TODO: Implement restart functionality
-                            showDropdown = false
-                        }
+                    Icon(
+                        imageVector = Icons.Filled.RestartAlt,
+                        contentDescription = "Restart"
                     )
                 }
             }
