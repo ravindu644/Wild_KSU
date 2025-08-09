@@ -657,6 +657,12 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
 
             // Icon Theme Selection
             var showIconThemeManager by remember { mutableStateOf(false) }
+            var availableIconPacks by remember { mutableStateOf<List<IconPack>>(emptyList()) }
+            
+            // Load available icon packs to check if any are installed
+            LaunchedEffect(Unit) {
+                availableIconPacks = IconPackHelper.getInstalledIconPacks(context)
+            }
             
             ListItem(
                 leadingContent = { Icon(Icons.Filled.Style, stringResource(R.string.icon_theme)) },
@@ -665,7 +671,15 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
                 ) },
-                supportingContent = { Text(stringResource(R.string.icon_theme_summary)) },
+                supportingContent = { 
+                    Text(
+                        if (availableIconPacks.isEmpty()) {
+                            "No themes installed. Install a theme"
+                        } else {
+                            stringResource(R.string.icon_theme_summary)
+                        }
+                    )
+                },
                 modifier = Modifier
                     .clickable {
                         showIconThemeManager = true

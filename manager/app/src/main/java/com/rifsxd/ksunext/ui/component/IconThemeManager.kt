@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
@@ -97,13 +98,15 @@ fun IconThemeManagerDialog(
         },
         text = {
             Column {
-                Text(
-                    text = "Drag to reorder priority. Higher items have priority over lower ones.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                
-                Spacer(modifier = Modifier.height(16.dp))
+                if (!isLoading && iconThemeItems.isNotEmpty()) {
+                    Text(
+                        text = "Use up/down buttons to reorder priority. Higher items have priority over lower ones.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
                 
                 if (isLoading) {
                     Box(
@@ -115,10 +118,35 @@ fun IconThemeManagerDialog(
                         CircularProgressIndicator()
                     }
                 } else if (iconThemeItems.isEmpty()) {
-                    Text(
-                        text = stringResource(R.string.icon_theme_none_found),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Palette,
+                                contentDescription = null,
+                                modifier = Modifier.size(48.dp),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(
+                                text = "No themes installed",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Medium
+                            )
+                            Text(
+                                 text = "Install an icon pack to customize app icons",
+                                 style = MaterialTheme.typography.bodyMedium,
+                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                 textAlign = TextAlign.Center
+                             )
+                        }
+                    }
                 } else {
                     LazyColumn(
                         modifier = Modifier
@@ -172,9 +200,10 @@ fun IconThemeManagerDialog(
                         .apply()
                     
                     onDismiss()
-                }
+                },
+                enabled = iconThemeItems.isNotEmpty()
             ) {
-                Text("Save")
+                Text(if (iconThemeItems.isEmpty()) "Close" else "Save")
             }
         },
         dismissButton = {
@@ -242,16 +271,17 @@ private fun IconThemeItemCard(
                 modifier = Modifier
                     .weight(1f)
                     .padding(end = 8.dp),
-                verticalArrangement = Arrangement.Center
+                verticalArrangement = Arrangement.spacedBy(2.dp)
             ) {
                 Text(
                     text = item.name,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Medium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    lineHeight = MaterialTheme.typography.titleMedium.lineHeight
                 )
-                if (item.packageName != null) {
+                if (item.packageName != null && item.packageName.isNotEmpty()) {
                     Text(
                         text = item.packageName,
                         style = MaterialTheme.typography.bodySmall,
