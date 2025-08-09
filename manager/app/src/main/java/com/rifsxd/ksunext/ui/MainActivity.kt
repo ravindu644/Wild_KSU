@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Checkbox
@@ -52,6 +53,10 @@ import androidx.compose.material.icons.filled.Spa
 import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material.icons.filled.Forest
 import androidx.compose.material.icons.filled.Whatshot
+import androidx.compose.material.icons.filled.LocalFlorist
+import androidx.compose.material.icons.filled.Adjust
+import androidx.compose.material.icons.filled.Eco
+import androidx.compose.material.icons.filled.Circle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -92,7 +97,6 @@ import com.ramcosta.composedestinations.generated.destinations.AppProfileScreenD
 import com.ramcosta.composedestinations.generated.destinations.TemplateEditorScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.AppProfileTemplateScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.InstallScreenDestination
-import com.ramcosta.composedestinations.generated.destinations.FlashScreenDestination
 import com.ramcosta.composedestinations.generated.NavGraphs
 import androidx.navigation.NavDestination
 import com.ramcosta.composedestinations.utils.isRouteOnBackStackAsState
@@ -115,6 +119,7 @@ import com.rifsxd.ksunext.ui.screen.FlashIt
 import com.rifsxd.ksunext.ui.viewmodel.ModuleViewModel
 import com.rifsxd.ksunext.ui.viewmodel.SuperUserViewModel
 import com.rifsxd.ksunext.ui.viewmodel.FlashViewModel
+import com.rifsxd.ksunext.ui.viewmodel.FlashingStatus
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -122,6 +127,23 @@ import java.util.*
 val LocalModuleViewModel = compositionLocalOf<ModuleViewModel> { error("ModuleViewModel not provided") }
 val LocalSuperUserViewModel = compositionLocalOf<SuperUserViewModel> { error("SuperUserViewModel not provided") }
 val LocalFlashViewModel = compositionLocalOf<FlashViewModel> { error("FlashViewModel not provided") }
+
+// Icon type enum
+enum class IconType(val displayName: String, val icon: ImageVector) {
+    SEASONAL("Seasonal", Icons.Filled.Whatshot), // Placeholder, actual icon determined by season
+    CANNABIS("Cannabis", Icons.Filled.LocalFlorist), // Using LocalFlorist as cannabis alternative
+    YIN_YANG("Yin Yang", Icons.Filled.Adjust), // Using Adjust as yin-yang alternative
+    ECO("Eco", Icons.Filled.Eco),
+    CIRCLE("Circle", Icons.Filled.Circle)
+}
+
+// Get icon based on type and season
+private fun getIcon(iconType: IconType): ImageVector {
+    return when (iconType) {
+        IconType.SEASONAL -> getSeasonalIcon()
+        else -> iconType.icon
+    }
+}
 
 // Seasonal icon function
 private fun getSeasonalIcon(): ImageVector {
@@ -194,6 +216,14 @@ class MainActivity : ComponentActivity() {
 
             var backgroundBlur by remember { mutableStateOf(prefs.getFloat("background_blur", 0.0f)) } // Default 0px blur
             
+            // Icon settings
+            var iconsEnabled by remember { mutableStateOf(prefs.getBoolean("icons_enabled", true)) } // Default enabled
+            var selectedIconType by remember { 
+                mutableStateOf(
+                    IconType.values().find { it.name == prefs.getString("selected_icon_type", "SEASONAL") } ?: IconType.SEASONAL
+                )
+            }
+            
             // Listen for preference changes
             DisposableEffect(Unit) {
                 val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
@@ -222,6 +252,12 @@ class MainActivity : ComponentActivity() {
 
                         "background_blur" -> {
                             backgroundBlur = prefs.getFloat("background_blur", 0.0f)
+                        }
+                        "icons_enabled" -> {
+                            iconsEnabled = prefs.getBoolean("icons_enabled", true)
+                        }
+                        "selected_icon_type" -> {
+                            selectedIconType = IconType.values().find { it.name == prefs.getString("selected_icon_type", "SEASONAL") } ?: IconType.SEASONAL
                         }
                     }
                 }
@@ -314,6 +350,8 @@ class MainActivity : ComponentActivity() {
                                 moduleViewModel = moduleViewModel,
                                 superUserViewModel = superUserViewModel,
                                 flashViewModel = flashViewModel,
+                                iconsEnabled = iconsEnabled,
+                                selectedIconType = selectedIconType,
                                 modifier = Modifier
                             )
                         }
@@ -422,6 +460,8 @@ private fun UnifiedTopBar(
     moduleViewModel: ModuleViewModel,
     superUserViewModel: SuperUserViewModel,
     flashViewModel: FlashViewModel,
+    iconsEnabled: Boolean,
+    selectedIconType: IconType,
     modifier: Modifier = Modifier
 ) {
     when (currentDestination?.route) {
@@ -432,7 +472,14 @@ private fun UnifiedTopBar(
             SuperUserTopBar(superUserViewModel = superUserViewModel, navigator = navigator, modifier = modifier)
         }
         else -> {
-            RegularTopBar(currentDestination = currentDestination, navigator = navigator, flashViewModel = flashViewModel, modifier = modifier)
+            RegularTopBar(
+                currentDestination = currentDestination, 
+                navigator = navigator, 
+                flashViewModel = flashViewModel, 
+                iconsEnabled = iconsEnabled,
+                selectedIconType = selectedIconType,
+                modifier = modifier
+            )
         }
     }
 }
@@ -653,12 +700,21 @@ private fun SuperUserTopBar(superUserViewModel: SuperUserViewModel, navigator: D
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun RegularTopBar(currentDestination: NavDestination?, navigator: DestinationsNavigator, flashViewModel: FlashViewModel, modifier: Modifier = Modifier) {
+private fun RegularTopBar(
+    currentDestination: NavDestination?, 
+    navigator: DestinationsNavigator, 
+    flashViewModel: FlashViewModel, 
+    iconsEnabled: Boolean,
+    selectedIconType: IconType,
+    modifier: Modifier = Modifier
+) {
+    val context = LocalContext.current
+    val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
     val surfaceContainer = MaterialTheme.colorScheme.surfaceContainer
     val containerColor = remember(surfaceContainer) { surfaceContainer }
     
     // Determine if we need a back button and the title based on current destination
-    val (title, showBackButton) = when (currentDestination?.route) {
+    val titleAndBackButton = when (currentDestination?.route) {
         HomeScreenDestination.route -> stringResource(R.string.app_name) to false
         SettingScreenDestination.route -> stringResource(R.string.settings) to false
         CustomizationScreenDestination.route -> stringResource(R.string.customization) to true
@@ -669,16 +725,19 @@ private fun RegularTopBar(currentDestination: NavDestination?, navigator: Destin
         AppProfileTemplateScreenDestination.route -> stringResource(R.string.settings_profile_template) to true
         InstallScreenDestination.route -> stringResource(R.string.install) to true
         FlashScreenDestination.route -> {
-            when (flashViewModel.flashingStatus.value) {
+            val title = when (flashViewModel.flashingStatus) {
                 FlashingStatus.FLASHING -> stringResource(R.string.flashing)
                 FlashingStatus.SUCCESS -> "flashing success"
                 FlashingStatus.FAILED -> "flashing fail"
             }
-        } to true
+            title to true
+        }
         else -> "" to false
     }
+    val title = titleAndBackButton.first
+    val showBackButton = titleAndBackButton.second
     
-    // Animation state for the seasonal icon (only for home screen)
+    // Animation state for the icon (only for home screen)
     val isHomeScreen = currentDestination?.route == HomeScreenDestination.route
     var rotationState by remember { mutableStateOf(0f) }
     val rotation by animateFloatAsState(
@@ -697,11 +756,29 @@ private fun RegularTopBar(currentDestination: NavDestination?, navigator: Destin
     TopAppBar(
         modifier = modifier,
         title = { 
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Black,
-            ) 
+            Row(
+                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+            ) {
+                // Show icon to the left of title only on home screen and if enabled
+                if (isHomeScreen && iconsEnabled) {
+                    IconButton(
+                        onClick = { 
+                            rotationState += 360f
+                        }
+                    ) {
+                        Icon(
+                            imageVector = getIcon(selectedIconType),
+                            contentDescription = "Icon",
+                            modifier = Modifier.graphicsLayer(rotationZ = rotation)
+                        )
+                    }
+                }
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Black,
+                )
+            }
         },
         navigationIcon = {
             if (showBackButton) {
@@ -713,18 +790,65 @@ private fun RegularTopBar(currentDestination: NavDestination?, navigator: Destin
             }
         },
         actions = {
-            // Show animated seasonal icon only on home screen
+            // Show icon settings menu only on home screen
             if (isHomeScreen) {
+                var showDropdown by remember { mutableStateOf(false) }
                 IconButton(
-                    onClick = { 
-                        rotationState += 360f
-                    }
+                    onClick = { showDropdown = true }
                 ) {
                     Icon(
-                        imageVector = getSeasonalIcon(),
-                        contentDescription = "Seasonal Icon",
-                        modifier = Modifier.graphicsLayer(rotationZ = rotation)
+                        imageVector = Icons.Filled.MoreVert,
+                        contentDescription = "Icon Settings"
                     )
+                }
+                DropdownMenu(
+                    expanded = showDropdown,
+                    onDismissRequest = { showDropdown = false },
+                    modifier = Modifier.clip(MaterialTheme.shapes.medium),
+                    shape = MaterialTheme.shapes.medium,
+                    tonalElevation = 0.dp,
+                    shadowElevation = 0.dp,
+                    offset = DpOffset(0.dp, 16.dp)
+                ) {
+                    // Toggle to enable/disable icons
+                    DropdownMenuItem(
+                        text = { Text("Enable Icons") },
+                        trailingIcon = {
+                            Checkbox(checked = iconsEnabled, onCheckedChange = null)
+                        },
+                        onClick = {
+                            prefs.edit().putBoolean("icons_enabled", !iconsEnabled).apply()
+                            showDropdown = false
+                        }
+                    )
+                    
+                    // Icon selection menu items
+                    if (iconsEnabled) {
+                        IconType.values().forEach { iconType ->
+                            DropdownMenuItem(
+                                text = { Text(iconType.displayName) },
+                                leadingIcon = {
+                                    Icon(
+                                        imageVector = if (iconType == IconType.SEASONAL) getSeasonalIcon() else iconType.icon,
+                                        contentDescription = iconType.displayName
+                                    )
+                                },
+                                trailingIcon = {
+                                    if (selectedIconType == iconType) {
+                                        Icon(
+                                            imageVector = Icons.Filled.Circle,
+                                            contentDescription = "Selected",
+                                            tint = MaterialTheme.colorScheme.primary
+                                        )
+                                    }
+                                },
+                                onClick = {
+                                    prefs.edit().putString("selected_icon_type", iconType.name).apply()
+                                    showDropdown = false
+                                }
+                            )
+                        }
+                    }
                 }
             }
         },

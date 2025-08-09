@@ -133,7 +133,7 @@ fun FlashScreen(
     val scrollState = rememberScrollState()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val flashViewModel = LocalFlashViewModel.current
-    val flashing by flashViewModel.flashingStatus.collectAsState()
+    val flashing = flashViewModel.flashingStatus
 
     val context = LocalContext.current
 
@@ -144,7 +144,7 @@ fun FlashScreen(
 
     // Reset flashing status when screen is entered
     LaunchedEffect(Unit) {
-        flashViewModel.resetStatus()
+        flashViewModel.resetFlashingStatus()
     }
 
     val view = LocalView.current
@@ -219,7 +219,7 @@ fun FlashScreen(
                     text += "\n\n\n"
                     showFloatAction = true
                 }
-                flashViewModel.updateStatus(if (code == 0) FlashingStatus.SUCCESS else FlashingStatus.FAILED)
+                flashViewModel.updateFlashingStatus(if (code == 0) FlashingStatus.SUCCESS else FlashingStatus.FAILED)
             }
         }
     }
