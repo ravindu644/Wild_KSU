@@ -637,7 +637,7 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                 
                 ListDialog(
                     state = rememberUseCaseState(visible = true, onCloseRequest = { dismiss() }),
-                    header = Header.Default(title = "Select Icon Style"),
+                    header = Header.Default(title = "Select Home Screen Icon Style"),
                     selection = ListSelection.Single(
                         showRadioButtons = true,
                         options = options
@@ -651,13 +651,13 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
             }
             
             ListItem(
-                leadingContent = { Icon(Icons.Filled.Palette, "Icon Style") },
+                leadingContent = { Icon(Icons.Filled.Palette, "Home Screen Icon Style") },
                 headlineContent = { Text(
-                    text = "Icon Style",
+                    text = "Home Screen Icon Style",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
                 ) },
-                supportingContent = { Text("Current: $currentIconDisplay") },
+                supportingContent = { Text("Change the home screen icon style or turn it off. Current: $currentIconDisplay") },
                 modifier = Modifier
                     .clickable {
                         iconDialog.show()
