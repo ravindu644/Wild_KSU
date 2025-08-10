@@ -113,6 +113,7 @@ import com.rifsxd.ksunext.ui.util.LocalSnackbarHost
 import com.rifsxd.ksunext.ui.util.*
 import com.rifsxd.ksunext.ui.util.IconPackHelper
 import com.rifsxd.ksunext.ui.util.IconPack
+import com.rifsxd.ksunext.ui.util.ImageStorageUtils
 
 import java.util.Locale
 
@@ -386,19 +387,28 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
             ) { result ->
                 if (result.resultCode == Activity.RESULT_OK) {
                     result.data?.data?.let { uri ->
-                        // Take persistable permission for the selected image
-                        try {
-                            context.contentResolver.takePersistableUriPermission(
-                                uri,
-                                Intent.FLAG_GRANT_READ_URI_PERMISSION
-                            )
-                            selectedImageUri = uri
+                        // Copy image to internal storage to prevent permission issues
+                        val internalPath = ImageStorageUtils.copyImageToInternalStorage(context, uri)
+                        if (internalPath != null) {
+                            // Convert to file URI for consistent handling
+                            val fileUri = ImageStorageUtils.filePathToUri(internalPath)
+                            selectedImageUri = Uri.parse(fileUri)
                             showCropDialog = true
-                        } catch (e: Exception) {
-                            // Handle permission error - fallback to direct save
-                            e.printStackTrace()
-                            prefs.edit().putString("background_image_uri", uri.toString()).apply()
-                            backgroundImageUri = uri.toString()
+                        } else {
+                            // Fallback: try to use original URI with permissions
+                            try {
+                                context.contentResolver.takePersistableUriPermission(
+                                    uri,
+                                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                                )
+                                selectedImageUri = uri
+                                showCropDialog = true
+                            } catch (e: Exception) {
+                                // Last resort: save original URI directly
+                                e.printStackTrace()
+                                prefs.edit().putString("background_image_uri", uri.toString()).apply()
+                                backgroundImageUri = uri.toString()
+                            }
                         }
                     }
                 }
@@ -451,6 +461,8 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                         // Delete button (only show if background image is selected)
                         if (backgroundImageUri != null) {
                             IconButton(onClick = {
+                                // Clean up internal storage if the image was stored there
+                                ImageStorageUtils.deleteInternalBackgroundImage(context)
                                 prefs.edit().remove("background_image_uri").commit()
                                 backgroundImageUri = null
                             }) {
@@ -726,7 +738,7 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Text(
-                                text = "0%",
+                                text = "Low",
                                 style = MaterialTheme.typography.bodySmall,
                                 modifier = Modifier.width(32.dp)
                             )
@@ -740,7 +752,7 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                                 colors = SliderDefaults.colors()
                             )
                             Text(
-                                text = "100%",
+                                text = "High",
                                 style = MaterialTheme.typography.bodySmall,
                                 modifier = Modifier.width(32.dp),
                                 textAlign = TextAlign.End

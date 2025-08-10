@@ -118,6 +118,7 @@ import com.rifsxd.ksunext.ui.util.rootAvailable
 import com.rifsxd.ksunext.ui.util.install
 import com.rifsxd.ksunext.ui.util.isSuCompatDisabled
 import com.rifsxd.ksunext.ui.util.reboot
+import com.rifsxd.ksunext.ui.util.ImageStorageUtils
 
 import com.rifsxd.ksunext.ui.screen.FlashIt
 import com.rifsxd.ksunext.ui.viewmodel.ModuleViewModel
@@ -236,7 +237,14 @@ class MainActivity : ComponentActivity() {
             // Darkness slider: 1.0f = 100% (full black overlay), 0.0f = 0% (no overlay)
             // UI transparency: 0.0f = 0% (fully transparent), 1.0f = 100% (fully opaque)
             var themeMode by remember { mutableStateOf(prefs.getString("theme_mode", "system_default") ?: "system_default") }
-            var backgroundImageUri by remember { mutableStateOf(prefs.getString("background_image_uri", null)) }
+            var backgroundImageUri by remember { 
+                mutableStateOf(
+                    // Check if we have an internal storage path first
+                    ImageStorageUtils.getInternalBackgroundImagePath(this@MainActivity)?.let { 
+                        ImageStorageUtils.filePathToUri(it) 
+                    } ?: prefs.getString("background_image_uri", null)
+                )
+            }
             var backgroundTransparency by remember { mutableStateOf(prefs.getFloat("background_transparency", 1.0f)) } // Default 100% darkness
             var uiTransparency by remember { mutableStateOf(prefs.getFloat("ui_transparency", 0.0f)) } // Default 0% UI transparency
 
@@ -269,7 +277,10 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                         "background_image_uri" -> {
-                            backgroundImageUri = prefs.getString("background_image_uri", null)
+                            // Check internal storage first, then fallback to preferences
+                            backgroundImageUri = ImageStorageUtils.getInternalBackgroundImagePath(this@MainActivity)?.let { 
+                                ImageStorageUtils.filePathToUri(it) 
+                            } ?: prefs.getString("background_image_uri", null)
                         }
                         "background_transparency" -> {
                             backgroundTransparency = prefs.getFloat("background_transparency", 1.0f)
