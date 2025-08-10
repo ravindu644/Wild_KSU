@@ -464,7 +464,7 @@ fun InfoCardSettingsScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
-                            imageVector = Icons.Filled.Help,
+                            imageVector = Icons.Filled.HelpOutline,
                             contentDescription = null,
                             modifier = Modifier.padding(end = 16.dp),
                             tint = MaterialTheme.colorScheme.primary
@@ -542,7 +542,7 @@ fun InfoCardSettingsScreen(
             // Section header
             item {
                 Text(
-                    text = "System Information Items",
+                    text = "Info Card Order",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.padding(vertical = 8.dp)

@@ -59,7 +59,7 @@ import androidx.compose.material.icons.filled.Forest
 import androidx.compose.material.icons.filled.Whatshot
 import androidx.compose.material.icons.filled.Archive
 import androidx.compose.material.icons.filled.Memory
-import androidx.compose.material.icons.filled.RestartAlt
+import androidx.compose.material.icons.filled.PowerSettingsNew
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.runtime.Composable
@@ -144,7 +144,8 @@ enum class IconType(val displayName: String, val icon: ImageVector) {
     SUMMER("Summer", Icons.Filled.WbSunny),
     FALL("Fall", Icons.Filled.Forest),
     KSU_NEXT("KSU Next", Icons.Filled.Whatshot), // Placeholder, actual icon is drawable
-    CANNABIS("Cannabis", Icons.Filled.Whatshot) // Placeholder, actual icon is drawable
+    CANNABIS("Cannabis", Icons.Filled.Whatshot), // Placeholder, actual icon is drawable
+    AMOGUS_SUSFS("Amogus SusFS", Icons.Filled.Whatshot) // Placeholder, actual icon is drawable
 }
 
 // Get icon based on type and season
@@ -159,6 +160,7 @@ private fun getIcon(iconType: IconType): Any {
         IconType.FALL -> Icons.Filled.Forest
         IconType.KSU_NEXT -> painterResource(R.drawable.ic_ksu_next)
         IconType.CANNABIS -> painterResource(R.drawable.ic_cannabis)
+        IconType.AMOGUS_SUSFS -> painterResource(R.drawable.ic_sus)
         else -> iconType.icon
     }
 }
@@ -878,7 +880,7 @@ private fun RegularTopBar(
                     }
                 ) {
                     Icon(
-                        imageVector = Icons.Filled.RestartAlt,
+                        imageVector = Icons.Filled.PowerSettingsNew,
                         contentDescription = "Reset to default"
                     )
                 }
@@ -909,7 +911,7 @@ private fun RegularTopBar(
                     }
                 ) {
                     Icon(
-                        imageVector = Icons.Filled.RestartAlt,
+                        imageVector = Icons.Filled.PowerSettingsNew,
                         contentDescription = "Reset to default"
                     )
                 }
@@ -939,7 +941,7 @@ private fun RegularTopBar(
                         }
                     ) {
                         Icon(
-                            imageVector = Icons.Filled.RestartAlt,
+                            imageVector = Icons.Filled.PowerSettingsNew,
                             contentDescription = "Restart"
                         )
                     }
