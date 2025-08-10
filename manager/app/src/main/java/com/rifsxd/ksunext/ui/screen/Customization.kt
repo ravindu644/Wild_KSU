@@ -520,48 +520,6 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.align(Alignment.CenterHorizontally)
                         )
-                        
-                        Spacer(modifier = Modifier.height(8.dp))
-                        
-                        // Min/Low/Med/High/Max preset buttons
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            val presets = listOf(
-                                0.0f to "Min",
-                                0.25f to "Low", 
-                                0.5f to "Med",
-                                0.75f to "High",
-                                1.0f to "Max"
-                            )
-                            
-                            presets.forEach { (value, label) ->
-                                Button(
-                                    onClick = { 
-                                        backgroundTransparency = value
-                                        prefs.edit().putFloat("background_transparency", value).commit()
-                                    },
-                                    modifier = Modifier.weight(1f),
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = if (backgroundTransparency == value) 
-                                            MaterialTheme.colorScheme.primary 
-                                        else 
-                                            MaterialTheme.colorScheme.surfaceVariant,
-                                        contentColor = if (backgroundTransparency == value) 
-                                            MaterialTheme.colorScheme.onPrimary 
-                                        else 
-                                            MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                ) {
-                                    Text(
-                                        text = label,
-                                        style = MaterialTheme.typography.labelSmall,
-                                        fontSize = 10.sp
-                                    )
-                                }
-                            }
-                        }
                     }
                 }
                 )
@@ -779,51 +737,11 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                         }
                         
                         Text(
-                            text = "$currentDpi DPI",
+                            text = "$currentDpi% DPI",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.align(Alignment.CenterHorizontally)
                         )
-                        
-                        Spacer(modifier = Modifier.height(12.dp))
-                        
-                        // Min/Low/Med/High/Max preset buttons
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(2.dp)
-                        ) {
-                            val presets = listOf(
-                                160 to "Min",
-                                240 to "Low", 
-                                320 to "Med",
-                                400 to "High",
-                                600 to "Max"
-                            )
-                            
-                            presets.forEach { (dpi, label) ->
-                                Button(
-                                    onClick = { currentDpi = dpi },
-                                    modifier = Modifier.weight(1f),
-                                    contentPadding = PaddingValues(horizontal = 4.dp, vertical = 8.dp),
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = if (currentDpi == dpi) 
-                                            MaterialTheme.colorScheme.primary 
-                                        else 
-                                            MaterialTheme.colorScheme.surfaceVariant,
-                                        contentColor = if (currentDpi == dpi) 
-                                            MaterialTheme.colorScheme.onPrimary 
-                                        else 
-                                            MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                ) {
-                                    Text(
-                                        text = label,
-                                        style = MaterialTheme.typography.labelSmall,
-                                        fontSize = 10.sp
-                                    )
-                                }
-                            }
-                        }
                         
                         // Apply button (only show when changes are made)
                         if (currentDpi != savedDpi) {
