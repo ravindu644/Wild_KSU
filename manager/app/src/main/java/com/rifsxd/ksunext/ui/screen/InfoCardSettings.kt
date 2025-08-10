@@ -94,7 +94,7 @@ fun InfoCardSettingsScreen(
                 prefs.edit().putBoolean("info_card_show_manager_version", it).apply()
                 showManagerVersion = it
             }, Icons.Filled.Apps),
-            InfoCardItem("hook_mode", R.string.home_magic_mount, showHookMode, {
+            InfoCardItem("hook_mode", R.string.hook_mode, showHookMode, {
                 prefs.edit().putBoolean("info_card_show_hook_mode", it).apply()
                 showHookMode = it
             }, Icons.Filled.Phishing),
@@ -102,7 +102,7 @@ fun InfoCardSettingsScreen(
                 prefs.edit().putBoolean("info_card_show_mount_system", it).apply()
                 showMountSystem = it
             }, Icons.Filled.Storage),
-            InfoCardItem("susfs_status", R.string.home_susfs, showSusfsStatus, {
+            InfoCardItem("susfs_status", R.string.home_susfs_version, showSusfsStatus, {
                 prefs.edit().putBoolean("info_card_show_susfs_status", it).apply()
                 showSusfsStatus = it
             }, Icons.Filled.Security),
