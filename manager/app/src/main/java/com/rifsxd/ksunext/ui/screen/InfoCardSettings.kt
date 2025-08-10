@@ -273,10 +273,18 @@ fun InfoCardSettingsScreen(
         AlertDialog(
             onDismissRequest = { showIconDialog = false },
             title = {
-                Text(
-                    text = stringResource(R.string.home_screen_icon_select_dialog_title),
-                    style = MaterialTheme.typography.headlineSmall
-                )
+                Column {
+                    Text(
+                        text = stringResource(R.string.home_screen_icon_select_dialog_title),
+                        style = MaterialTheme.typography.headlineSmall
+                    )
+                    Text(
+                        text = "Scroll to see more icons",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
             },
             text = {
                 LazyColumn(
@@ -597,14 +605,20 @@ fun InfoCardSettingsScreen(
                                     fontWeight = FontWeight.Medium
                                 )
                                 
-                                // Move controls
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically
+                                // Move controls - separated vertically and bigger
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.spacedBy(4.dp)
                                 ) {
                                     // Move up button (tap to move up one, hold to move to top)
                                     Box(
                                         modifier = Modifier
-                                            .size(40.dp)
+                                            .size(48.dp)
+                                            .background(
+                                                if (index > 0) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f) 
+                                                else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f),
+                                                CircleShape
+                                            )
                                             .combinedClickable(
                                                 onClick = {
                                                     if (index > 0) {
@@ -613,6 +627,7 @@ fun InfoCardSettingsScreen(
                                                         newOrder[index] = newOrder[index - 1]
                                                         newOrder[index - 1] = temp
                                                         itemOrder = newOrder
+                                                        hapticFeedback.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                                                     }
                                                 },
                                                 onLongClick = {
@@ -631,14 +646,20 @@ fun InfoCardSettingsScreen(
                                         Icon(
                                             imageVector = Icons.Default.KeyboardArrowUp,
                                             contentDescription = "Move up (tap) or to top (hold)",
-                                            tint = if (index > 0) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+                                            modifier = Modifier.size(28.dp),
+                                            tint = if (index > 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
                                         )
                                     }
                                     
                                     // Move down button (tap to move down one, hold to move to bottom)
                                     Box(
                                         modifier = Modifier
-                                            .size(40.dp)
+                                            .size(48.dp)
+                                            .background(
+                                                if (index < itemOrder.size - 1) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f) 
+                                                else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f),
+                                                CircleShape
+                                            )
                                             .combinedClickable(
                                                 onClick = {
                                                     if (index < itemOrder.size - 1) {
@@ -647,6 +668,7 @@ fun InfoCardSettingsScreen(
                                                         newOrder[index] = newOrder[index + 1]
                                                         newOrder[index + 1] = temp
                                                         itemOrder = newOrder
+                                                        hapticFeedback.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                                                     }
                                                 },
                                                 onLongClick = {
@@ -665,7 +687,8 @@ fun InfoCardSettingsScreen(
                                         Icon(
                                             imageVector = Icons.Default.KeyboardArrowDown,
                                             contentDescription = "Move down (tap) or to bottom (hold)",
-                                            tint = if (index < itemOrder.size - 1) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+                                            modifier = Modifier.size(28.dp),
+                                            tint = if (index < itemOrder.size - 1) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
                                         )
                                     }
                                 }

@@ -904,14 +904,12 @@ private fun RegularTopBar(
                         // Set darkness and blur to zero
                         editor.putFloat("background_blur", 0.0f)
                         editor.putFloat("ui_transparency", 0.0f)
-                        // Detect and set system DPI
-                        val systemDpi = context.resources.displayMetrics.densityDpi
-                        editor.putInt("app_dpi", systemDpi)
+                        // Reset DPI to system default (0 means use system DPI)
+                        editor.putInt("app_dpi", 0)
                         editor.apply()
                         
-                        // Navigate back and forward to refresh the screen
-                        navigator.navigateUp()
-                        navigator.navigate(CustomizationScreenDestination)
+                        // Force activity recreation to apply DPI changes immediately
+                        (context as? ComponentActivity)?.recreate()
                     }
                 ) {
                     Icon(
