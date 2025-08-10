@@ -95,6 +95,7 @@ private fun getIcon(iconType: String): Any {
         "FALL" -> Icons.Filled.Forest
         "KSU_NEXT" -> painterResource(R.drawable.ic_ksu_next)
         "CANNABIS" -> painterResource(R.drawable.ic_cannabis)
+        "AMOGUS_SUSFS" -> painterResource(R.drawable.ic_sus)
         else -> getSeasonalIcon()
     }
 }
@@ -258,7 +259,8 @@ fun InfoCardSettingsScreen(
         "SUMMER" to "Summer",
         "FALL" to "Fall",
         "KSU_NEXT" to "KSU Next",
-        "CANNABIS" to "Cannabis"
+        "CANNABIS" to "Cannabis",
+        "AMOGUS_SUSFS" to "Amogus SusFS"
     )
     
     val currentIconDisplay = iconOptions.find { it.first == selectedIconType }?.second ?: "Seasonal (Auto)"
