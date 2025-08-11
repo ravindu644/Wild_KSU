@@ -15,8 +15,8 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.material.icons.filled.ZoomOutMap
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.RotateRight
-import androidx.compose.material.icons.filled.FlipHorizontal
-import androidx.compose.material.icons.filled.FlipVertical
+import androidx.compose.material.icons.filled.Flip
+import androidx.compose.material.icons.filled.SwapVert
 import androidx.compose.material.icons.filled.Brightness6
 import androidx.compose.material.icons.filled.Contrast
 import androidx.compose.material.icons.filled.Palette
@@ -32,6 +32,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.ColorMatrix
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.zIndex
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
@@ -146,7 +149,7 @@ fun AdvancedImageCropDialog(
                         flipHorizontal = !flipHorizontal
                     }) {
                         Icon(
-                            Icons.Default.FlipHorizontal,
+                            Icons.Default.Flip,
                             contentDescription = "Flip Horizontal",
                             tint = if (flipHorizontal) MaterialTheme.colorScheme.primary else Color.White
                         )
@@ -201,8 +204,8 @@ fun AdvancedImageCropDialog(
                             alpha = brightness.coerceIn(0.1f, 2.0f)
                         ),
                     contentScale = ContentScale.Fit, // Match the actual background behavior
-                    colorFilter = androidx.compose.ui.graphics.ColorFilter.colorMatrix(
-                        androidx.compose.ui.graphics.ColorMatrix().apply {
+                    colorFilter = ColorFilter.colorMatrix(
+                            ColorMatrix().apply {
                             // Apply contrast
                             val contrastValue = contrast.coerceIn(0.1f, 3.0f)
                             val translate = (1.0f - contrastValue) / 2.0f * 255.0f
@@ -339,7 +342,7 @@ fun AdvancedImageCropDialog(
                                 ),
                                 modifier = Modifier.weight(1f)
                             ) {
-                                Icon(Icons.Default.FlipVertical, contentDescription = null)
+                                Icon(Icons.Default.SwapVert, contentDescription = null)
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text("Flip V", style = MaterialTheme.typography.bodySmall)
                             }
