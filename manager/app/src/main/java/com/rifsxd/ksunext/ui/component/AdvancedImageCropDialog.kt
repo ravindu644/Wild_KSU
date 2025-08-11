@@ -34,6 +34,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import coil.compose.rememberAsyncImagePainter
 import com.rifsxd.ksunext.ui.util.ImageCropUtils
 
@@ -78,7 +82,8 @@ fun AdvancedImageCropDialog(
         properties = DialogProperties(
             usePlatformDefaultWidth = false,
             dismissOnBackPress = true,
-            dismissOnClickOutside = false
+            dismissOnClickOutside = false,
+            decorFitsSystemWindows = false
         )
     ) {
         Box(
@@ -131,6 +136,7 @@ fun AdvancedImageCropDialog(
                         Color.Black.copy(alpha = 0.8f),
                         RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
                     )
+                    .navigationBarsPadding() // Ensure controls appear above navigation bar
                     .padding(16.dp)
             ) {
                 // Fit options row
@@ -246,11 +252,12 @@ private fun UITemplateOverlay(backgroundTransparency: Float = 0.0f) {
         val padding = 16.dp.toPx()
         val cardSpacing = 16.dp.toPx()
         
-        // The background image spans the full screen, position UI elements exactly as in main app
-        // In the main app, content starts after the top app bar (which includes status bar space)
+        // The background image now spans the full screen behind system bars
+        // Position UI elements as they appear in the main app with full-screen background
         val topAppBarHeight = 64.dp.toPx() // Standard Material3 top app bar height
         val statusBarHeight = 24.dp.toPx() // Approximate status bar height
         
+        // Start positioning from the actual content area (after system UI)
         var currentY = padding + topAppBarHeight + statusBarHeight
         
         // 1. Primary Status Card (Working card)
