@@ -517,6 +517,8 @@ private fun ModuleList(
                             }
                         }
 
+                        val keepModulesExpanded = prefs.getBoolean("keep_modules_expanded", false)
+                        
                         ModuleItem(
                             navigator = navigator,
                             module = module,
@@ -536,7 +538,6 @@ private fun ModuleList(
                                     }
                                     if (success) {
                                         viewModel.fetchModuleList()
-
                                         val result = snackBarHost.showSnackbar(
                                             message = rebootToApply,
                                             actionLabel = reboot,
@@ -566,9 +567,11 @@ private fun ModuleList(
                             onClick = {
                                 onClickModule(it.dirId, it.name, it.hasWebUi)
                             },
-                            expanded = expandedModuleId == module.id,
+                            expanded = if (keepModulesExpanded) true else expandedModuleId == module.id,
                             onExpandToggle = {
-                                expandedModuleId = if (expandedModuleId == module.id) null else module.id
+                                if (!keepModulesExpanded) {
+                                    expandedModuleId = if (expandedModuleId == module.id) null else module.id
+                                }
                             }
                         )
                     }
@@ -719,78 +722,84 @@ fun ModuleItem(
                         Column(
                             modifier = Modifier.fillMaxWidth(0.8f)
                         ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(6.dp)
-                            ) {
-                                LabelItem(
-                                    text = formatSize(module.size),
-                                    style = LabelItemDefaults.style.copy(
-                                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer
-                                    )
-                                )
-                                if (module.remove) {
+                            val hideModuleDetails = prefs.getBoolean("hide_module_details", false)
+                            
+                            if (!hideModuleDetails) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                ) {
                                     LabelItem(
-                                        text = stringResource(R.string.uninstalled),
+                                        text = formatSize(module.size),
                                         style = LabelItemDefaults.style.copy(
-                                            containerColor = MaterialTheme.colorScheme.errorContainer,
-                                            contentColor = MaterialTheme.colorScheme.onErrorContainer
+                                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                            contentColor = MaterialTheme.colorScheme.onSecondaryContainer
                                         )
                                     )
-                                }
-                                if (!Natives.isZygiskEnabled() && module.zygiskRequired && !module.remove) {
-                                    LabelItem(
-                                        text = stringResource(R.string.zygisk_required),
-                                        style = LabelItemDefaults.style.copy(
-                                            containerColor = MaterialTheme.colorScheme.errorContainer,
-                                            contentColor = MaterialTheme.colorScheme.onErrorContainer
-                                        )
-                                    )
-                                }
-                                if (updateUrl.isNotEmpty() && !module.remove && !module.update) {
-                                    LabelItem(
-                                        text = stringResource(R.string.module_update_available),
-                                        style = LabelItemDefaults.style.copy(
-                                            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                                            contentColor = MaterialTheme.colorScheme.onTertiaryContainer
-                                        )
-                                    )
-                                }
-                                if (!module.remove) {
-                                    if (module.update) {
+                                    if (module.remove) {
                                         LabelItem(
-                                            text = stringResource(R.string.module_updated),
+                                            text = stringResource(R.string.uninstalled),
+                                            style = LabelItemDefaults.style.copy(
+                                                containerColor = MaterialTheme.colorScheme.errorContainer,
+                                                contentColor = MaterialTheme.colorScheme.onErrorContainer
+                                            )
+                                        )
+                                    }
+                                    if (!Natives.isZygiskEnabled() && module.zygiskRequired && !module.remove) {
+                                        LabelItem(
+                                            text = stringResource(R.string.zygisk_required),
+                                            style = LabelItemDefaults.style.copy(
+                                                containerColor = MaterialTheme.colorScheme.errorContainer,
+                                                contentColor = MaterialTheme.colorScheme.onErrorContainer
+                                            )
+                                        )
+                                    }
+                                    if (updateUrl.isNotEmpty() && !module.remove && !module.update) {
+                                        LabelItem(
+                                            text = stringResource(R.string.module_update_available),
                                             style = LabelItemDefaults.style.copy(
                                                 containerColor = MaterialTheme.colorScheme.tertiaryContainer,
                                                 contentColor = MaterialTheme.colorScheme.onTertiaryContainer
                                             )
                                         )
                                     }
-                                }
-                                if (module.enabled && !module.remove) {
-                                    if (module.hasWebUi && filterZygiskModules) {
-                                        LabelItem(
-                                            text = stringResource(R.string.webui),
-                                            style = LabelItemDefaults.style.copy(
-                                                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                                contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                                    if (!module.remove) {
+                                        if (module.update) {
+                                            LabelItem(
+                                                text = stringResource(R.string.module_updated),
+                                                style = LabelItemDefaults.style.copy(
+                                                    containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                                                    contentColor = MaterialTheme.colorScheme.onTertiaryContainer
+                                                )
                                             )
-                                        )
+                                        }
                                     }
-                                    if (module.hasActionScript && filterZygiskModules) {
-                                        LabelItem(
-                                            text = stringResource(R.string.action),
-                                            style = LabelItemDefaults.style.copy(
-                                                containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                                                contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                                    if (module.enabled && !module.remove) {
+                                        if (module.hasWebUi && filterZygiskModules) {
+                                            LabelItem(
+                                                text = stringResource(R.string.webui),
+                                                style = LabelItemDefaults.style.copy(
+                                                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                                                )
                                             )
-                                        )
+                                        }
+                                        if (module.hasActionScript && filterZygiskModules) {
+                                            LabelItem(
+                                                text = stringResource(R.string.action),
+                                                style = LabelItemDefaults.style.copy(
+                                                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                                                )
+                                            )
+                                        }
                                     }
                                 }
                             }
 
-                            Spacer(modifier = Modifier.height(8.dp))
+                            if (!hideModuleDetails) {
+                                Spacer(modifier = Modifier.height(8.dp))
+                            }
 
                             Text(
                                 text = module.name,

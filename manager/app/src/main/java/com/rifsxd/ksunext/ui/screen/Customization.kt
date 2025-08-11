@@ -99,6 +99,7 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.generated.destinations.InfoCardSettingsScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.ModuleSettingsScreenDestination
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.rifsxd.ksunext.Natives
 import com.rifsxd.ksunext.ksuApp
@@ -744,6 +745,40 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
             )
 
 
+
+            // Module Settings
+            ListItem(
+                leadingContent = { 
+                    Icon(
+                        imageVector = Icons.Filled.Extension,
+                        contentDescription = "Module Settings"
+                    ) 
+                },
+                headlineContent = {
+                    Text(
+                        text = "Module Settings",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                },
+                supportingContent = {
+                    Text(
+                        text = "Customize module card appearance and behavior",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                },
+                trailingContent = {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                        contentDescription = "Navigate to module settings",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                },
+                modifier = Modifier.clickable { 
+                    navigator.navigate(ModuleSettingsScreenDestination)
+                }
+            )
 
             // System Info Card Settings
             ListItem(
