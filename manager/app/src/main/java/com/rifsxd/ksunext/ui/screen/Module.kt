@@ -279,7 +279,7 @@ fun ModuleScreen(navigator: DestinationsNavigator) {
                     viewModel.markNeedRefresh()
                 }
 
-                ExtendedFloatingActionButton(
+                FilledTonalButton(
                     onClick = {
                         // Select the zip files to install
                         val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
@@ -288,11 +288,17 @@ fun ModuleScreen(navigator: DestinationsNavigator) {
                         }
                         selectZipLauncher.launch(intent)
                     },
-                    icon = { Icon(Icons.Filled.Add, moduleInstall) },
-                    text = { Text(text = moduleInstall) },
-                    containerColor = Color.Transparent,
-                    contentColor = MaterialTheme.colorScheme.onSurface
-                )
+                    modifier = Modifier.defaultMinSize(minWidth = 120.dp, minHeight = 48.dp),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Add,
+                        contentDescription = moduleInstall,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(text = moduleInstall)
+                }
             }
         }
     }
