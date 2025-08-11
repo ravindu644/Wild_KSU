@@ -98,7 +98,7 @@ import com.maxkeppeler.sheets.list.models.ListSelection
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import com.ramcosta.composedestinations.generated.destinations.InfoCardSettingsScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.HomeSettingsScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.ModuleSettingsScreenDestination
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.rifsxd.ksunext.Natives
@@ -810,7 +810,7 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                     )
                 },
                 modifier = Modifier.clickable { 
-                    navigator.navigate(InfoCardSettingsScreenDestination)
+                    navigator.navigate(HomeSettingsScreenDestination)
                 }
             )
 

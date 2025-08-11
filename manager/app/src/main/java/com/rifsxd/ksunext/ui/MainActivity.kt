@@ -106,7 +106,7 @@ import com.ramcosta.composedestinations.generated.destinations.AppProfileScreenD
 import com.ramcosta.composedestinations.generated.destinations.TemplateEditorScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.AppProfileTemplateScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.InstallScreenDestination
-import com.ramcosta.composedestinations.generated.destinations.InfoCardSettingsScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.HomeSettingsScreenDestination
 import com.ramcosta.composedestinations.generated.NavGraphs
 import androidx.navigation.NavDestination
 import com.ramcosta.composedestinations.utils.isRouteOnBackStackAsState
@@ -778,7 +778,7 @@ private fun RegularTopBar(
         TemplateEditorScreenDestination.route -> stringResource(R.string.app_profile_template_edit) to true
         AppProfileTemplateScreenDestination.route -> stringResource(R.string.settings_profile_template) to true
         InstallScreenDestination.route -> stringResource(R.string.install) to true
-        InfoCardSettingsScreenDestination.route -> stringResource(R.string.info_card_customization) to true
+        HomeSettingsScreenDestination.route -> stringResource(R.string.info_card_customization) to true
         FlashScreenDestination.route -> {
             val title = when (flashViewModel.flashingStatus) {
                 FlashingStatus.FLASHING -> stringResource(R.string.flashing)
@@ -853,8 +853,8 @@ private fun RegularTopBar(
             }
         },
         actions = {
-            // Show reset button for InfoCardSettings screen
-            if (currentDestination?.route == InfoCardSettingsScreenDestination.route) {
+            // Show reset button for HomeSettings screen
+            if (currentDestination?.route == HomeSettingsScreenDestination.route) {
                 IconButton(
                     onClick = {
                         // Reset all InfoCard settings to default
@@ -881,7 +881,7 @@ private fun RegularTopBar(
                         
                         // Navigate back and forward to refresh the screen
                         navigator.navigateUp()
-                        navigator.navigate(InfoCardSettingsScreenDestination)
+                        navigator.navigate(HomeSettingsScreenDestination)
                     }
                 ) {
                     Icon(

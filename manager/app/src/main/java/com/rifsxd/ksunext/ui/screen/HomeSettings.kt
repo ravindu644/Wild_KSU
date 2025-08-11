@@ -103,7 +103,7 @@ private fun getIcon(iconType: String): Any {
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Destination<RootGraph>
 @Composable
-fun InfoCardSettingsScreen(
+fun HomeSettingsScreen(
     navigator: DestinationsNavigator
 ) {
     val context = LocalContext.current
@@ -715,6 +715,6 @@ fun InfoCardSettingsScreen(
 
 @Preview
 @Composable
-private fun InfoCardSettingsPreview() {
-    InfoCardSettingsScreen(EmptyDestinationsNavigator)
+private fun HomeSettingsPreview() {
+    HomeSettingsScreen(EmptyDestinationsNavigator)
 }

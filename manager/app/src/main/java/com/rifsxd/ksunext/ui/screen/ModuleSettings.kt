@@ -38,11 +38,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.rifsxd.ksunext.ui.component.SwitchItem
 
-@Destination
+@OptIn(ExperimentalMaterial3Api::class)
+@Destination<RootGraph>
 @Composable
 fun ModuleSettingsScreen(
     navigator: DestinationsNavigator
