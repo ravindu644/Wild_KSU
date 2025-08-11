@@ -211,11 +211,9 @@ fun AdvancedImageCropDialog(
                     HomeLayoutCardTemplate(
                         modifier = Modifier.fillMaxSize()
                     )
-                }
-            }
-            
-            // Expanded options panel
-            if (showMoreOptions) {
+                    
+                    // Expanded options panel
+                    if (showMoreOptions) {
                 Card(
                     modifier = Modifier
                         .align(Alignment.TopEnd)
@@ -340,10 +338,10 @@ fun AdvancedImageCropDialog(
                         }
                     }
                 }
-            }
-            
-            // Enhanced bottom controls with rotation and auto-fit
-            Column(
+                    }
+                    
+                    // Enhanced bottom controls with rotation and auto-fit
+                    Column(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
@@ -442,6 +440,8 @@ fun AdvancedImageCropDialog(
                         Text("Confirm")
                     }
                 }
+            }
+        }
             }
         }
     }
