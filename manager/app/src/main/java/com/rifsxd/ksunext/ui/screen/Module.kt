@@ -880,11 +880,7 @@ fun ModuleItem(
                                         navigator.navigate(ExecuteModuleActionScreenDestination(module.dirId))
                                         viewModel.markNeedRefresh()
                                     },
-                                    contentPadding = ButtonDefaults.TextButtonContentPadding,
-                                    colors = ButtonDefaults.filledTonalButtonColors(
-                                        containerColor = Color.Transparent,
-                                        disabledContainerColor = Color.Transparent
-                                    )
+                                    contentPadding = ButtonDefaults.TextButtonContentPadding
                                 ) {
                                     Icon(
                                         modifier = Modifier.size(20.dp),
@@ -910,11 +906,7 @@ fun ModuleItem(
                                     enabled = !module.remove && module.enabled && filterZygiskModules,
                                     onClick = { onClick(module) },
                                     interactionSource = interactionSource,
-                                    contentPadding = ButtonDefaults.TextButtonContentPadding,
-                                    colors = ButtonDefaults.filledTonalButtonColors(
-                                        containerColor = Color.Transparent,
-                                        disabledContainerColor = Color.Transparent
-                                    )
+                                    contentPadding = ButtonDefaults.TextButtonContentPadding
                                 ) {
                                     Icon(
                                         modifier = Modifier.size(20.dp),
@@ -967,11 +959,7 @@ fun ModuleItem(
                                 FilledTonalButton(
                                     modifier = Modifier.defaultMinSize(52.dp, 32.dp),
                                     onClick = { onRestore(module) },
-                                    contentPadding = ButtonDefaults.TextButtonContentPadding,
-                                    colors = ButtonDefaults.filledTonalButtonColors(
-                                        containerColor = Color.Transparent,
-                                        disabledContainerColor = Color.Transparent
-                                    )
+                                    contentPadding = ButtonDefaults.TextButtonContentPadding
                                 ) {
                                     Icon(
                                         modifier = Modifier.size(20.dp),
@@ -992,11 +980,7 @@ fun ModuleItem(
                                     modifier = Modifier.defaultMinSize(52.dp, 32.dp),
                                     enabled = true,
                                     onClick = { onUninstall(module) },
-                                    contentPadding = ButtonDefaults.TextButtonContentPadding,
-                                    colors = ButtonDefaults.filledTonalButtonColors(
-                                        containerColor = Color.Transparent,
-                                        disabledContainerColor = Color.Transparent
-                                    )
+                                    contentPadding = ButtonDefaults.TextButtonContentPadding
                                 ) {
                                     Icon(
                                         modifier = Modifier.size(20.dp),
