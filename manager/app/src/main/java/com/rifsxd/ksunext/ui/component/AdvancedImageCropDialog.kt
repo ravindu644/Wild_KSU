@@ -246,12 +246,12 @@ private fun UITemplateOverlay(backgroundTransparency: Float = 0.0f) {
         val padding = 16.dp.toPx()
         val cardSpacing = 16.dp.toPx()
         
-        // The background image spans the full screen, so we position UI elements
-        // as they would appear in the actual app (with system bars visible over the background)
-        val topOffset = 80.dp.toPx() // Space for status bar + top app bar
-        val bottomOffset = 80.dp.toPx() // Space for bottom navigation
+        // The background image spans the full screen, position UI elements exactly as in main app
+        // In the main app, content starts after the top app bar (which includes status bar space)
+        val topAppBarHeight = 64.dp.toPx() // Standard Material3 top app bar height
+        val statusBarHeight = 24.dp.toPx() // Approximate status bar height
         
-        var currentY = padding + topOffset
+        var currentY = padding + topAppBarHeight + statusBarHeight
         
         // 1. Primary Status Card (Working card)
         // Use original card heights since the background spans full screen
@@ -339,7 +339,7 @@ private fun UITemplateOverlay(backgroundTransparency: Float = 0.0f) {
         drawContext.canvas.nativeCanvas.drawText(
             "Working Status",
             padding + 12.dp.toPx(),
-            topOffset + padding + 25.dp.toPx(),
+            topAppBarHeight + statusBarHeight + padding + 25.dp.toPx(),
             textPaint
         )
         
@@ -347,14 +347,14 @@ private fun UITemplateOverlay(backgroundTransparency: Float = 0.0f) {
         drawContext.canvas.nativeCanvas.drawText(
             "Superusers",
             padding + 12.dp.toPx(),
-            topOffset + padding + primaryCardHeight + cardSpacing + 25.dp.toPx(),
+            topAppBarHeight + statusBarHeight + padding + primaryCardHeight + cardSpacing + 25.dp.toPx(),
             textPaint
         )
         
         drawContext.canvas.nativeCanvas.drawText(
             "Modules",
             padding + secondaryCardWidth + cardSpacing + 12.dp.toPx(),
-            topOffset + padding + primaryCardHeight + cardSpacing + 25.dp.toPx(),
+            topAppBarHeight + statusBarHeight + padding + primaryCardHeight + cardSpacing + 25.dp.toPx(),
             textPaint
         )
         
@@ -362,7 +362,7 @@ private fun UITemplateOverlay(backgroundTransparency: Float = 0.0f) {
         drawContext.canvas.nativeCanvas.drawText(
             "System Info",
             padding + 12.dp.toPx(),
-            topOffset + padding + primaryCardHeight + cardSpacing + secondaryCardHeight + cardSpacing + 25.dp.toPx(),
+            topAppBarHeight + statusBarHeight + padding + primaryCardHeight + cardSpacing + secondaryCardHeight + cardSpacing + 25.dp.toPx(),
             textPaint
         )
     }
