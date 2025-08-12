@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -301,17 +302,14 @@ fun PhotoEditor(
                         translationY = offsetY,
                         rotationZ = rotation,
                         scaleX = scale * (if (flipHorizontal) -1f else 1f),
-                        scaleY = scale * (if (flipVertical) -1f else 1f)
+                        scaleY = scale * (if (flipVertical) -1f else 1f),
+                        transformOrigin = androidx.compose.ui.graphics.TransformOrigin.Center
                     )
                     .pointerInput(Unit) {
                         detectTransformGestures { _, pan, zoom, rotationChange ->
-                            // Always allow zoom regardless of free-form mode
-                            val newScale = (scale * zoom).coerceIn(0.1f, 5f)
-                            scale = newScale
-                            
                             if (freeFormMode) {
-                                // Normalize pan by current scale to maintain consistent drag speed
-                                // This ensures that dragging feels the same regardless of zoom level
+                                // Normalize pan by current scale BEFORE updating scale
+                                // This ensures consistent drag speed regardless of zoom level
                                 val normalizedPanX = pan.x / scale
                                 val normalizedPanY = pan.y / scale
                                 offsetX += normalizedPanX
@@ -320,6 +318,11 @@ fun PhotoEditor(
                                 // Apply rotation
                                 rotation += rotationChange
                             }
+                            
+                            // Always allow zoom regardless of free-form mode
+                            // Update scale after pan normalization to avoid affecting drag speed
+                            val newScale = (scale * zoom).coerceIn(0.1f, 5f)
+                            scale = newScale
                         }
                     },
                 contentScale = ContentScale.Fit,
