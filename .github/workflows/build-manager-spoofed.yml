@@ -145,7 +145,7 @@ jobs:
       - name: Setup need_upload
         id: need_upload
         run: |
-          if [ ! -z "${{ secrets.BOT_TOKEN }}" ]; then
+          if [ ! -z "${{ secrets.TELEGRAM_BOT_TOKEN }}" ]; then
             echo "UPLOAD=true" >> $GITHUB_OUTPUT
           else
             echo "UPLOAD=false" >> $GITHUB_OUTPUT
@@ -326,15 +326,15 @@ jobs:
         env:
           API_ID: ${{ secrets.API_ID }}
           API_HASH: ${{ secrets.API_HASH }}
-          CHAT_ID: ${{ secrets.CHAT_ID }}
-          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-          MESSAGE_THREAD_ID: ${{ secrets.MESSAGE_THREAD_ID }}
+          CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          MESSAGE_THREAD_ID: ${{ secrets.TELEGRAM_TOPIC_ID }}
           COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
           COMMIT_URL: ${{ github.event.head_commit.url }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           TITLE: Spoofed Manager (TEST BUILD)
         run: |
-          if [ ! -z "${{ secrets.BOT_TOKEN }}" ]; then
+          if [ ! -z "${{ secrets.TELEGRAM_BOT_TOKEN }}" ]; then
             export VERSION=$(git rev-list --count HEAD)
             APK=$(find ./app/build/outputs/apk/release -name "*.apk")
             pip3 install telethon
@@ -344,9 +344,9 @@ jobs:
       - name: Send APK to Telegram
         run: |
           # Check if required secrets are available
-          if [ -z "${{ secrets.BOT_TOKEN }}" ] || [ -z "${{ secrets.CHAT_ID }}" ]; then
+          if [ -z "${{ secrets.TELEGRAM_BOT_TOKEN }}" ] || [ -z "${{ secrets.TELEGRAM_CHAT_ID }}" ]; then
             echo "⚠️ Telegram secrets not configured - skipping upload"
-            echo "Required: BOT_TOKEN, CHAT_ID"
+            echo "Required: TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID"
             exit 0
           fi
           
@@ -362,12 +362,12 @@ jobs:
             🏃 [Workflow](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
             
             echo "📤 Uploading to Telegram..."
-            curl -F "chat_id=${{ secrets.CHAT_ID }}" \
+            curl -F "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
                  -F "document=@${APK}" \
                  -F "caption=${CAPTION}" \
                  -F "parse_mode=Markdown" \
-                 -F "reply_to_message_id=${{ secrets.MESSAGE_THREAD_ID }}" \
-                 "https://api.telegram.org/bot${{ secrets.BOT_TOKEN }}/sendDocument"
+                 -F "reply_to_message_id=${{ secrets.TELEGRAM_TOPIC_ID }}" \
+                 "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendDocument"
           else
             echo "❌ APK file not found!"
             exit 1
