@@ -426,10 +426,9 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                         // Crop button (only show if background image is selected)
                         if (backgroundImageUri != null) {
                             IconButton(onClick = {
-                                // Open crop dialog for current image
+                                // Navigate to PhotoEditor for current image
                                 backgroundImageUri?.let { uriString ->
-                                    selectedImageUri = Uri.parse(uriString)
-                                    showCropDialog = true
+                                    navigator.navigate(PhotoEditorScreenDestination(imageUri = uriString))
                                 }
                             }) {
                                 Icon(Icons.Filled.Crop, stringResource(R.string.crop_background_image))
