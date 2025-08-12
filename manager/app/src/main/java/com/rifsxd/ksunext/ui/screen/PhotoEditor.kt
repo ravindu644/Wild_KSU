@@ -190,11 +190,17 @@ fun PhotoEditorScreen(
                 if (editedImageUri != null) {
                     // Clean up old background image
                     ImageStorageUtils.deleteInternalBackgroundImage(context)
-                    // Save the edited image URI as background
-                    prefs.edit().putString("background_image_uri", editedImageUri).apply()
+                    // Save the edited image URI as background and reset transparency to make it visible
+                    prefs.edit()
+                        .putString("background_image_uri", editedImageUri)
+                        .putFloat("background_transparency", 0.0f) // Reset darkness to 0% so image is visible
+                        .apply()
                 } else {
-                    // Fallback: save original URI if editing failed
-                    prefs.edit().putString("background_image_uri", imageUri).apply()
+                    // Fallback: save original URI if editing failed and reset transparency
+                    prefs.edit()
+                        .putString("background_image_uri", imageUri)
+                        .putFloat("background_transparency", 0.0f) // Reset darkness to 0% so image is visible
+                        .apply()
                 }
                 
                 navigator.popBackStack()
