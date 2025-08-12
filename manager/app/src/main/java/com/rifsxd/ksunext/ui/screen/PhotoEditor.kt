@@ -104,8 +104,9 @@ fun PhotoEditor(
     
     // UI state
     var freeFormMode by remember { mutableStateOf(true) }
-    var showRotationMenu by remember { mutableStateOf(false) }
+    var showCropMenu by remember { mutableStateOf(false) }
     var showColorMenu by remember { mutableStateOf(false) }
+    var hideControls by remember { mutableStateOf(false) }
     
     // Simple image painter without custom decoders
     val painter = rememberAsyncImagePainter(
@@ -118,6 +119,66 @@ fun PhotoEditor(
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
+        // Top bar with confirm and cancel buttons
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.TopCenter)
+                .padding(16.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainer
+            ),
+            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Cancel button
+                Button(
+                    onClick = onDismiss,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer
+                    )
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Cancel",
+                        tint = MaterialTheme.colorScheme.onErrorContainer
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Cancel",
+                        color = MaterialTheme.colorScheme.onErrorContainer
+                    )
+                }
+            }
+        }
+        
+                
+                // Confirm button
+                Button(
+                    onClick = { onSave(scale, offsetX, offsetY, rotation, brightness, contrast, saturation, hue) },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary
+                    )
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Check,
+                        contentDescription = "Confirm",
+                        tint = MaterialTheme.colorScheme.onPrimary
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Confirm",
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                }
+            }
+        }
         // Create color matrix for adjustments
         val colorMatrix = remember(brightness, contrast, saturation, hue) {
             ColorMatrix().apply {
@@ -179,116 +240,101 @@ fun PhotoEditor(
             colorFilter = ColorFilter.colorMatrix(colorMatrix)
         )
         
-        // No top bar - all controls moved to bottom
-        
-        // Bottom bar with all controls
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.BottomCenter)
-                .padding(16.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainer
-            ),
-            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp)
+        // Bottom controls (only show if not hidden)
+        if (!hideControls) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter)
+                    .padding(16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
             ) {
-                // Main button row
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    verticalAlignment = Alignment.CenterVertically
+                Column(
+                    modifier = Modifier.padding(16.dp)
                 ) {
-                    // Rotation menu button
-                    IconButton(
-                        onClick = { 
-                            showRotationMenu = !showRotationMenu
-                            showColorMenu = false
-                        },
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(if (showRotationMenu) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant)
+                    // Main button row - 4 buttons as requested
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.RotateRight,
-                            contentDescription = "Rotation Settings",
-                            tint = if (showRotationMenu) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                        // Crop menu button (renamed from rotation)
+                        IconButton(
+                            onClick = { 
+                                showCropMenu = !showCropMenu
+                                showColorMenu = false
+                            },
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(if (showCropMenu) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Crop,
+                                contentDescription = "Crop Menu",
+                                tint = if (showCropMenu) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        
+                        // Color menu button
+                        IconButton(
+                            onClick = { 
+                                showColorMenu = !showColorMenu
+                                showCropMenu = false
+                            },
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(if (showColorMenu) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Tune,
+                                contentDescription = "Color Menu",
+                                tint = if (showColorMenu) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        
+                        // Reset button
+                        IconButton(
+                            onClick = {
+                                scale = 1f
+                                offsetX = 0f
+                                offsetY = 0f
+                                rotation = 0f
+                                brightness = 0f
+                                contrast = 1f
+                                saturation = 1f
+                                hue = 0f
+                            },
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(MaterialTheme.colorScheme.surfaceVariant)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Refresh,
+                                contentDescription = "Reset",
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        
+                        // Hide controls button
+                        IconButton(
+                            onClick = { hideControls = true },
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(MaterialTheme.colorScheme.surfaceVariant)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.VisibilityOff,
+                                contentDescription = "Hide Controls",
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
                     }
-                    
-                    // Color menu button
-                    IconButton(
-                        onClick = { 
-                            showColorMenu = !showColorMenu
-                            showRotationMenu = false
-                        },
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(if (showColorMenu) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Tune,
-                            contentDescription = "Color Settings",
-                            tint = if (showColorMenu) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                    
-                    // Reset button
-                    IconButton(
-                        onClick = {
-                            scale = 1f
-                            offsetX = 0f
-                            offsetY = 0f
-                            rotation = 0f
-                            brightness = 0f
-                            contrast = 1f
-                            saturation = 1f
-                            hue = 0f
-                        },
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(MaterialTheme.colorScheme.surfaceVariant)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Refresh,
-                            contentDescription = "Reset",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                    
-                    // Cancel button
-                    IconButton(
-                        onClick = onDismiss,
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(MaterialTheme.colorScheme.errorContainer)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = "Cancel",
-                            tint = MaterialTheme.colorScheme.onErrorContainer
-                        )
-                    }
-                    
-                    // Confirm button
-                    IconButton(
-                        onClick = { onSave(scale, offsetX, offsetY, rotation, brightness, contrast, saturation, hue) },
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(MaterialTheme.colorScheme.primary)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Check,
-                            contentDescription = "Confirm",
-                            tint = MaterialTheme.colorScheme.onPrimary
-                        )
-                    }
-                }
                 
-                // Rotation menu (expandable)
-                if (showRotationMenu) {
+                    // Crop menu (expandable) - renamed from rotation menu
+                if (showCropMenu) {
                     Spacer(modifier = Modifier.height(16.dp))
                     
                     Card(
@@ -301,7 +347,7 @@ fun PhotoEditor(
                             modifier = Modifier.padding(16.dp)
                         ) {
                             Text(
-                                text = "Rotation Settings",
+                                text = "Crop Settings",
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colorScheme.onSurface
