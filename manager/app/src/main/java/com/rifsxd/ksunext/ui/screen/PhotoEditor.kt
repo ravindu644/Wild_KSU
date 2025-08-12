@@ -3,6 +3,7 @@ package com.rifsxd.ksunext.ui.screen
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.media.ExifInterface
 import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -65,8 +66,29 @@ suspend fun saveEditedImage(
                 BitmapFactory.decodeStream(input, null, options)
             } ?: return@withContext null
             
+            // Read EXIF orientation and apply correction
+            val exifOrientation = try {
+                context.contentResolver.openInputStream(originalUri)?.use { input ->
+                    val exif = ExifInterface(input)
+                    exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
+                }
+            } catch (e: Exception) {
+                ExifInterface.ORIENTATION_NORMAL
+            } ?: ExifInterface.ORIENTATION_NORMAL
+            
+            // Calculate EXIF rotation correction
+            val exifRotation = when (exifOrientation) {
+                ExifInterface.ORIENTATION_ROTATE_90 -> -90f
+                ExifInterface.ORIENTATION_ROTATE_180 -> -180f
+                ExifInterface.ORIENTATION_ROTATE_270 -> -270f
+                else -> 0f
+            }
+            
+            // Apply EXIF correction to user rotation
+            val correctedRotation = rotation + exifRotation
+            
             // Calculate output dimensions considering rotation
-            val radians = Math.toRadians(rotation.toDouble())
+            val radians = Math.toRadians(correctedRotation.toDouble())
             val cos = kotlin.math.abs(kotlin.math.cos(radians))
             val sin = kotlin.math.abs(kotlin.math.sin(radians))
             
@@ -104,9 +126,9 @@ suspend fun saveEditedImage(
             )
             
             // Apply rotation around center
-            if (rotation != 0f) {
+            if (correctedRotation != 0f) {
                 matrix.postRotate(
-                    rotation,
+                    correctedRotation,
                     rotatedWidth / 2f,
                     rotatedHeight / 2f
                 )
