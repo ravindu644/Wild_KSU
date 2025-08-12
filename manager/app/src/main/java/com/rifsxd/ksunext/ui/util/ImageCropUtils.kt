@@ -113,7 +113,7 @@ object ImageCropUtils {
     }
     
     // Simplified transformation for crop settings only
-    // Note: Rotation is excluded since it's now applied directly to the bitmap in PhotoEditor
+    // Note: All transformations are now applied via graphicsLayer (like original AdvancedImageCropDialog)
     fun getSimpleCropTransformation(
         prefs: SharedPreferences
     ): androidx.compose.ui.Modifier.() -> androidx.compose.ui.Modifier {
@@ -124,7 +124,7 @@ object ImageCropUtils {
                 scaleY = constrainScale(cropSettings.scale),
                 translationX = constrainTranslation(cropSettings.offsetX),
                 translationY = constrainTranslation(cropSettings.offsetY),
-                // rotationZ = constrainRotation(cropSettings.rotation), // Removed: rotation is applied to bitmap
+                rotationZ = constrainRotation(cropSettings.rotation), // Restored: rotation via graphicsLayer
                 transformOrigin = androidx.compose.ui.graphics.TransformOrigin.Center
             )
         }

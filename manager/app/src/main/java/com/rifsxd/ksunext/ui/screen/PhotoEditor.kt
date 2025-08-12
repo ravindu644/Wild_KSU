@@ -1,8 +1,6 @@
 package com.rifsxd.ksunext.ui.screen
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 // Removed ExifInterface import - not needed for simple rotation
 import android.net.Uri
 import androidx.compose.foundation.Image
@@ -31,171 +29,13 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.rifsxd.ksunext.ui.util.ImageStorageUtils
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.io.File
-import java.io.FileOutputStream
 import coil.ImageLoader
 import coil.request.ImageRequest
 import coil.request.SuccessResult
 
-// Function to save edited image with transformations
-suspend fun saveEditedImage(
-    context: Context,
-    originalUri: Uri,
-    offsetX: Float,
-    offsetY: Float,
-    rotation: Float,
-    scale: Float,
-    brightness: Float,
-    contrast: Float,
-    saturation: Float,
-    hue: Float,
-    flipHorizontal: Boolean,
-    flipVertical: Boolean
-): String? {
-    return withContext(Dispatchers.IO) {
-        try {
-            // Load the original bitmap without automatic EXIF orientation handling
-            val options = BitmapFactory.Options().apply {
-                inJustDecodeBounds = false
-                inPreferredConfig = Bitmap.Config.ARGB_8888
-            }
-            val originalBitmap = context.contentResolver.openInputStream(originalUri)?.use { input ->
-                BitmapFactory.decodeStream(input, null, options)
-            } ?: return@withContext null
-            
-            // Use rotation directly without EXIF correction (like AdvancedImageCropDialog)
-            // Invert rotation direction to match UI coordinate system
-            val correctedRotation = -rotation
-            
-            // Calculate output dimensions considering rotation
-            val radians = Math.toRadians(correctedRotation.toDouble())
-            val cos = kotlin.math.abs(kotlin.math.cos(radians))
-            val sin = kotlin.math.abs(kotlin.math.sin(radians))
-            
-            val scaledWidth = (originalBitmap.width * scale).toInt()
-            val scaledHeight = (originalBitmap.height * scale).toInt()
-            
-            val rotatedWidth = (scaledWidth * cos + scaledHeight * sin).toInt()
-            val rotatedHeight = (scaledWidth * sin + scaledHeight * cos).toInt()
-            
-            // Create output bitmap with proper dimensions
-            val transformedBitmap = Bitmap.createBitmap(
-                rotatedWidth,
-                rotatedHeight,
-                Bitmap.Config.ARGB_8888
-            )
-            
-            val canvas = android.graphics.Canvas(transformedBitmap)
-            val paint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG)
-            
-            // Create transformation matrix
-            val matrix = android.graphics.Matrix()
-            
-            // Move to center of output canvas
-            matrix.postTranslate(
-                rotatedWidth / 2f - originalBitmap.width / 2f,
-                rotatedHeight / 2f - originalBitmap.height / 2f
-            )
-            
-            // Apply scale and flip
-            matrix.postScale(
-                scale * (if (flipHorizontal) -1f else 1f),
-                scale * (if (flipVertical) -1f else 1f),
-                rotatedWidth / 2f,
-                rotatedHeight / 2f
-            )
-            
-            // Apply rotation around center
-            if (correctedRotation != 0f) {
-                matrix.postRotate(
-                    correctedRotation,
-                    rotatedWidth / 2f,
-                    rotatedHeight / 2f
-                )
-            }
-            
-            // Apply translation (offset)
-            matrix.postTranslate(offsetX, offsetY)
-            
-            // Draw the transformed bitmap
-            canvas.drawBitmap(originalBitmap, matrix, paint)
-            
-            // Apply color adjustments
-            val finalBitmap = if (brightness != 0f || contrast != 0f || saturation != 0f || hue != 0f) {
-                val colorMatrix = android.graphics.ColorMatrix()
-                
-                // Apply saturation
-                val saturationValue = (saturation + 100f) / 100f
-                colorMatrix.setSaturation(saturationValue)
-                
-                // Apply brightness and contrast
-                val contrastValue = (contrast + 100f) / 100f
-                val brightnessValue = brightness * 255f / 100f
-                
-                val contrastMatrix = android.graphics.ColorMatrix(floatArrayOf(
-                    contrastValue, 0f, 0f, 0f, brightnessValue,
-                    0f, contrastValue, 0f, 0f, brightnessValue,
-                    0f, 0f, contrastValue, 0f, brightnessValue,
-                    0f, 0f, 0f, 1f, 0f
-                ))
-                
-                colorMatrix.postConcat(contrastMatrix)
-                
-                // Apply hue rotation
-                if (hue != 0f) {
-                    val hueMatrix = android.graphics.ColorMatrix()
-                    hueMatrix.setRotate(0, hue) // Red
-                    hueMatrix.setRotate(1, hue) // Green  
-                    hueMatrix.setRotate(2, hue) // Blue
-                    colorMatrix.postConcat(hueMatrix)
-                }
-                
-                val paint = android.graphics.Paint()
-                paint.colorFilter = android.graphics.ColorMatrixColorFilter(colorMatrix)
-                
-                val adjustedBitmap = Bitmap.createBitmap(
-                    transformedBitmap.width,
-                    transformedBitmap.height,
-                    Bitmap.Config.ARGB_8888
-                )
-                
-                val canvas = android.graphics.Canvas(adjustedBitmap)
-                canvas.drawBitmap(transformedBitmap, 0f, 0f, paint)
-                
-                transformedBitmap.recycle()
-                adjustedBitmap
-            } else {
-                transformedBitmap
-            }
-            
-            // Save to internal storage
-            val imagesDir = File(context.filesDir, "images")
-            if (!imagesDir.exists()) {
-                imagesDir.mkdirs()
-            }
-            
-            val fileName = "background_edited_${System.currentTimeMillis()}.jpg"
-            val file = File(imagesDir, fileName)
-            
-            FileOutputStream(file).use { out ->
-                finalBitmap.compress(Bitmap.CompressFormat.JPEG, 90, out)
-            }
-            
-            // Clean up bitmaps
-            originalBitmap.recycle()
-            finalBitmap.recycle()
-            
-            // Return file URI
-            ImageStorageUtils.filePathToUri(file.absolutePath)
-        } catch (e: Exception) {
-            android.util.Log.e("PhotoEditor", "Failed to save edited image", e)
-            null
-        }
-    }
-}
+// Note: Removed saveEditedImage function - now using SharedPreferences approach like original AdvancedImageCropDialog
+// All transformations are applied via graphicsLayer in the UI instead of bitmap processing
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Destination<RootGraph>
@@ -215,58 +55,25 @@ fun PhotoEditorScreen(
             navigator.popBackStack()
         },
         onSave = { offsetX, offsetY, rotation, scale, brightness, contrast, saturation, hue, flipHorizontal, flipVertical ->
-            coroutineScope.launch {
-                val editedImageUri = saveEditedImage(
-                    context = context,
-                    originalUri = uri,
-                    offsetX = offsetX,
-                    offsetY = offsetY,
-                    rotation = rotation,
-                    scale = scale,
-                    brightness = brightness,
-                    contrast = contrast,
-                    saturation = saturation,
-                    hue = hue,
-                    flipHorizontal = flipHorizontal,
-                    flipVertical = flipVertical
-                )
-                
-                if (editedImageUri != null) {
-                    // Clean up old background image
-                    ImageStorageUtils.deleteInternalBackgroundImage(context)
-                    // Save the edited image URI as background and reset transparency to make it visible
-                    prefs.edit()
-                        .putString("background_image_uri", editedImageUri)
-                        .putFloat("background_transparency", 0.0f) // Reset darkness to 0% so image is visible
-                        .apply()
-                    
-                    // Save crop settings for the background image (no rotation since it's already applied to bitmap)
-                    val cropSettings = com.rifsxd.ksunext.ui.component.ImageCropSettings(
-                        scale = 1.0f,
-                        offsetX = 0.0f,
-                        offsetY = 0.0f,
-                        rotation = 0.0f
-                    )
-                    com.rifsxd.ksunext.ui.util.ImageCropUtils.saveImageCropSettings(prefs, editedImageUri, cropSettings)
-                } else {
-                    // Fallback: save original URI if editing failed and reset transparency
-                    prefs.edit()
-                        .putString("background_image_uri", imageUri)
-                        .putFloat("background_transparency", 0.0f) // Reset darkness to 0% so image is visible
-                        .apply()
-                    
-                    // Save crop settings for the original image (no rotation since it's already applied to bitmap)
-                    val cropSettings = com.rifsxd.ksunext.ui.component.ImageCropSettings(
-                        scale = 1.0f,
-                        offsetX = 0.0f,
-                        offsetY = 0.0f,
-                        rotation = 0.0f
-                    )
-                    com.rifsxd.ksunext.ui.util.ImageCropUtils.saveImageCropSettings(prefs, imageUri, cropSettings)
-                }
-                
-                navigator.popBackStack()
-            }
+            // Save original image URI and transformation settings to SharedPreferences (like AdvancedImageCropDialog)
+            prefs.edit()
+                .putString("background_image_uri", imageUri)
+                .putFloat("background_transparency", 0.0f) // Reset darkness to 0% so image is visible
+                .apply()
+            
+            // Save crop settings with all transformations to be applied via graphicsLayer
+            val cropSettings = com.rifsxd.ksunext.ui.component.ImageCropSettings(
+                scale = scale,
+                offsetX = offsetX,
+                offsetY = offsetY,
+                rotation = rotation
+            )
+            com.rifsxd.ksunext.ui.util.ImageCropUtils.saveImageCropSettings(prefs, imageUri, cropSettings)
+            
+            // TODO: Save color adjustments (brightness, contrast, saturation, hue, flip) to SharedPreferences
+            // For now, these will be lost when switching back to graphicsLayer approach
+            
+            navigator.popBackStack()
         }
     )
 }
