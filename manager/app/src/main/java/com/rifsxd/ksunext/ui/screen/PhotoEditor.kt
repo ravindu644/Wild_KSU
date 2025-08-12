@@ -56,9 +56,13 @@ suspend fun saveEditedImage(
 ): String? {
     return withContext(Dispatchers.IO) {
         try {
-            // Load the original bitmap
+            // Load the original bitmap without automatic EXIF orientation handling
+            val options = BitmapFactory.Options().apply {
+                inJustDecodeBounds = false
+                inPreferredConfig = Bitmap.Config.ARGB_8888
+            }
             val originalBitmap = context.contentResolver.openInputStream(originalUri)?.use { input ->
-                BitmapFactory.decodeStream(input)
+                BitmapFactory.decodeStream(input, null, options)
             } ?: return@withContext null
             
             // Calculate output dimensions considering rotation
@@ -289,7 +293,10 @@ fun PhotoEditor(
     var showTransforms by remember { mutableStateOf(false) }
     
     val painter = rememberAsyncImagePainter(
-        model = imageUri,
+        model = ImageRequest.Builder(LocalContext.current)
+            .data(imageUri)
+            .respectCacheHeaders(false)
+            .build(),
         onError = { error ->
             android.util.Log.e("PhotoEditor", "Failed to load image URI: $imageUri, Error: ${error.result.throwable?.message}")
         },
