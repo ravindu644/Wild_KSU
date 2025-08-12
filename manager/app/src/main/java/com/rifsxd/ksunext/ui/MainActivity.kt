@@ -832,28 +832,50 @@ fun PhotoEditorTopBar(
     modifier: Modifier = Modifier
 ) {
     val saveFunction = com.rifsxd.ksunext.ui.screen.LocalPhotoEditorSave.current
+    val hideControlsFunction = com.rifsxd.ksunext.ui.screen.LocalPhotoEditorHideControls.current
+    val surfaceContainer = MaterialTheme.colorScheme.surfaceContainer
+    val containerColor = remember(surfaceContainer) { surfaceContainer }
     
     TopAppBar(
-        title = { Text("Photo Editor") },
+        title = { 
+            Text(
+                text = "Photo Editor",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Black,
+            )
+        },
         navigationIcon = {
             IconButton(onClick = { navigator.popBackStack() }) {
-                Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
             }
         },
         actions = {
-            TextButton(
-                onClick = { navigator.popBackStack() }
+            IconButton(
+                onClick = {
+                    hideControlsFunction?.invoke()
+                }
             ) {
-                Text("Cancel")
+                Icon(
+                    imageVector = Icons.Default.VisibilityOff,
+                    contentDescription = "Hide Controls"
+                )
             }
-            TextButton(
+            IconButton(
                 onClick = {
                     saveFunction?.invoke()
                 }
             ) {
-                Text("Confirm")
+                Icon(
+                    imageVector = Icons.Default.Check,
+                    contentDescription = "Save",
+                    tint = MaterialTheme.colorScheme.primary
+                )
             }
         },
+        windowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = containerColor
+        ),
         modifier = modifier
     )
 }

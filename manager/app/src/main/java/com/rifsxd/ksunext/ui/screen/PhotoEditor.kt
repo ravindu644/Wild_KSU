@@ -42,6 +42,8 @@ import com.rifsxd.ksunext.ui.util.BackgroundEditorUtils
 
 // CompositionLocal for sharing save function with top bar
 val LocalPhotoEditorSave = compositionLocalOf<(() -> Unit)?> { null }
+// CompositionLocal for sharing hide controls state with top bar
+val LocalPhotoEditorHideControls = compositionLocalOf<(() -> Unit)?> { null }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Destination<RootGraph>
@@ -54,10 +56,14 @@ fun PhotoEditorScreen(
     val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
     val uri = Uri.parse(imageUri)
     
-    // Create a mutable state to hold the save function
+    // Create mutable states to hold the save function and hide controls function
     var saveFunction by remember { mutableStateOf<(() -> Unit)?>(null) }
+    var hideControlsFunction by remember { mutableStateOf<(() -> Unit)?>(null) }
     
-    CompositionLocalProvider(LocalPhotoEditorSave provides saveFunction) {
+    CompositionLocalProvider(
+        LocalPhotoEditorSave provides saveFunction,
+        LocalPhotoEditorHideControls provides hideControlsFunction
+    ) {
         PhotoEditor(
             imageUri = uri,
             onDismiss = {
@@ -94,6 +100,9 @@ fun PhotoEditorScreen(
             },
             onProvideSaveFunction = { saveFunc ->
                 saveFunction = saveFunc
+            },
+            onProvideHideControlsFunction = { hideFunc ->
+                hideControlsFunction = hideFunc
             }
         )
     }
@@ -105,7 +114,8 @@ fun PhotoEditor(
     imageUri: Uri?,
     onDismiss: () -> Unit,
     onSave: (Float, Float, Float, Float, Float, Float, Float, Float) -> Unit, // scale, offsetX, offsetY, rotation, brightness, contrast, saturation, hue
-    onProvideSaveFunction: (((() -> Unit)) -> Unit)? = null // Callback to provide save function to parent
+    onProvideSaveFunction: (((() -> Unit)) -> Unit)? = null, // Callback to provide save function to parent
+    onProvideHideControlsFunction: (((() -> Unit)) -> Unit)? = null // Callback to provide hide controls function to parent
 ) {
     // Transform states - simple like original AdvancedImageTransformDialog
     var scale by remember { mutableFloatStateOf(1f) }
@@ -125,10 +135,13 @@ fun PhotoEditor(
     var showColorMenu by remember { mutableStateOf(false) }
     var hideControls by remember { mutableStateOf(false) }
     
-    // Provide save function to parent
+    // Provide save function and hide controls function to parent
     LaunchedEffect(Unit) {
         onProvideSaveFunction?.invoke {
             onSave(scale, offsetX, offsetY, rotation, brightness, contrast, saturation, hue)
+        }
+        onProvideHideControlsFunction?.invoke {
+            hideControls = true
         }
     }
     
