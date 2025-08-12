@@ -56,10 +56,94 @@ suspend fun saveEditedImage(
 ): String? {
     return withContext(Dispatchers.IO) {
         try {
-            // For performance, we'll save the original image and store transformations as metadata
-            // This avoids the expensive bitmap transformation process
+            // Load the original bitmap
+            val originalBitmap = context.contentResolver.openInputStream(originalUri)?.use { input ->
+                BitmapFactory.decodeStream(input)
+            } ?: return@withContext null
             
-            // Copy original image to internal storage if it's not already there
+            // Create a canvas to apply transformations
+            val matrix = android.graphics.Matrix()
+            
+            // Apply transformations in the correct order
+            // 1. Scale
+            matrix.postScale(
+                scale * (if (flipHorizontal) -1f else 1f),
+                scale * (if (flipVertical) -1f else 1f),
+                originalBitmap.width / 2f,
+                originalBitmap.height / 2f
+            )
+            
+            // 2. Rotation around center
+            if (rotation != 0f) {
+                matrix.postRotate(
+                    rotation,
+                    originalBitmap.width / 2f,
+                    originalBitmap.height / 2f
+                )
+            }
+            
+            // 3. Translation (offset)
+            matrix.postTranslate(offsetX, offsetY)
+            
+            // Create transformed bitmap
+            val transformedBitmap = Bitmap.createBitmap(
+                originalBitmap,
+                0, 0,
+                originalBitmap.width,
+                originalBitmap.height,
+                matrix,
+                true
+            )
+            
+            // Apply color adjustments
+            val finalBitmap = if (brightness != 0f || contrast != 0f || saturation != 0f || hue != 0f) {
+                val colorMatrix = android.graphics.ColorMatrix()
+                
+                // Apply saturation
+                val saturationValue = (saturation + 100f) / 100f
+                colorMatrix.setSaturation(saturationValue)
+                
+                // Apply brightness and contrast
+                val contrastValue = (contrast + 100f) / 100f
+                val brightnessValue = brightness * 255f / 100f
+                
+                val contrastMatrix = android.graphics.ColorMatrix(floatArrayOf(
+                    contrastValue, 0f, 0f, 0f, brightnessValue,
+                    0f, contrastValue, 0f, 0f, brightnessValue,
+                    0f, 0f, contrastValue, 0f, brightnessValue,
+                    0f, 0f, 0f, 1f, 0f
+                ))
+                
+                colorMatrix.postConcat(contrastMatrix)
+                
+                // Apply hue rotation
+                if (hue != 0f) {
+                    val hueMatrix = android.graphics.ColorMatrix()
+                    hueMatrix.setRotate(0, hue) // Red
+                    hueMatrix.setRotate(1, hue) // Green  
+                    hueMatrix.setRotate(2, hue) // Blue
+                    colorMatrix.postConcat(hueMatrix)
+                }
+                
+                val paint = android.graphics.Paint()
+                paint.colorFilter = android.graphics.ColorMatrixColorFilter(colorMatrix)
+                
+                val adjustedBitmap = Bitmap.createBitmap(
+                    transformedBitmap.width,
+                    transformedBitmap.height,
+                    Bitmap.Config.ARGB_8888
+                )
+                
+                val canvas = android.graphics.Canvas(adjustedBitmap)
+                canvas.drawBitmap(transformedBitmap, 0f, 0f, paint)
+                
+                transformedBitmap.recycle()
+                adjustedBitmap
+            } else {
+                transformedBitmap
+            }
+            
+            // Save to internal storage
             val imagesDir = File(context.filesDir, "images")
             if (!imagesDir.exists()) {
                 imagesDir.mkdirs()
@@ -68,31 +152,16 @@ suspend fun saveEditedImage(
             val fileName = "background_edited_${System.currentTimeMillis()}.jpg"
             val file = File(imagesDir, fileName)
             
-            // Copy original image with JPEG compression for faster loading
-            context.contentResolver.openInputStream(originalUri)?.use { input ->
-                val originalBitmap = BitmapFactory.decodeStream(input)
-                FileOutputStream(file).use { out ->
-                    // Use JPEG with 85% quality for faster loading while maintaining good quality
-                    originalBitmap.compress(Bitmap.CompressFormat.JPEG, 85, out)
-                }
-                originalBitmap.recycle()
+            FileOutputStream(file).use { out ->
+                finalBitmap.compress(Bitmap.CompressFormat.JPEG, 90, out)
             }
             
-            // Store transformation metadata in SharedPreferences for faster access
-            val prefs = context.getSharedPreferences("settings", android.content.Context.MODE_PRIVATE)
-            val fileUri = ImageStorageUtils.filePathToUri(file.absolutePath)
-            
-            prefs.edit()
-                .putFloat("edit_brightness", brightness)
-                .putFloat("edit_contrast", contrast)
-                .putFloat("edit_saturation", saturation)
-                .putFloat("edit_hue", hue)
-                .putBoolean("edit_flip_horizontal", flipHorizontal)
-                .putBoolean("edit_flip_vertical", flipVertical)
-                .apply()
+            // Clean up bitmaps
+            originalBitmap.recycle()
+            finalBitmap.recycle()
             
             // Return file URI
-            fileUri
+            ImageStorageUtils.filePathToUri(file.absolutePath)
         } catch (e: Exception) {
             android.util.Log.e("PhotoEditor", "Failed to save edited image", e)
             null
@@ -196,7 +265,7 @@ fun PhotoEditor(
     var flipVertical by remember { mutableStateOf(false) }
     
     // UI states
-    var freeFormMode by remember { mutableStateOf(false) }
+    var freeFormMode by remember { mutableStateOf(true) }
     var showAdjustments by remember { mutableStateOf(false) }
     var showTransforms by remember { mutableStateOf(false) }
     
