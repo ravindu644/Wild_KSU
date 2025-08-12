@@ -137,77 +137,71 @@ fun AdvancedImageCropDialog(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxWidth()
+                        .pointerInput(Unit) {
+                            detectTransformGestures(
+                                panZoomLock = false
+                            ) { _, pan, zoom, rotationDelta ->
+                                // Apply zoom
+                                scale = (scale * zoom).coerceIn(minScale, maxScale)
+                                // Apply pan/drag
+                                offsetX = (offsetX + pan.x).coerceIn(minTranslation, maxTranslation)
+                                offsetY = (offsetY + pan.y).coerceIn(minTranslation, maxTranslation)
+                                // Apply rotation with finger drag
+                                rotation = (rotation + rotationDelta) % 360f
+                            }
+                        }
                 ) {
                     // Image preview with full transformations (zoom, drag, and rotation)
-                    Box(
+                    Image(
+                        painter = painter,
+                        contentDescription = "Background Image Preview",
                         modifier = Modifier
                             .fillMaxSize()
-                            .pointerInput(Unit) {
-                                detectTransformGestures(
-                                    panZoomLock = false
-                                ) { _, pan, zoom, rotationDelta ->
-                                    // Apply zoom
-                                    scale = (scale * zoom).coerceIn(minScale, maxScale)
-                                    // Apply pan/drag
-                                    offsetX = (offsetX + pan.x).coerceIn(minTranslation, maxTranslation)
-                                    offsetY = (offsetY + pan.y).coerceIn(minTranslation, maxTranslation)
-                                    // Apply rotation with finger drag
-                                    rotation = (rotation + rotationDelta) % 360f
-                                }
-                            },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Image(
-                            painter = painter,
-                            contentDescription = "Background Image Preview",
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .graphicsLayer(
-                                    scaleX = scale * if (flipHorizontal) -1f else 1f,
-                                    scaleY = scale * if (flipVertical) -1f else 1f,
-                                    translationX = offsetX,
-                                    translationY = offsetY,
-                                    rotationZ = rotation,
-                                    alpha = brightness.coerceIn(0.1f, 2.0f)
-                                ),
-                            contentScale = ContentScale.Fit,
-                            colorFilter = ColorFilter.colorMatrix(
-                                    ColorMatrix().apply {
-                                    // Apply contrast
-                                    val contrastValue = contrast.coerceIn(0.1f, 3.0f)
-                                    val translate = (1.0f - contrastValue) / 2.0f * 255.0f
-                                    val scale = contrastValue
-                                    this[0, 0] = scale // Red
-                                    this[1, 1] = scale // Green  
-                                    this[2, 2] = scale // Blue
-                                    this[0, 4] = translate // Red offset
-                                    this[1, 4] = translate // Green offset
-                                    this[2, 4] = translate // Blue offset
-                                    
-                                    // Apply saturation
-                                    val satValue = saturation.coerceIn(0.0f, 2.0f)
-                                    val lumR = 0.3086f
-                                    val lumG = 0.6094f
-                                    val lumB = 0.0820f
-                                    val sr = (1 - satValue) * lumR
-                                    val sg = (1 - satValue) * lumG
-                                    val sb = (1 - satValue) * lumB
-                                    
-                                    this[0, 0] = sr + satValue
-                                    this[0, 1] = sr
-                                    this[0, 2] = sr
-                                    this[1, 0] = sg
-                                    this[1, 1] = sg + satValue
-                                    this[1, 2] = sg
-                                    this[2, 0] = sb
-                                    this[2, 1] = sb
-                                    this[2, 2] = sb + satValue
-                                }
-                            )
+                            .graphicsLayer(
+                                scaleX = scale * if (flipHorizontal) -1f else 1f,
+                                scaleY = scale * if (flipVertical) -1f else 1f,
+                                translationX = offsetX,
+                                translationY = offsetY,
+                                rotationZ = rotation,
+                                alpha = brightness.coerceIn(0.1f, 2.0f)
+                            ),
+                        contentScale = ContentScale.Fit,
+                        colorFilter = ColorFilter.colorMatrix(
+                                ColorMatrix().apply {
+                                // Apply contrast
+                                val contrastValue = contrast.coerceIn(0.1f, 3.0f)
+                                val translate = (1.0f - contrastValue) / 2.0f * 255.0f
+                                val scale = contrastValue
+                                this[0, 0] = scale // Red
+                                this[1, 1] = scale // Green  
+                                this[2, 2] = scale // Blue
+                                this[0, 4] = translate // Red offset
+                                this[1, 4] = translate // Green offset
+                                this[2, 4] = translate // Blue offset
+                                
+                                // Apply saturation
+                                val satValue = saturation.coerceIn(0.0f, 2.0f)
+                                val lumR = 0.3086f
+                                val lumG = 0.6094f
+                                val lumB = 0.0820f
+                                val sr = (1 - satValue) * lumR
+                                val sg = (1 - satValue) * lumG
+                                val sb = (1 - satValue) * lumB
+                                
+                                this[0, 0] = sr + satValue
+                                this[0, 1] = sr
+                                this[0, 2] = sr
+                                this[1, 0] = sg
+                                this[1, 1] = sg + satValue
+                                this[1, 2] = sg
+                                this[2, 0] = sb
+                                this[2, 1] = sb
+                                this[2, 2] = sb + satValue
+                            }
                         )
-                    }
+                    )
                     
-                    // Home layout card template overlay - non-blocking for touch
+                    // Home layout card template overlay - completely non-interactive
                     HomeLayoutCardTemplate(
                         modifier = Modifier.fillMaxSize()
                     )
@@ -687,7 +681,7 @@ private fun PhotoEditorTopBar(
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = Color.Transparent,
+                containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f),
                 titleContentColor = MaterialTheme.colorScheme.onSurface,
                 navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
                 actionIconContentColor = MaterialTheme.colorScheme.onSurface
