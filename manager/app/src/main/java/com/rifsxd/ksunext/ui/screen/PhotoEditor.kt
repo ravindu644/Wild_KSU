@@ -93,27 +93,27 @@ fun PhotoEditor(
     // Create color matrix for image adjustments
     val colorMatrix = ColorMatrix().apply {
         // Brightness
-        val brightnessMatrix = ColorMatrix(
-            floatArrayOf(
+        val brightnessMatrix = ColorMatrix().apply {
+            val brightnessArray = floatArrayOf(
                 1f, 0f, 0f, 0f, brightness * 255,
                 0f, 1f, 0f, 0f, brightness * 255,
                 0f, 0f, 1f, 0f, brightness * 255,
                 0f, 0f, 0f, 1f, 0f
             )
-        )
+            set(brightnessArray)
+        }
         
         // Contrast
         val contrastMatrix = ColorMatrix().apply {
             val scale = contrast
             val translate = (1f - contrast) / 2f * 255f
-            set(
-                floatArrayOf(
-                    scale, 0f, 0f, 0f, translate,
-                    0f, scale, 0f, 0f, translate,
-                    0f, 0f, scale, 0f, translate,
-                    0f, 0f, 0f, 1f, 0f
-                )
+            val contrastArray = floatArrayOf(
+                scale, 0f, 0f, 0f, translate,
+                0f, scale, 0f, 0f, translate,
+                0f, 0f, scale, 0f, translate,
+                0f, 0f, 0f, 1f, 0f
             )
+            set(contrastArray)
         }
         
         // Saturation
@@ -122,9 +122,8 @@ fun PhotoEditor(
         }
         
         // Combine all matrices
-        this *= brightnessMatrix
-        this *= contrastMatrix
-        this *= saturationMatrix
+        this.setConcat(brightnessMatrix, contrastMatrix)
+        this.setConcat(this, saturationMatrix)
     }
     
     // Reset function
