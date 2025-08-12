@@ -212,12 +212,12 @@ fun PhotoEditorScreen(
                         .putFloat("background_transparency", 0.0f) // Reset darkness to 0% so image is visible
                         .apply()
                     
-                    // Save crop settings for the background image
+                    // Save crop settings for the background image (no rotation since it's already applied to bitmap)
                     val cropSettings = com.rifsxd.ksunext.ui.component.ImageCropSettings(
-                        scale = scale,
-                        offsetX = offsetX,
-                        offsetY = offsetY,
-                        rotation = rotation
+                        scale = 1.0f,
+                        offsetX = 0.0f,
+                        offsetY = 0.0f,
+                        rotation = 0.0f
                     )
                     com.rifsxd.ksunext.ui.util.ImageCropUtils.saveImageCropSettings(prefs, editedImageUri, cropSettings)
                 } else {
@@ -227,12 +227,12 @@ fun PhotoEditorScreen(
                         .putFloat("background_transparency", 0.0f) // Reset darkness to 0% so image is visible
                         .apply()
                     
-                    // Save crop settings for the original image
+                    // Save crop settings for the original image (no rotation since it's already applied to bitmap)
                     val cropSettings = com.rifsxd.ksunext.ui.component.ImageCropSettings(
-                        scale = scale,
-                        offsetX = offsetX,
-                        offsetY = offsetY,
-                        rotation = rotation
+                        scale = 1.0f,
+                        offsetX = 0.0f,
+                        offsetY = 0.0f,
+                        rotation = 0.0f
                     )
                     com.rifsxd.ksunext.ui.util.ImageCropUtils.saveImageCropSettings(prefs, imageUri, cropSettings)
                 }
@@ -688,71 +688,7 @@ fun PhotoEditor(
                         )
                     }
                     
-                    // Save to gallery button
-                    val context = LocalContext.current
-                    IconButton(
-                        onClick = {
-                            // Save edited photo to gallery
-                            kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
-                                try {
-                                    val editedImageUri = saveEditedImage(
-                                        context = context,
-                                        originalUri = imageUri!!,
-                                        offsetX = offsetX,
-                                        offsetY = offsetY,
-                                        rotation = rotation,
-                                        scale = scale,
-                                        brightness = brightness,
-                                        contrast = contrast,
-                                        saturation = saturation,
-                                        hue = hue,
-                                        flipHorizontal = flipHorizontal,
-                                        flipVertical = flipVertical
-                                    )
-                                    
-                                    if (editedImageUri != null) {
-                                        // Copy the edited image to Downloads folder
-                                        val downloadsDir = android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_DOWNLOADS)
-                                        val fileName = "edited_photo_${System.currentTimeMillis()}.jpg"
-                                        val destFile = java.io.File(downloadsDir, fileName)
-                                        
-                                        // Copy file from internal storage to Downloads
-                                        val sourceFile = java.io.File(android.net.Uri.parse(editedImageUri).path!!)
-                                        sourceFile.copyTo(destFile, overwrite = true)
-                                        
-                                        // Notify media scanner
-                                        android.media.MediaScannerConnection.scanFile(
-                                            context,
-                                            arrayOf(destFile.absolutePath),
-                                            arrayOf("image/jpeg"),
-                                            null
-                                        )
-                                        
-                                        kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
-                                            android.widget.Toast.makeText(context, "Photo saved to Downloads", android.widget.Toast.LENGTH_SHORT).show()
-                                        }
-                                    } else {
-                                        kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
-                                            android.widget.Toast.makeText(context, "Failed to save photo", android.widget.Toast.LENGTH_SHORT).show()
-                                        }
-                                    }
-                                } catch (e: Exception) {
-                                    kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
-                                        android.widget.Toast.makeText(context, "Error saving photo: ${e.message}", android.widget.Toast.LENGTH_SHORT).show()
-                                    }
-                                }
-                            }
-                        },
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(MaterialTheme.colorScheme.primaryContainer)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Save,
-                            contentDescription = "Save to Gallery",
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                    }
+
                     
                     // Reset all
                     IconButton(
