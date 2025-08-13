@@ -190,43 +190,39 @@ fun PhotoEditor(
         }
     }
     
-    Column(
+    Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        // Main image display area - takes remaining space after controls
-        Box(
-            modifier = Modifier.weight(1f)
-        ) {
-            // Main image display with graphicsLayer transformations and color adjustments
-            Image(
-                painter = painter,
-                contentDescription = "Photo to edit",
-                modifier = Modifier
-                    .fillMaxSize()
-                    .graphicsLayer(
-                        scaleX = scale,
-                        scaleY = scale,
-                        translationX = offsetX,
-                        translationY = offsetY,
-                        rotationZ = rotation,
-                        transformOrigin = TransformOrigin.Center
-                    )
-                    .pointerInput(Unit) {
-                        // Only allow zoom gestures, no dragging or rotation
-                        detectTransformGestures { _, _, zoom, _ ->
-                            // Only allow zoom
-                            scale = (scale * zoom).coerceIn(0.1f, 5f)
-                        }
-                    },
-                contentScale = ContentScale.Fit,
-                colorFilter = ColorFilter.colorMatrix(colorMatrix)
-            )
-        }
+        // Main image display - full screen, ignoring all bars
+        Image(
+            painter = painter,
+            contentDescription = "Photo to edit",
+            modifier = Modifier
+                .fillMaxSize()
+                .graphicsLayer(
+                    scaleX = scale,
+                    scaleY = scale,
+                    translationX = offsetX,
+                    translationY = offsetY,
+                    rotationZ = rotation,
+                    transformOrigin = TransformOrigin.Center
+                )
+                .pointerInput(Unit) {
+                    // Only allow zoom gestures, no dragging or rotation
+                    detectTransformGestures { _, _, zoom, _ ->
+                        // Only allow zoom
+                        scale = (scale * zoom).coerceIn(0.1f, 5f)
+                    }
+                },
+            contentScale = ContentScale.Fit,
+            colorFilter = ColorFilter.colorMatrix(colorMatrix)
+        )
         
-        // Bottom controls
+        // Bottom controls - positioned absolutely at bottom
         Card(
             modifier = Modifier
                 .fillMaxWidth()
+                .align(Alignment.BottomCenter)
                 .padding(16.dp),
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surfaceContainer
