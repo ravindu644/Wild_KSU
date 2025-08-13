@@ -258,13 +258,27 @@ fun PhotoEditor(
                 Column(
                     modifier = Modifier.padding(16.dp)
                 ) {
-                    // Main button row - 4 buttons as requested
+                    // Main button row - 5 buttons inline
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceEvenly,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // Crop menu button (renamed from rotation)
+                        // Cancel button
+                        IconButton(
+                            onClick = { onDismiss() },
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(MaterialTheme.colorScheme.surfaceVariant)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Cancel",
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        
+                        // Crop menu button
                         IconButton(
                             onClick = { 
                                 showCropMenu = !showCropMenu
@@ -320,79 +334,34 @@ fun PhotoEditor(
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
-                    }
-                    
-                    // Action buttons row - Cancel, Hide Controls, Confirm
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        // Cancel button
-                        Button(
-                            onClick = { onDismiss() },
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(end = 4.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceVariant
-                            )
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Close,
-                                contentDescription = "Cancel",
-                                modifier = Modifier.size(18.dp)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = "Cancel",
-                                style = MaterialTheme.typography.labelMedium
-                            )
-                        }
                         
                         // Hide Controls button
-                        Button(
+                        IconButton(
                             onClick = { hideControls = !hideControls },
                             modifier = Modifier
-                                .weight(1f)
-                                .padding(horizontal = 4.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.secondaryContainer
-                            )
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(MaterialTheme.colorScheme.secondaryContainer)
                         ) {
                             Icon(
                                 imageVector = Icons.Default.VisibilityOff,
                                 contentDescription = "Hide Controls",
-                                modifier = Modifier.size(18.dp)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = "Hide",
-                                style = MaterialTheme.typography.labelMedium
+                                tint = MaterialTheme.colorScheme.onSecondaryContainer
                             )
                         }
                         
                         // Confirm button
-                        Button(
+                        IconButton(
                             onClick = {
                                 onSave(scale, offsetX, offsetY, rotation, brightness, contrast, saturation, hue)
                             },
                             modifier = Modifier
-                                .weight(1f)
-                                .padding(start = 4.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.primary
-                            )
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(MaterialTheme.colorScheme.primary)
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Check,
                                 contentDescription = "Confirm",
-                                modifier = Modifier.size(18.dp)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = "Confirm",
-                                style = MaterialTheme.typography.labelMedium
+                                tint = MaterialTheme.colorScheme.onPrimary
                             )
                         }
                     }
