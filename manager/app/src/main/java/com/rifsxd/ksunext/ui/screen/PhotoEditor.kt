@@ -5,6 +5,7 @@ import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTransformGestures
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -212,28 +213,36 @@ fun PhotoEditor(
                         transformOrigin = TransformOrigin.Center
                     )
                     .pointerInput(Unit) {
-                        detectTransformGestures { _, pan, zoom, rotationChange ->
+                        // Handle dragging separately for more direct control
+                        detectDragGestures { change ->
                             if (freeFormMode) {
+                                // Direct drag - move the photo exactly as finger moves
+                                val dragX = change.x
+                                val dragY = change.y
+                                
                                 // Convert current rotation to radians for coordinate transformation
                                 val rotationRad = Math.toRadians(rotation.toDouble())
                                 val cosRotation = kotlin.math.cos(rotationRad).toFloat()
                                 val sinRotation = kotlin.math.sin(rotationRad).toFloat()
                                 
-                                // Transform pan coordinates to account for current rotation
-                                // This ensures dragging always follows finger direction regardless of rotation
-                                val transformedPanX = pan.x * cosRotation + pan.y * sinRotation
-                                val transformedPanY = -pan.x * sinRotation + pan.y * cosRotation
+                                // Transform drag coordinates to account for current rotation
+                                val transformedDragX = dragX * cosRotation + dragY * sinRotation
+                                val transformedDragY = -dragX * sinRotation + dragY * cosRotation
                                 
                                 // Normalize by scale to maintain consistent movement speed regardless of zoom level
-                                // When zoomed in, the same screen movement should result in proportionally less image movement
-                                val normalizedPanX = transformedPanX / scale
-                                val normalizedPanY = transformedPanY / scale
+                                val normalizedDragX = transformedDragX / scale
+                                val normalizedDragY = transformedDragY / scale
                                 
-                                // Apply movement with consistent sensitivity
-                                val sensitivity = 0.5f
-                                offsetX += normalizedPanX * sensitivity
-                                offsetY += normalizedPanY * sensitivity
-                                
+                                // Apply direct movement - no sensitivity reduction for more responsive dragging
+                                offsetX += normalizedDragX
+                                offsetY += normalizedDragY
+                            }
+                        }
+                    }
+                    .pointerInput(Unit) {
+                        // Handle zoom and rotation separately
+                        detectTransformGestures { _, _, zoom, rotationChange ->
+                            if (freeFormMode) {
                                 rotation += rotationChange
                             }
                             // Always allow zoom
