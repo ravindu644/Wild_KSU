@@ -137,15 +137,26 @@ fun PhotoEditor(
     var showColorMenu by remember { mutableStateOf(false) }
     var hideControls by remember { mutableStateOf(false) }
     
-    // Provide save function and hide controls function to parent
-    // Use SideEffect to ensure functions always capture current state
-    SideEffect {
-        onProvideSaveFunction?.invoke {
+    // Create functions that capture current state
+    val currentSaveFunction = remember(scale, offsetX, offsetY, rotation, brightness, contrast, saturation, hue) {
+        {
             onSave(scale, offsetX, offsetY, rotation, brightness, contrast, saturation, hue)
         }
-        onProvideHideControlsFunction?.invoke {
+    }
+    
+    val currentHideControlsFunction = remember {
+        {
             hideControls = !hideControls
         }
+    }
+    
+    // Provide functions to parent
+    LaunchedEffect(currentSaveFunction) {
+        onProvideSaveFunction?.invoke(currentSaveFunction)
+    }
+    
+    LaunchedEffect(Unit) {
+        onProvideHideControlsFunction?.invoke(currentHideControlsFunction)
     }
     
     // Simple image painter without custom decoders
