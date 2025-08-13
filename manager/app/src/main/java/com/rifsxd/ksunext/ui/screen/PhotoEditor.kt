@@ -10,6 +10,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.runtime.*
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
@@ -134,9 +136,20 @@ fun PhotoEditor(
     
     // UI state
     var freeFormMode by remember { mutableStateOf(true) }
-    var showCropMenu by remember { mutableStateOf(false) }
-    var showColorMenu by remember { mutableStateOf(false) }
-    var hideControls by remember { mutableStateOf(false) }
+    var selectedControl by remember { mutableStateOf("None") }
+    var showDropdown by remember { mutableStateOf(false) }
+    
+    val controlOptions = listOf(
+        "None",
+        "Position X",
+        "Position Y", 
+        "Rotation",
+        "Scale",
+        "Brightness",
+        "Contrast",
+        "Saturation",
+        "Hue"
+    )
     
     // Provide save function that captures current state values
     LaunchedEffect(scale, offsetX, offsetY, rotation, brightness, contrast, saturation, hue) {
@@ -234,184 +247,96 @@ fun PhotoEditor(
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Show other buttons only when controls are not hidden
-                    if (!hideControls) {
-                        // Crop menu button
-                        IconButton(
-                            onClick = { 
-                                showCropMenu = !showCropMenu
-                                showColorMenu = false
+                    // Control selector dropdown
+                    ExposedDropdownMenuBox(
+                        expanded = showDropdown,
+                        onExpandedChange = { showDropdown = !showDropdown },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        OutlinedTextField(
+                            value = selectedControl,
+                            onValueChange = {},
+                            readOnly = true,
+                            label = { Text("Control") },
+                            trailingIcon = {
+                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = showDropdown)
                             },
                             modifier = Modifier
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(if (showCropMenu) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant)
+                                .menuAnchor()
+                                .fillMaxWidth()
+                        )
+                        ExposedDropdownMenu(
+                            expanded = showDropdown,
+                            onDismissRequest = { showDropdown = false }
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.Crop,
-                                contentDescription = "Crop Menu",
-                                tint = if (showCropMenu) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                        
-                        // Color menu button
-                        IconButton(
-                            onClick = { 
-                                showColorMenu = !showColorMenu
-                                showCropMenu = false
-                            },
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(if (showColorMenu) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Tune,
-                                contentDescription = "Color Menu",
-                                tint = if (showColorMenu) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                        
-                        // Reset button
-                        IconButton(
-                            onClick = {
-                                scale = 1f
-                                offsetX = 0f
-                                offsetY = 0f
-                                rotation = 0f
-                                brightness = 0f
-                                contrast = 1f
-                                saturation = 1f
-                                hue = 0f
-                            },
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(MaterialTheme.colorScheme.surfaceVariant)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Refresh,
-                                contentDescription = "Reset",
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                        
-                        // Confirm button
-                        IconButton(
-                            onClick = {
-                                onSave(scale, offsetX, offsetY, rotation, brightness, contrast, saturation, hue)
-                            },
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(MaterialTheme.colorScheme.primary)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Check,
-                                contentDescription = "Confirm",
-                                tint = MaterialTheme.colorScheme.onPrimary
-                            )
+                            controlOptions.forEach { option ->
+                                DropdownMenuItem(
+                                    text = { Text(option) },
+                                    onClick = {
+                                        selectedControl = option
+                                        showDropdown = false
+                                    }
+                                )
+                            }
                         }
                     }
                     
-                    // Hide/Show Controls button (always visible)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    
+                    // Reset button
                     IconButton(
-                        onClick = { hideControls = !hideControls },
+                        onClick = {
+                            scale = 1f
+                            offsetX = 0f
+                            offsetY = 0f
+                            rotation = 0f
+                            brightness = 0f
+                            contrast = 1f
+                            saturation = 1f
+                            hue = 0f
+                        },
                         modifier = Modifier
                             .clip(RoundedCornerShape(8.dp))
-                            .background(MaterialTheme.colorScheme.secondaryContainer)
+                            .background(MaterialTheme.colorScheme.surfaceVariant)
                     ) {
                         Icon(
-                            imageVector = if (hideControls) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                            contentDescription = if (hideControls) "Show Controls" else "Hide Controls",
-                            tint = MaterialTheme.colorScheme.onSecondaryContainer
+                            imageVector = Icons.Default.Refresh,
+                            contentDescription = "Reset",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    
+                    // Confirm button
+                    IconButton(
+                        onClick = {
+                            onSave(scale, offsetX, offsetY, rotation, brightness, contrast, saturation, hue)
+                        },
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(MaterialTheme.colorScheme.primary)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = "Confirm",
+                            tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                 }
                 
-                // Only show expandable menus when controls are not hidden
-                if (!hideControls) {
-                
-                    // Crop menu (expandable) - renamed from rotation menu
-                if (showCropMenu) {
+                // Show selected control slider
+                if (selectedControl != "None") {
                     Spacer(modifier = Modifier.height(16.dp))
                     
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surface
-                        )
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(16.dp)
-                        ) {
-                            Text(
-                                text = "Crop Settings",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.SemiBold,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                            
-                            Spacer(modifier = Modifier.height(16.dp))
-                            
-                            // Free-form mode toggle
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = "Free Transform",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    fontWeight = FontWeight.Medium
-                                )
-                                Switch(
-                                    checked = freeFormMode,
-                                    onCheckedChange = { freeFormMode = it }
-                                )
-                            }
-                            
-                            Spacer(modifier = Modifier.height(16.dp))
-                            
-                            // Rotation controls
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceEvenly
-                            ) {
-                                // Rotate Left
-                                IconButton(
-                                    onClick = { rotation -= 90f },
-                                    modifier = Modifier
-                                        .clip(RoundedCornerShape(8.dp))
-                                        .background(MaterialTheme.colorScheme.surfaceVariant)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.RotateLeft,
-                                        contentDescription = "Rotate Left",
-                                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                                
-                                // Rotate Right
-                                IconButton(
-                                    onClick = { rotation += 90f },
-                                    modifier = Modifier
-                                        .clip(RoundedCornerShape(8.dp))
-                                        .background(MaterialTheme.colorScheme.surfaceVariant)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.RotateRight,
-                                        contentDescription = "Rotate Right",
-                                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                            }
-                            
-                            Spacer(modifier = Modifier.height(16.dp))
-                            
-                            // Position X slider
+                    when (selectedControl) {
+                        "Position X" -> {
                             Column {
                                 Text(
                                     text = "Position X: ${offsetX.toInt()}px",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.Medium,
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
+                                Spacer(modifier = Modifier.height(8.dp))
                                 Slider(
                                     value = offsetX,
                                     onValueChange = { offsetX = it },
@@ -419,16 +344,16 @@ fun PhotoEditor(
                                     modifier = Modifier.fillMaxWidth()
                                 )
                             }
-                            
-                            Spacer(modifier = Modifier.height(12.dp))
-                            
-                            // Position Y slider
+                        }
+                        "Position Y" -> {
                             Column {
                                 Text(
                                     text = "Position Y: ${offsetY.toInt()}px",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.Medium,
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
+                                Spacer(modifier = Modifier.height(8.dp))
                                 Slider(
                                     value = offsetY,
                                     onValueChange = { offsetY = it },
@@ -436,33 +361,64 @@ fun PhotoEditor(
                                     modifier = Modifier.fillMaxWidth()
                                 )
                             }
-                            
-                            Spacer(modifier = Modifier.height(12.dp))
-                            
-                            // Rotation slider
+                        }
+                        "Rotation" -> {
                             Column {
                                 Text(
                                     text = "Rotation: ${rotation.toInt()}°",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.Medium,
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
+                                Spacer(modifier = Modifier.height(8.dp))
                                 Slider(
                                     value = rotation,
                                     onValueChange = { rotation = it },
                                     valueRange = -360f..360f,
                                     modifier = Modifier.fillMaxWidth()
                                 )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                // Quick rotation buttons
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceEvenly
+                                ) {
+                                    IconButton(
+                                        onClick = { rotation -= 90f },
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(8.dp))
+                                            .background(MaterialTheme.colorScheme.surfaceVariant)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.RotateLeft,
+                                            contentDescription = "Rotate Left 90°",
+                                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                    IconButton(
+                                        onClick = { rotation += 90f },
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(8.dp))
+                                            .background(MaterialTheme.colorScheme.surfaceVariant)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.RotateRight,
+                                            contentDescription = "Rotate Right 90°",
+                                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                }
                             }
-                            
-                            Spacer(modifier = Modifier.height(12.dp))
-                            
-                            // Scale slider
+                        }
+                        "Scale" -> {
                             Column {
                                 Text(
                                     text = "Scale: ${String.format("%.1f", scale)}x",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.Medium,
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
+                                Spacer(modifier = Modifier.height(8.dp))
                                 Slider(
                                     value = scale,
                                     onValueChange = { scale = it },
@@ -471,40 +427,15 @@ fun PhotoEditor(
                                 )
                             }
                         }
-                    }
-                }
-                
-                // Color menu (expandable)
-                if (showColorMenu) {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surface
-                        )
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .padding(16.dp)
-                                .verticalScroll(rememberScrollState())
-                        ) {
-                            Text(
-                                text = "Color Settings",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.SemiBold,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                            
-                            Spacer(modifier = Modifier.height(16.dp))
-                            
-                            // Brightness slider (-200 to 200, expanded range)
+                        "Brightness" -> {
                             Column {
                                 Text(
                                     text = "Brightness: ${brightness.toInt()}",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.Medium,
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
+                                Spacer(modifier = Modifier.height(8.dp))
                                 Slider(
                                     value = brightness,
                                     onValueChange = { brightness = it },
@@ -512,16 +443,16 @@ fun PhotoEditor(
                                     modifier = Modifier.fillMaxWidth()
                                 )
                             }
-                            
-                            Spacer(modifier = Modifier.height(12.dp))
-                            
-                            // Contrast slider (0 to 4, expanded range)
+                        }
+                        "Contrast" -> {
                             Column {
                                 Text(
                                     text = "Contrast: ${String.format("%.1f", contrast)}",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.Medium,
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
+                                Spacer(modifier = Modifier.height(8.dp))
                                 Slider(
                                     value = contrast,
                                     onValueChange = { contrast = it },
@@ -529,16 +460,16 @@ fun PhotoEditor(
                                     modifier = Modifier.fillMaxWidth()
                                 )
                             }
-                            
-                            Spacer(modifier = Modifier.height(12.dp))
-                            
-                            // Saturation slider (0 to 3, expanded range)
+                        }
+                        "Saturation" -> {
                             Column {
                                 Text(
                                     text = "Saturation: ${String.format("%.1f", saturation)}",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.Medium,
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
+                                Spacer(modifier = Modifier.height(8.dp))
                                 Slider(
                                     value = saturation,
                                     onValueChange = { saturation = it },
@@ -546,16 +477,16 @@ fun PhotoEditor(
                                     modifier = Modifier.fillMaxWidth()
                                 )
                             }
-                            
-                            Spacer(modifier = Modifier.height(12.dp))
-                            
-                            // Hue slider (-360 to 360, expanded range)
+                        }
+                        "Hue" -> {
                             Column {
                                 Text(
                                     text = "Hue: ${hue.toInt()}°",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.Medium,
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
+                                Spacer(modifier = Modifier.height(8.dp))
                                 Slider(
                                     value = hue,
                                     onValueChange = { hue = it },
@@ -563,7 +494,6 @@ fun PhotoEditor(
                                     modifier = Modifier.fillMaxWidth()
                                 )
                             }
-                        }
                         }
                     }
                 }
