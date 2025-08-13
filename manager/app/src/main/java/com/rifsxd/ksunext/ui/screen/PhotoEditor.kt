@@ -85,7 +85,7 @@ fun PhotoEditorScreen(
                 prefs.edit()
                     .putString("background_image_uri", imageUri)
                     .putFloat("background_transparency", 0.0f) // Reset darkness so image is visible
-                    .putString("background_fit_mode", "center") // Use simple center positioning
+                    .putString("background_fit_mode", "fit") // Use fit mode for proper screen scaling
                     .apply()
                 
                 // Save all transform and adjustment settings using ImageTransformSettings
@@ -163,10 +163,9 @@ fun PhotoEditor(
     )
     
     // Provide save function that captures current state values
-    LaunchedEffect(brightness, contrast, saturation, hue) {
+    LaunchedEffect(scale, offsetX, offsetY, rotation, brightness, contrast, saturation, hue) {
         val saveFunc = {
-            val currentSettings = BackgroundEditorUtils.loadImageTransformSettings(prefs)
-            onSave(currentSettings.scale, currentSettings.offsetX, currentSettings.offsetY, currentSettings.rotation, brightness, contrast, saturation, hue)
+            onSave(scale, offsetX, offsetY, rotation, brightness, contrast, saturation, hue)
         }
         onProvideSaveFunction?.invoke(saveFunc)
     }
@@ -244,7 +243,7 @@ fun PhotoEditor(
                     rotationZ = rotation,
                     transformOrigin = TransformOrigin.Center
                 ),
-            contentScale = ContentScale.None,
+            contentScale = ContentScale.Fit,
             alignment = androidx.compose.ui.Alignment.Center,
             colorFilter = ColorFilter.colorMatrix(colorMatrix)
         )

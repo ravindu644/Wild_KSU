@@ -145,7 +145,6 @@ fun BackgroundImageWrapper(
                     "fill" -> ContentScale.FillBounds
                     "crop" -> ContentScale.Crop
                     "custom_crop" -> ContentScale.Crop
-                    "center" -> ContentScale.None
                     else -> ContentScale.Fit
                 }
                 
