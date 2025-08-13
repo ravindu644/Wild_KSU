@@ -213,11 +213,22 @@ fun PhotoEditor(
                 .pointerInput(Unit) {
                     detectTransformGestures { _, pan, zoom, rotationChange ->
                         if (freeFormMode) {
-                            // Apply transformations directly to state variables
-                            val normalizedPanX = pan.x / scale
-                            val normalizedPanY = pan.y / scale
-                            offsetX += normalizedPanX
-                            offsetY += normalizedPanY
+                            // Convert pan to radians for rotation calculation
+                            val rotationRad = Math.toRadians(-rotation.toDouble())
+                            val cosRotation = kotlin.math.cos(rotationRad).toFloat()
+                            val sinRotation = kotlin.math.sin(rotationRad).toFloat()
+                            
+                            // Apply inverse rotation to pan vector to maintain correct direction
+                            // regardless of current rotation state
+                            val rotatedPanX = pan.x * cosRotation - pan.y * sinRotation
+                            val rotatedPanY = pan.x * sinRotation + pan.y * cosRotation
+                            
+                            // Apply consistent movement speed regardless of zoom level
+                            // Use a fixed sensitivity factor instead of dividing by scale
+                            val sensitivity = 1.0f
+                            offsetX += rotatedPanX * sensitivity
+                            offsetY += rotatedPanY * sensitivity
+                            
                             rotation += rotationChange
                         }
                         // Always allow zoom

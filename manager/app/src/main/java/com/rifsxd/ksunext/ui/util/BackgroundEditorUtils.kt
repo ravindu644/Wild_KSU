@@ -136,15 +136,14 @@ object BackgroundEditorUtils {
     ): androidx.compose.ui.Modifier.() -> androidx.compose.ui.Modifier {
         return {
             val transformSettings = loadImageTransformSettings(prefs)
-            // Apply scale-normalized translation to match PhotoEditor behavior
-            // In PhotoEditor, pan values are normalized by scale (pan.x / scale)
-            // So we need to apply the same scaling when displaying
+            // Apply transformations directly since PhotoEditor now uses consistent sensitivity
+            // No need to scale translation values as gesture handling is now zoom-independent
             val scale = constrainScale(transformSettings.scale)
             graphicsLayer(
                 scaleX = scale,
                 scaleY = scale,
-                translationX = constrainTranslation(transformSettings.offsetX * scale),
-                translationY = constrainTranslation(transformSettings.offsetY * scale),
+                translationX = constrainTranslation(transformSettings.offsetX),
+                translationY = constrainTranslation(transformSettings.offsetY),
                 rotationZ = constrainRotation(transformSettings.rotation),
                 transformOrigin = androidx.compose.ui.graphics.TransformOrigin.Center
             )
