@@ -212,20 +212,9 @@ fun PhotoEditor(
                         transformOrigin = TransformOrigin.Center
                     )
                     .pointerInput(Unit) {
-                        // Use single transform gestures for all interactions
-                        detectTransformGestures { _, pan, zoom, rotationChange ->
-                            if (freeFormMode) {
-                                // Use fixed sensitivity factor for consistent drag speed
-                                val dragSensitivity = 1.0f
-                                
-                                // Apply pan values directly with fixed sensitivity
-                                offsetX += pan.x * dragSensitivity
-                                offsetY += pan.y * dragSensitivity
-                                
-                                // Handle rotation
-                                rotation += rotationChange
-                            }
-                            // Always allow zoom
+                        // Only allow zoom gestures, no dragging or rotation
+                        detectTransformGestures { _, _, zoom, _ ->
+                            // Only allow zoom
                             scale = (scale * zoom).coerceIn(0.1f, 5f)
                         }
                     },
@@ -423,6 +412,57 @@ fun PhotoEditor(
                             }
                             
                             Spacer(modifier = Modifier.height(16.dp))
+                            
+                            // Position X slider
+                            Column {
+                                Text(
+                                    text = "Position X: ${offsetX.toInt()}px",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Slider(
+                                    value = offsetX,
+                                    onValueChange = { offsetX = it },
+                                    valueRange = -1000f..1000f,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
+                            
+                            Spacer(modifier = Modifier.height(12.dp))
+                            
+                            // Position Y slider
+                            Column {
+                                Text(
+                                    text = "Position Y: ${offsetY.toInt()}px",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Slider(
+                                    value = offsetY,
+                                    onValueChange = { offsetY = it },
+                                    valueRange = -1000f..1000f,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
+                            
+                            Spacer(modifier = Modifier.height(12.dp))
+                            
+                            // Rotation slider
+                            Column {
+                                Text(
+                                    text = "Rotation: ${rotation.toInt()}°",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Slider(
+                                    value = rotation,
+                                    onValueChange = { rotation = it },
+                                    valueRange = -360f..360f,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
+                            
+                            Spacer(modifier = Modifier.height(12.dp))
                             
                             // Scale slider
                             Column {
