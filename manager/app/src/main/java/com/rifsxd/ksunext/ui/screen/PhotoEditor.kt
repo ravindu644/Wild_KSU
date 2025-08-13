@@ -26,7 +26,7 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
-val LocalPhotoEditorSave = compositionLocalOf<(() -> Unit)?> { null }
+val LocalPhotoEditorSave = compositionLocalOf<((Float, Float, Float, Float) -> Unit)?> { null }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Destination<RootGraph>
@@ -38,10 +38,14 @@ fun PhotoEditorScreen(
     val context = LocalContext.current
     val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
     
-    val saveFunction = {
-        // Save basic transform settings
+    val saveFunction = { scale: Float, offsetX: Float, offsetY: Float, rotation: Float ->
+        // Save transform settings and background configuration
         prefs.edit()
             .putString("background_image_uri", imageUri)
+            .putFloat("image_scale", scale)
+            .putFloat("image_offset_x", offsetX)
+            .putFloat("image_offset_y", offsetY)
+            .putFloat("image_rotation", rotation)
             .putFloat("background_transparency", 1.0f)
             .putString("background_fit_mode", "fit")
             .apply()
@@ -54,7 +58,7 @@ fun PhotoEditorScreen(
         PhotoEditor(
             imageUri = Uri.parse(imageUri),
             onDismiss = { navigator.popBackStack() },
-            onSave = { _, _, _, _ -> saveFunction() }
+            onSave = { scale, offsetX, offsetY, rotation -> saveFunction(scale, offsetX, offsetY, rotation) }
         )
     }
 }
