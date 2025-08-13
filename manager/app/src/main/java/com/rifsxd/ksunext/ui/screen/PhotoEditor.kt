@@ -215,9 +215,12 @@ fun PhotoEditor(
                         // Use single transform gestures for all interactions
                         detectTransformGestures { _, pan, zoom, rotationChange ->
                             if (freeFormMode) {
-                                // Simple direct pan application for testing
-                                offsetX += pan.x
-                                offsetY += pan.y
+                                // Normalize pan by scale to maintain consistent drag speed
+                                val normalizedPanX = pan.x / scale
+                                val normalizedPanY = pan.y / scale
+                                
+                                offsetX += normalizedPanX
+                                offsetY += normalizedPanY
                                 
                                 // Handle rotation
                                 rotation += rotationChange
