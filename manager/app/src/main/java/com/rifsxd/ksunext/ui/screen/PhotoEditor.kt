@@ -42,6 +42,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.filled.Tune
 
 import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -172,12 +173,23 @@ fun PhotoEditor(
     
 
     
-    // Simple image painter without custom decoders
+    // Use ImageRequest.Builder like BackgroundImage for consistent loading
     val painter = rememberAsyncImagePainter(
-        model = imageUri,
-        onError = { error ->
-            android.util.Log.e("PhotoEditor", "Failed to load image: ${error.result.throwable?.message}")
-        }
+        model = ImageRequest.Builder(context)
+            .data(imageUri)
+            .crossfade(false) // Disable crossfade to prevent flashing
+            .listener(
+                onStart = { 
+                    android.util.Log.d("PhotoEditor", "Started loading image")
+                },
+                onSuccess = { _, _ -> 
+                    android.util.Log.d("PhotoEditor", "Successfully loaded image")
+                },
+                onError = { _, result -> 
+                    android.util.Log.e("PhotoEditor", "Failed to load image: ${result.throwable}")
+                }
+            )
+            .build()
     )
     
     // Create color matrix for adjustments
