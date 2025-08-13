@@ -125,10 +125,6 @@ fun PhotoEditor(
     var scale by remember { mutableFloatStateOf(1f) }
     var rotation by remember { mutableFloatStateOf(0f) }
     
-    // Track previous pan values to calculate delta
-    var lastPanX by remember { mutableFloatStateOf(0f) }
-    var lastPanY by remember { mutableFloatStateOf(0f) }
-    
     // Image adjustment states with expanded ranges for better effects
     var brightness by remember { mutableFloatStateOf(0f) } // -200 to 200 (expanded from -100 to 100)
     var contrast by remember { mutableFloatStateOf(1f) } // 0 to 4 (expanded from 0 to 2)
@@ -219,43 +215,22 @@ fun PhotoEditor(
                         // Use single transform gestures for all interactions
                         detectTransformGestures { _, pan, zoom, rotationChange ->
                             if (freeFormMode) {
-                                // Check if this is a new gesture (pan values reset to near zero)
-                                val isNewGesture = kotlin.math.abs(pan.x) < 5f && kotlin.math.abs(pan.y) < 5f
-                                
-                                // Calculate delta pan (change since last gesture)
-                                val deltaPanX = if (isNewGesture) {
-                                    lastPanX = 0f
-                                    pan.x
-                                } else {
-                                    pan.x - lastPanX
-                                }
-                                val deltaPanY = if (isNewGesture) {
-                                    lastPanY = 0f
-                                    pan.y
-                                } else {
-                                    pan.y - lastPanY
-                                }
-                                
-                                // Update last pan values
-                                lastPanX = pan.x
-                                lastPanY = pan.y
+                                // Use pan values directly - they represent the movement delta
+                                val dragX = pan.x
+                                val dragY = pan.y
                                 
                                 // Convert current rotation to radians for coordinate transformation
                                 val rotationRad = Math.toRadians(rotation.toDouble())
                                 val cosRotation = kotlin.math.cos(rotationRad).toFloat()
                                 val sinRotation = kotlin.math.sin(rotationRad).toFloat()
                                 
-                                // Transform delta pan coordinates to account for current rotation
-                                val transformedDragX = deltaPanX * cosRotation + deltaPanY * sinRotation
-                                val transformedDragY = -deltaPanX * sinRotation + deltaPanY * cosRotation
+                                // Transform drag coordinates to account for current rotation
+                                val transformedDragX = dragX * cosRotation + dragY * sinRotation
+                                val transformedDragY = -dragX * sinRotation + dragY * cosRotation
                                 
-                                // Normalize by scale to maintain consistent movement speed regardless of zoom level
-                                val normalizedDragX = transformedDragX / scale
-                                val normalizedDragY = transformedDragY / scale
-                                
-                                // Apply direct movement - no sensitivity reduction for more responsive dragging
-                                offsetX += normalizedDragX
-                                offsetY += normalizedDragY
+                                // Apply movement with sensitivity factor for better control
+                                offsetX += transformedDragX * 0.5f
+                                offsetY += transformedDragY * 0.5f
                                 
                                 // Handle rotation
                                 rotation += rotationChange
