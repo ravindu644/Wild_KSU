@@ -219,8 +219,17 @@ fun PhotoEditor(
                                 val normalizedPanX = pan.x / scale
                                 val normalizedPanY = pan.y / scale
                                 
-                                offsetX += normalizedPanX
-                                offsetY += normalizedPanY
+                                // Transform drag coordinates to account for current rotation
+                                val rotationRad = Math.toRadians(rotation.toDouble())
+                                val cosRotation = kotlin.math.cos(rotationRad).toFloat()
+                                val sinRotation = kotlin.math.sin(rotationRad).toFloat()
+                                
+                                // Apply rotation transformation to normalized pan values
+                                val transformedDragX = normalizedPanX * cosRotation + normalizedPanY * sinRotation
+                                val transformedDragY = -normalizedPanX * sinRotation + normalizedPanY * cosRotation
+                                
+                                offsetX += transformedDragX
+                                offsetY += transformedDragY
                                 
                                 // Handle rotation
                                 rotation += rotationChange
