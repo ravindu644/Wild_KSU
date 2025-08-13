@@ -194,22 +194,7 @@ fun PhotoEditor(
         modifier = Modifier.fillMaxSize()
     ) {
         
-        // Show Controls FAB (only show when controls are hidden)
-        if (hideControls) {
-            FloatingActionButton(
-                onClick = { hideControls = !hideControls },
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(16.dp),
-                containerColor = MaterialTheme.colorScheme.primary
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Visibility,
-                    contentDescription = "Show Controls",
-                    tint = MaterialTheme.colorScheme.onPrimary
-                )
-            }
-        }
+
         
         // Main image display with graphicsLayer transformations and color adjustments
         Image(
@@ -243,27 +228,28 @@ fun PhotoEditor(
             colorFilter = ColorFilter.colorMatrix(colorMatrix)
         )
         
-        // Bottom controls (only show if not hidden)
-        if (!hideControls) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.BottomCenter)
-                    .padding(16.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainer
-                ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+        // Bottom controls
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.BottomCenter)
+                .padding(16.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainer
+            ),
+            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp)
             ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
+                // Main button row
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Main button row - 4 buttons inline
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
+                    // Show other buttons only when controls are not hidden
+                    if (!hideControls) {
                         // Crop menu button
                         IconButton(
                             onClick = { 
@@ -321,20 +307,6 @@ fun PhotoEditor(
                             )
                         }
                         
-                        // Hide Controls button
-                        IconButton(
-                            onClick = { hideControls = !hideControls },
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(MaterialTheme.colorScheme.secondaryContainer)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.VisibilityOff,
-                                contentDescription = "Hide Controls",
-                                tint = MaterialTheme.colorScheme.onSecondaryContainer
-                            )
-                        }
-                        
                         // Confirm button
                         IconButton(
                             onClick = {
@@ -351,6 +323,24 @@ fun PhotoEditor(
                             )
                         }
                     }
+                    
+                    // Hide/Show Controls button (always visible)
+                    IconButton(
+                        onClick = { hideControls = !hideControls },
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(MaterialTheme.colorScheme.secondaryContainer)
+                    ) {
+                        Icon(
+                            imageVector = if (hideControls) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                            contentDescription = if (hideControls) "Show Controls" else "Hide Controls",
+                            tint = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
+                    }
+                }
+                
+                // Only show expandable menus when controls are not hidden
+                if (!hideControls) {
                 
                     // Crop menu (expandable) - renamed from rotation menu
                 if (showCropMenu) {
@@ -537,8 +527,8 @@ fun PhotoEditor(
                                 )
                             }
                         }
+                        }
                     }
-                }
                 }
             }
         }
