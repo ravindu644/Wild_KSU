@@ -12,7 +12,7 @@ import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.union
-import androidx.compose.foundation.layout.windowInsetsPadding
+
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Save
@@ -272,22 +272,17 @@ fun PhotoEditor(
         }
         
         // Bottom controls overlay - positioned as a separate layer
-        Box(
+        Surface(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-                .windowInsetsPadding(
-                    WindowInsets.systemBars.union(WindowInsets.displayCutout).only(
-                        WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom
-                    )
-                )
+                .fillMaxWidth(),
+            color = MaterialTheme.colorScheme.surface,
+            shadowElevation = 16.dp,
+            tonalElevation = 3.dp,
+            windowInsets = WindowInsets.systemBars.union(WindowInsets.displayCutout).only(
+                WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom
+            )
         ) {
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                color = MaterialTheme.colorScheme.surface,
-                shadowElevation = 16.dp,
-                tonalElevation = 3.dp
-            ) {
             Column(
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
@@ -447,7 +442,6 @@ fun PhotoEditor(
                     }
                 }
             }
-        }
         }
     }
 }
