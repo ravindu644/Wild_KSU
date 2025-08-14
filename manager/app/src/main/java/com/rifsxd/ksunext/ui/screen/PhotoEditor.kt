@@ -58,8 +58,7 @@ fun PhotoEditorScreen(
     }
     
     CompositionLocalProvider(
-        LocalPhotoEditorSave provides saveFunction,
-        LocalPhotoEditorSaveCallback provides { navigator.popBackStack() }
+        LocalPhotoEditorSave provides saveFunction
     ) {
         PhotoEditor(
             imageUri = Uri.parse(imageUri)
