@@ -273,6 +273,7 @@ class MainActivity : ComponentActivity() {
             var uiTransparency by remember { mutableStateOf(prefs.getFloat("ui_transparency", 0.0f)) } // Default 0% UI transparency
 
             var backgroundBlur by remember { mutableStateOf(prefs.getFloat("background_blur", 0.0f)) } // Default 0px blur
+            var backgroundFitMode by remember { mutableStateOf(prefs.getString("background_fit_mode", "fit") ?: "fit") }
             
             // DPI setting
             var appDpi by remember { mutableStateOf(prefs.getInt("app_dpi", 0)) }
@@ -315,6 +316,9 @@ class MainActivity : ComponentActivity() {
 
                         "background_blur" -> {
                             backgroundBlur = prefs.getFloat("background_blur", 0.0f)
+                        }
+                        "background_fit_mode" -> {
+                            backgroundFitMode = prefs.getString("background_fit_mode", "fit") ?: "fit"
                         }
                         "app_dpi" -> {
                             appDpi = prefs.getInt("app_dpi", 0)
@@ -374,7 +378,7 @@ class MainActivity : ComponentActivity() {
                 
                 BackgroundImageWrapper(
                     backgroundImageUri = effectiveBackgroundUri,
-                    backgroundFitMode = "custom_crop", // Default to advanced crop editor
+                    backgroundFitMode = backgroundFitMode,
                     backgroundTransparency = backgroundTransparency,
                     backgroundBlur = backgroundBlur
                 ) {
