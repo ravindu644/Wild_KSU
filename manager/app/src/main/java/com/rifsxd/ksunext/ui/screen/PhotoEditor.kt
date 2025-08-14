@@ -58,7 +58,6 @@ fun PhotoEditorScreen(
     }
     
     // Load saved transform states or use defaults for the callback
-    val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
     var scale by remember { mutableFloatStateOf(prefs.getFloat("background_scale_x", 1f)) }
     var offsetX by remember { mutableFloatStateOf(prefs.getFloat("background_pos_x", 0f)) }
     var offsetY by remember { mutableFloatStateOf(prefs.getFloat("background_pos_y", 0f)) }
