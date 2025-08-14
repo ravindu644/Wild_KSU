@@ -61,11 +61,11 @@ fun PhotoEditorScreen(
         Unit
     }
     
-    // Load saved transform states or use defaults for the callback
-    var scale by remember { mutableFloatStateOf(prefs.getFloat("background_scale_x", 1f)) }
-    var offsetX by remember { mutableFloatStateOf(prefs.getFloat("background_pos_x", 0f)) }
-    var offsetY by remember { mutableFloatStateOf(prefs.getFloat("background_pos_y", 0f)) }
-    var rotation by remember { mutableFloatStateOf(prefs.getFloat("background_rotation", 0f)) }
+    // Reset transform states for new image to avoid applying previous image's transforms
+    var scale by remember { mutableFloatStateOf(1f) }
+    var offsetX by remember { mutableFloatStateOf(0f) }
+    var offsetY by remember { mutableFloatStateOf(0f) }
+    var rotation by remember { mutableFloatStateOf(0f) }
     
     PhotoEditor(
         imageUri = Uri.parse(imageUri),
@@ -109,6 +109,7 @@ fun PhotoEditor(
         currentOffsetX = offsetX
         currentOffsetY = offsetY
         currentRotation = rotation
+        println("PhotoEditor: Loaded transform settings: scale=$scale, offsetX=$offsetX, offsetY=$offsetY, rotation=$rotation")
     }
         // Load image with ImageRequest for consistency
         val painter = rememberAsyncImagePainter(
@@ -145,6 +146,7 @@ fun PhotoEditor(
                         onTransformChange(newScale, newOffsetX, newOffsetY, newRotation)
                         
                         // Save to preferences immediately for real-time updates
+                        println("PhotoEditor: Gesture update - scale=$newScale, offsetX=$newOffsetX, offsetY=$newOffsetY, rotation=$newRotation")
                         prefs.edit()
                             .putFloat("background_scale_x", newScale)
                             .putFloat("background_pos_x", newOffsetX)
