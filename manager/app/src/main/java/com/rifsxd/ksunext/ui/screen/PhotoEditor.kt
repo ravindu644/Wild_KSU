@@ -57,14 +57,27 @@ fun PhotoEditorScreen(
         Unit
     }
     
+    // Load saved transform states or use defaults for the callback
+    val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+    var scale by remember { mutableFloatStateOf(prefs.getFloat("background_scale_x", 1f)) }
+    var offsetX by remember { mutableFloatStateOf(prefs.getFloat("background_pos_x", 0f)) }
+    var offsetY by remember { mutableFloatStateOf(prefs.getFloat("background_pos_y", 0f)) }
+    var rotation by remember { mutableFloatStateOf(prefs.getFloat("background_rotation", 0f)) }
+    
     CompositionLocalProvider(
         LocalPhotoEditorSave provides saveFunction,
         LocalPhotoEditorSaveCallback provides {
-            // This will be overridden by PhotoEditor with current transform values
+            saveFunction(scale, offsetX, offsetY, rotation)
         }
     ) {
         PhotoEditor(
-            imageUri = Uri.parse(imageUri)
+            imageUri = Uri.parse(imageUri),
+            onTransformChange = { newScale, newOffsetX, newOffsetY, newRotation ->
+                scale = newScale
+                offsetX = newOffsetX
+                offsetY = newOffsetY
+                rotation = newRotation
+            }
         )
     }
 }
@@ -72,24 +85,17 @@ fun PhotoEditorScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PhotoEditor(
-    imageUri: Uri?
+    imageUri: Uri?,
+    onTransformChange: (Float, Float, Float, Float) -> Unit = { _, _, _, _ -> }
 ) {
     val context = LocalContext.current
     val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
-    val saveFunction = LocalPhotoEditorSave.current
     
     // Load saved transform states or use defaults
     var scale by remember { mutableFloatStateOf(prefs.getFloat("background_scale_x", 1f)) }
     var offsetX by remember { mutableFloatStateOf(prefs.getFloat("background_pos_x", 0f)) }
     var offsetY by remember { mutableFloatStateOf(prefs.getFloat("background_pos_y", 0f)) }
     var rotation by remember { mutableFloatStateOf(prefs.getFloat("background_rotation", 0f)) }
-    
-    // Provide save callback with current transform values
-    CompositionLocalProvider(
-        LocalPhotoEditorSaveCallback provides {
-            saveFunction?.invoke(scale, offsetX, offsetY, rotation)
-        }
-    ) {
         // Load image with ImageRequest for consistency
         val painter = rememberAsyncImagePainter(
             model = ImageRequest.Builder(context)
@@ -115,6 +121,9 @@ fun PhotoEditor(
                         offsetY = (offsetY + pan.y).coerceIn(-1000f, 1000f)
                         rotation = (rotation + rotationChange) % 360f
                         
+                        // Notify parent of transform changes
+                        onTransformChange(scale, offsetX, offsetY, rotation)
+                        
                         // Save to preferences
                         prefs.edit()
                             .putFloat("background_scale_x", scale)
@@ -136,6 +145,5 @@ fun PhotoEditor(
             contentScale = ContentScale.Fit,
             alignment = Alignment.Center
         )
-        }
     }
 }
