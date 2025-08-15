@@ -14,6 +14,14 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Refresh
@@ -312,20 +320,33 @@ fun PhotoEditor(
             )
         }
         
-        // Crop menu popup
-        if (showCropMenu) {
+        // Crop menu popup - positioned above the control bar with Material 3 Expressive animation
+        AnimatedVisibility(
+            visible = showCropMenu,
+            enter = scaleIn(
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                    stiffness = Spring.StiffnessMedium
+                ),
+                transformOrigin = androidx.compose.ui.graphics.TransformOrigin(0.25f, 1f)
+            ) + fadeIn(animationSpec = tween(300)),
+            exit = scaleOut(
+                animationSpec = tween(200),
+                transformOrigin = androidx.compose.ui.graphics.TransformOrigin(0.25f, 1f)
+            ) + fadeOut(animationSpec = tween(200))
+        ) {
             Card(
                 modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .padding(top = 16.dp)
-                    .widthIn(min = 200.dp, max = 300.dp),
+                    .align(Alignment.BottomStart)
+                    .padding(start = 32.dp, bottom = 80.dp)
+                    .widthIn(min = 250.dp, max = 320.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceContainer.copy(
-                        alpha = 0.95f
+                        alpha = 0.98f
                     )
                 ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-                shape = RoundedCornerShape(16.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 12.dp),
+                shape = RoundedCornerShape(20.dp)
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp)
@@ -452,24 +473,37 @@ fun PhotoEditor(
                         valueRange = 0.1f..3.0f,
                         modifier = Modifier.fillMaxWidth()
                     )
-                }
             }
         }
+        }
         
-        // Color menu popup
-        if (showColorMenu) {
+        // Color menu popup - positioned above the control bar with Material 3 Expressive animation
+        AnimatedVisibility(
+            visible = showColorMenu,
+            enter = scaleIn(
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                    stiffness = Spring.StiffnessMedium
+                ),
+                transformOrigin = androidx.compose.ui.graphics.TransformOrigin(0.5f, 1f)
+            ) + fadeIn(animationSpec = tween(300)),
+            exit = scaleOut(
+                animationSpec = tween(200),
+                transformOrigin = androidx.compose.ui.graphics.TransformOrigin(0.5f, 1f)
+            ) + fadeOut(animationSpec = tween(200))
+        ) {
             Card(
                 modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .padding(top = 16.dp)
-                    .widthIn(min = 200.dp, max = 300.dp),
+                    .align(Alignment.BottomCenter)
+                    .padding(start = 16.dp, bottom = 80.dp)
+                    .widthIn(min = 250.dp, max = 320.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceContainer.copy(
-                        alpha = 0.95f
+                        alpha = 0.98f
                     )
                 ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-                shape = RoundedCornerShape(16.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 12.dp),
+                shape = RoundedCornerShape(20.dp)
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp)
@@ -553,8 +587,9 @@ fun PhotoEditor(
                           valueRange = 0f..360f,
                           modifier = Modifier.fillMaxWidth()
                       )
-                }
-            }
+                 }
+             }
+         }
         }
         
         // Bottom controls overlay - positioned as a separate layer
@@ -584,11 +619,15 @@ fun PhotoEditor(
                      horizontalArrangement = Arrangement.SpaceEvenly,
                      verticalAlignment = Alignment.CenterVertically
                  ) {
-                     // Crop button
+                     // Crop button with Material 3 Expressive styling
                      IconButton(
-                         onClick = { showCropMenu = !showCropMenu },
+                         onClick = { 
+                             showCropMenu = !showCropMenu
+                             if (showCropMenu) showColorMenu = false
+                         },
                          modifier = Modifier
-                             .clip(RoundedCornerShape(12.dp))
+                             .size(56.dp)
+                             .clip(RoundedCornerShape(16.dp))
                              .background(
                                  if (showCropMenu) MaterialTheme.colorScheme.primary
                                  else MaterialTheme.colorScheme.surfaceVariant
@@ -598,15 +637,20 @@ fun PhotoEditor(
                              imageVector = Icons.Filled.Crop,
                              contentDescription = "Crop Tools",
                              tint = if (showCropMenu) MaterialTheme.colorScheme.onPrimary
-                                    else MaterialTheme.colorScheme.onSurfaceVariant
+                                    else MaterialTheme.colorScheme.onSurfaceVariant,
+                             modifier = Modifier.size(24.dp)
                          )
                      }
                      
-                     // Color button
+                     // Color button with Material 3 Expressive styling
                      IconButton(
-                         onClick = { showColorMenu = !showColorMenu },
+                         onClick = { 
+                             showColorMenu = !showColorMenu
+                             if (showColorMenu) showCropMenu = false
+                         },
                          modifier = Modifier
-                             .clip(RoundedCornerShape(12.dp))
+                             .size(56.dp)
+                             .clip(RoundedCornerShape(16.dp))
                              .background(
                                  if (showColorMenu) MaterialTheme.colorScheme.primary
                                  else MaterialTheme.colorScheme.surfaceVariant
@@ -616,13 +660,18 @@ fun PhotoEditor(
                              imageVector = Icons.Default.Palette,
                              contentDescription = "Color Adjustments",
                              tint = if (showColorMenu) MaterialTheme.colorScheme.onPrimary
-                                    else MaterialTheme.colorScheme.onSurfaceVariant
+                                    else MaterialTheme.colorScheme.onSurfaceVariant,
+                             modifier = Modifier.size(24.dp)
                          )
                      }
                      
-                     // Reset button
+                     // Reset button with Material 3 Expressive styling
                      IconButton(
                          onClick = {
+                             // Close any open menus
+                             showCropMenu = false
+                             showColorMenu = false
+                             
                              // Reset all settings
                              currentScale = 1.0f
                              currentOffsetX = 0f
@@ -653,27 +702,35 @@ fun PhotoEditor(
                                  .apply()
                          },
                          modifier = Modifier
-                             .clip(RoundedCornerShape(12.dp))
+                             .size(56.dp)
+                             .clip(RoundedCornerShape(16.dp))
                              .background(MaterialTheme.colorScheme.surfaceVariant)
                      ) {
                          Icon(
                              imageVector = Icons.Default.Refresh,
                              contentDescription = "Reset All",
-                             tint = MaterialTheme.colorScheme.onSurfaceVariant
+                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                             modifier = Modifier.size(24.dp)
                          )
                      }
                      
-                     // Confirm button
+                     // Confirm button with Material 3 Expressive styling
                      IconButton(
-                         onClick = onSave,
+                         onClick = {
+                             showCropMenu = false
+                             showColorMenu = false
+                             onSave()
+                         },
                          modifier = Modifier
-                             .clip(RoundedCornerShape(12.dp))
+                             .size(56.dp)
+                             .clip(RoundedCornerShape(16.dp))
                              .background(MaterialTheme.colorScheme.primary)
                      ) {
                          Icon(
                              imageVector = Icons.Default.Check,
                              contentDescription = "Confirm",
-                             tint = MaterialTheme.colorScheme.onPrimary
+                             tint = MaterialTheme.colorScheme.onPrimary,
+                             modifier = Modifier.size(24.dp)
                          )
                      }
                  }
