@@ -65,7 +65,19 @@ fun PhotoEditorScreen(
         // Save transform settings and background configuration
         // Preserve existing background_transparency setting instead of overriding it
         val currentTransparency = prefs.getFloat("background_transparency", 0.0f)
+        
+        // Get current flip and color states from preferences
+        val flipHorizontal = prefs.getBoolean("${imageUri}_flip_horizontal", false)
+        val flipVertical = prefs.getBoolean("${imageUri}_flip_vertical", false)
+        val brightness = prefs.getFloat("${imageUri}_brightness", 0f)
+        val contrast = prefs.getFloat("${imageUri}_contrast", 0f)
+        val saturation = prefs.getFloat("${imageUri}_saturation", 0f)
+        val hue = prefs.getFloat("${imageUri}_hue", 0f)
+        
         println("PhotoEditor: Saving with scale=$scale, offsetX=$offsetX, offsetY=$offsetY, rotation=$rotation")
+        println("PhotoEditor: Flip states - horizontal=$flipHorizontal, vertical=$flipVertical")
+        println("PhotoEditor: Color adjustments - brightness=$brightness, contrast=$contrast, saturation=$saturation, hue=$hue")
+        
         prefs.edit()
             .putString("background_image_uri", imageUri)
             .putFloat("background_scale_x", scale)
@@ -74,8 +86,16 @@ fun PhotoEditorScreen(
             .putFloat("background_rotation", rotation)
             .putFloat("background_transparency", currentTransparency)
             .putString("background_fit_mode", "fit")
+            // Save flip states to main background settings
+            .putBoolean("background_flip_horizontal", flipHorizontal)
+            .putBoolean("background_flip_vertical", flipVertical)
+            // Save color adjustments to main background settings
+            .putFloat("background_brightness", brightness)
+            .putFloat("background_contrast", contrast)
+            .putFloat("background_saturation", saturation)
+            .putFloat("background_hue", hue)
             .apply()
-        println("PhotoEditor: Settings saved, navigating back")
+        println("PhotoEditor: All settings saved, navigating back")
         navigator.popBackStack()
         Unit
     }
@@ -95,13 +115,45 @@ fun PhotoEditorScreen(
             offsetX = prefs.getFloat("background_pos_x", 0f)
             offsetY = prefs.getFloat("background_pos_y", 0f)
             rotation = prefs.getFloat("background_rotation", 0f)
+            
+            // Also load flip and color states from main background settings and copy to image-specific keys
+            val flipHorizontal = prefs.getBoolean("background_flip_horizontal", false)
+            val flipVertical = prefs.getBoolean("background_flip_vertical", false)
+            val brightness = prefs.getFloat("background_brightness", 0f)
+            val contrast = prefs.getFloat("background_contrast", 0f)
+            val saturation = prefs.getFloat("background_saturation", 0f)
+            val hue = prefs.getFloat("background_hue", 0f)
+            
+            // Copy to image-specific keys for the PhotoEditor to use
+            prefs.edit()
+                .putBoolean("${imageUri}_flip_horizontal", flipHorizontal)
+                .putBoolean("${imageUri}_flip_vertical", flipVertical)
+                .putFloat("${imageUri}_brightness", brightness)
+                .putFloat("${imageUri}_contrast", contrast)
+                .putFloat("${imageUri}_saturation", saturation)
+                .putFloat("${imageUri}_hue", hue)
+                .apply()
+            
             println("PhotoEditor: Loaded existing settings for image: scale=$scale, offsetX=$offsetX, offsetY=$offsetY, rotation=$rotation")
+            println("PhotoEditor: Loaded flip states - horizontal=$flipHorizontal, vertical=$flipVertical")
+            println("PhotoEditor: Loaded color adjustments - brightness=$brightness, contrast=$contrast, saturation=$saturation, hue=$hue")
         } else {
             // Reset to defaults for new image
             scale = 1f
             offsetX = 0f
             offsetY = 0f
             rotation = 0f
+            
+            // Reset image-specific settings to defaults
+            prefs.edit()
+                .putBoolean("${imageUri}_flip_horizontal", false)
+                .putBoolean("${imageUri}_flip_vertical", false)
+                .putFloat("${imageUri}_brightness", 0f)
+                .putFloat("${imageUri}_contrast", 0f)
+                .putFloat("${imageUri}_saturation", 0f)
+                .putFloat("${imageUri}_hue", 0f)
+                .apply()
+            
             println("PhotoEditor: New image, using default transform settings")
         }
     }
@@ -339,6 +391,8 @@ fun PhotoEditor(
                         onClick = {
                             currentRotation = (currentRotation - 90f) % 360f
                             onTransformChange(currentScale, currentOffsetX, currentOffsetY, currentRotation)
+                            // Save rotation immediately
+                            prefs.edit().putFloat("background_rotation", currentRotation).apply()
                         },
                         modifier = Modifier
                             .clip(RoundedCornerShape(8.dp))
@@ -355,6 +409,8 @@ fun PhotoEditor(
                         onClick = {
                             currentRotation = (currentRotation + 90f) % 360f
                             onTransformChange(currentScale, currentOffsetX, currentOffsetY, currentRotation)
+                            // Save rotation immediately
+                            prefs.edit().putFloat("background_rotation", currentRotation).apply()
                         },
                         modifier = Modifier
                             .clip(RoundedCornerShape(8.dp))
