@@ -71,15 +71,17 @@ fun BackgroundImageWrapper(
                 val offsetX = prefs.getFloat("background_pos_x", 0f)
                 val offsetY = prefs.getFloat("background_pos_y", 0f)
                 val rotation = prefs.getFloat("background_rotation", 0f)
+                val flipHorizontal = prefs.getBoolean("background_flip_horizontal", false)
+                val flipVertical = prefs.getBoolean("background_flip_vertical", false)
                 
-                Log.d("BackgroundImage", "Transform settings: scale=$scale, offsetX=$offsetX, offsetY=$offsetY, rotation=$rotation")
+                Log.d("BackgroundImage", "Transform settings: scale=$scale, offsetX=$offsetX, offsetY=$offsetY, rotation=$rotation, flipH=$flipHorizontal, flipV=$flipVertical")
                 
                 // Apply transformations and blur
                 val imageModifier = Modifier
                     .fillMaxSize()
                     .graphicsLayer {
-                        scaleX = scale
-                        scaleY = scale
+                        scaleX = scale * (if (flipHorizontal) -1f else 1f)
+                        scaleY = scale * (if (flipVertical) -1f else 1f)
                         translationX = offsetX
                         translationY = offsetY
                         rotationZ = rotation
