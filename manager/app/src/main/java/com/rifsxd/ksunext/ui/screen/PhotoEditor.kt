@@ -237,32 +237,40 @@ fun PhotoEditor(
             alignment = Alignment.Center
         )
         
-        // Advanced controls panel (when enabled) - positioned higher to avoid overlap
+        // Advanced controls modal bottom sheet
         if (showAdvancedControls) {
-            Card(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth()
-                    .padding(bottom = 240.dp)
-                    .padding(horizontal = 16.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainer
-                ),
-                elevation = CardDefaults.cardElevation(
-                    defaultElevation = 8.dp
-                )
+            ModalBottomSheet(
+                onDismissRequest = { showAdvancedControls = false },
+                containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                contentColor = MaterialTheme.colorScheme.onSurface,
+                tonalElevation = 8.dp,
+                dragHandle = { BottomSheetDefaults.DragHandle() },
+                shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)
             ) {
                 Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp)
+                        .padding(bottom = 32.dp),
+                    verticalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
+                    // Header
+                    Text(
+                        text = "Advanced Controls",
+                        style = MaterialTheme.typography.headlineSmall,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                    
                     // Free-form editing toggle
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text("Free-form Editing")
+                        Text(
+                            text = "Free-form Editing",
+                            style = MaterialTheme.typography.bodyLarge
+                        )
                         Switch(
                             checked = freeFormEditing,
                             onCheckedChange = { freeFormEditing = it }
@@ -270,15 +278,31 @@ fun PhotoEditor(
                     }
                     
                     // Scale slider
-                    Text("Scale: ${(currentScale * 100).toInt()}%")
-                    Slider(
-                        value = currentScale,
-                        onValueChange = { newScale ->
-                            currentScale = newScale
-                            onTransformChange(newScale, currentOffsetX, currentOffsetY, currentRotation)
-                        },
-                        valueRange = 0.1f..5f
-                    )
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = "Scale",
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                            Text(
+                                text = "${(currentScale * 100).toInt()}%",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Slider(
+                            value = currentScale,
+                            onValueChange = { newScale ->
+                                currentScale = newScale
+                                onTransformChange(newScale, currentOffsetX, currentOffsetY, currentRotation)
+                            },
+                            valueRange = 0.1f..5f,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
                 }
             }
         }
