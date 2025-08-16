@@ -20,8 +20,6 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Save
@@ -403,8 +401,8 @@ fun PhotoEditor(
                 // Inline Crop Menu
                 AnimatedVisibility(
                     visible = activeMenu == "crop",
-                    enter = fadeIn(animationSpec = tween(200)) + slideInVertically(animationSpec = tween(200)) { fullHeight -> fullHeight },
-                    exit = fadeOut(animationSpec = tween(150)) + slideOutVertically(animationSpec = tween(150)) { fullHeight -> fullHeight }
+                    enter = fadeIn(animationSpec = tween(200)),
+                    exit = fadeOut(animationSpec = tween(150))
                 ) {
                     Column(
                         modifier = Modifier
@@ -565,8 +563,8 @@ fun PhotoEditor(
                 // Inline Color Menu
                 AnimatedVisibility(
                     visible = activeMenu == "color",
-                    enter = fadeIn(animationSpec = tween(200)) + slideInVertically(animationSpec = tween(200)) { fullHeight -> fullHeight },
-                    exit = fadeOut(animationSpec = tween(150)) + slideOutVertically(animationSpec = tween(150)) { fullHeight -> fullHeight }
+                    enter = fadeIn(animationSpec = tween(200)),
+                    exit = fadeOut(animationSpec = tween(150))
                 ) {
                     Column(
                         modifier = Modifier
