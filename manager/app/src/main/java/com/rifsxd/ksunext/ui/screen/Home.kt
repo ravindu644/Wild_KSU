@@ -1,6 +1,7 @@
 package com.rifsxd.ksunext.ui.screen
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Build
 import android.os.PowerManager
 import android.os.Handler
@@ -28,6 +29,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
