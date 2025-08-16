@@ -403,8 +403,8 @@ fun PhotoEditor(
                 // Inline Crop Menu
                 AnimatedVisibility(
                     visible = activeMenu == "crop",
-                    enter = fadeIn(animationSpec = tween(200)) + slideInVertically(animationSpec = tween(200)) { it },
-                    exit = fadeOut(animationSpec = tween(150)) + slideOutVertically(animationSpec = tween(150)) { it }
+                    enter = fadeIn(animationSpec = tween(200)) + slideInVertically(animationSpec = tween(200)) { fullHeight -> fullHeight },
+                    exit = fadeOut(animationSpec = tween(150)) + slideOutVertically(animationSpec = tween(150)) { fullHeight -> fullHeight }
                 ) {
                     Column(
                         modifier = Modifier
@@ -565,8 +565,8 @@ fun PhotoEditor(
                 // Inline Color Menu
                 AnimatedVisibility(
                     visible = activeMenu == "color",
-                    enter = fadeIn(animationSpec = tween(200)) + slideInVertically(animationSpec = tween(200)) { it },
-                    exit = fadeOut(animationSpec = tween(150)) + slideOutVertically(animationSpec = tween(150)) { it }
+                    enter = fadeIn(animationSpec = tween(200)) + slideInVertically(animationSpec = tween(200)) { fullHeight -> fullHeight },
+                    exit = fadeOut(animationSpec = tween(150)) + slideOutVertically(animationSpec = tween(150)) { fullHeight -> fullHeight }
                 ) {
                     Column(
                         modifier = Modifier
