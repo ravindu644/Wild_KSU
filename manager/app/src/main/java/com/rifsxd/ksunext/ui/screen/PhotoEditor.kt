@@ -241,8 +241,9 @@ fun PhotoEditor(
     var currentRotation by remember { mutableFloatStateOf(rotation) }
     
     // Additional states for advanced controls
-    var showCropMenu by remember { mutableStateOf(false) }
-    var showColorMenu by remember { mutableStateOf(false) }
+    var activeMenu by remember { mutableStateOf<String?>(null) }
+    val showCropMenu = activeMenu == "crop"
+    val showColorMenu = activeMenu == "color"
     var flipHorizontal by remember { mutableStateOf(false) }
     var flipVertical by remember { mutableStateOf(false) }
     var brightness by remember { mutableFloatStateOf(1.0f) }
@@ -332,7 +333,7 @@ fun PhotoEditor(
             modifier = Modifier
                 .fillMaxSize()
                 .pointerInput(freeFormEditing) {
-                    if (!freeFormEditing) {
+                    if (freeFormEditing) {
                         detectTransformGestures { _, pan, zoom, rotationChange ->
                             val newScale = (currentScale * zoom).coerceIn(0.1f, 5f)
                             val newOffsetX = (currentOffsetX + pan.x).coerceIn(-1000f, 1000f)
@@ -593,7 +594,7 @@ fun PhotoEditor(
                                 val imageUriString = imageUri.toString()
                                 prefs.edit().putFloat("${imageUriString}_brightness", brightness).apply()
                             },
-                            valueRange = 0.5f..1.5f,
+                            valueRange = 0.0f..3.0f,
                             modifier = Modifier.fillMaxWidth()
                         )
                         
@@ -610,7 +611,7 @@ fun PhotoEditor(
                                 val imageUriString = imageUri.toString()
                                 prefs.edit().putFloat("${imageUriString}_contrast", contrast).apply()
                             },
-                            valueRange = 0.5f..1.5f,
+                            valueRange = 0.0f..3.0f,
                             modifier = Modifier.fillMaxWidth()
                         )
                         
@@ -627,7 +628,7 @@ fun PhotoEditor(
                                 val imageUriString = imageUri.toString()
                                 prefs.edit().putFloat("${imageUriString}_saturation", saturation).apply()
                             },
-                            valueRange = 0.5f..1.5f,
+                            valueRange = 0.0f..3.0f,
                             modifier = Modifier.fillMaxWidth()
                         )
                         
@@ -659,12 +660,7 @@ fun PhotoEditor(
                      // Crop button with Material 3 Expressive styling
                      IconButton(
                          onClick = { 
-                             if (showCropMenu) {
-                                 showCropMenu = false
-                             } else {
-                                 showColorMenu = false
-                                 showCropMenu = true
-                             }
+                             activeMenu = if (activeMenu == "crop") null else "crop"
                          },
                          modifier = Modifier
                              .size(56.dp)
@@ -686,12 +682,7 @@ fun PhotoEditor(
                      // Color button with Material 3 Expressive styling
                      IconButton(
                          onClick = { 
-                             if (showColorMenu) {
-                                 showColorMenu = false
-                             } else {
-                                 showCropMenu = false
-                                 showColorMenu = true
-                             }
+                             activeMenu = if (activeMenu == "color") null else "color"
                          },
                          modifier = Modifier
                              .size(56.dp)
@@ -714,8 +705,7 @@ fun PhotoEditor(
                      IconButton(
                          onClick = {
                              // Close any open menus
-                             showCropMenu = false
-                             showColorMenu = false
+                             activeMenu = null
                              
                              // Reset all settings
                              currentScale = 1.0f
@@ -762,8 +752,7 @@ fun PhotoEditor(
                      // Confirm button with Material 3 Expressive styling
                      IconButton(
                          onClick = {
-                             showCropMenu = false
-                             showColorMenu = false
+                             activeMenu = null
                              onSave()
                          },
                          modifier = Modifier
