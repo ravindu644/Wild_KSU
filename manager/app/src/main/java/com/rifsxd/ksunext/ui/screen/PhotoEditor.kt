@@ -20,8 +20,8 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Save
@@ -389,7 +389,7 @@ fun PhotoEditor(
                             WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom
                         )
                     )
-                    .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 16.dp),
+                    .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 100.dp),
                 color = MaterialTheme.colorScheme.surfaceContainer,
                 tonalElevation = 3.dp,
                 shape = RoundedCornerShape(16.dp)
@@ -403,8 +403,8 @@ fun PhotoEditor(
                 // Inline Crop Menu
                 AnimatedVisibility(
                     visible = activeMenu == "crop",
-                    enter = fadeIn(animationSpec = tween(200)) + scaleIn(animationSpec = tween(200)),
-                    exit = fadeOut(animationSpec = tween(150)) + scaleOut(animationSpec = tween(150))
+                    enter = fadeIn(animationSpec = tween(200)) + slideInVertically(animationSpec = tween(200)) { it },
+                    exit = fadeOut(animationSpec = tween(150)) + slideOutVertically(animationSpec = tween(150)) { it }
                 ) {
                     Column(
                         modifier = Modifier
@@ -565,8 +565,8 @@ fun PhotoEditor(
                 // Inline Color Menu
                 AnimatedVisibility(
                     visible = activeMenu == "color",
-                    enter = fadeIn(animationSpec = tween(200)) + scaleIn(animationSpec = tween(200)),
-                    exit = fadeOut(animationSpec = tween(150)) + scaleOut(animationSpec = tween(150))
+                    enter = fadeIn(animationSpec = tween(200)) + slideInVertically(animationSpec = tween(200)) { it },
+                    exit = fadeOut(animationSpec = tween(150)) + slideOutVertically(animationSpec = tween(150)) { it }
                 ) {
                     Column(
                         modifier = Modifier
