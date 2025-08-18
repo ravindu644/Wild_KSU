@@ -42,6 +42,7 @@ import androidx.compose.material.icons.filled.ScreenRotation
 import androidx.compose.material.icons.filled.ScreenLockRotation
 import androidx.compose.material.icons.filled.FlipToBack
 import androidx.compose.material.icons.filled.SwapHoriz
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.filled.SwapVert
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.Palette
@@ -425,8 +426,10 @@ fun PhotoEditor(
                 
                 // Control bar with 4 buttons
                  Row(
-                     modifier = Modifier.fillMaxWidth(0.5f),
-                     horizontalArrangement = Arrangement.Start,
+                     modifier = Modifier
+                         .fillMaxWidth(0.5f)
+                         .padding(start = 16.dp),
+                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                      verticalAlignment = Alignment.CenterVertically
                  ) {
 
@@ -434,7 +437,9 @@ fun PhotoEditor(
                      // Screen Rotation Toggle
                      IconButton(
                          onClick = { screenRotationLocked = !screenRotationLocked },
-                         modifier = Modifier.size(64.dp)
+                         modifier = Modifier
+                             .size(64.dp)
+                             .background(MaterialTheme.colorScheme.primary, CircleShape)
                      ) {
                          Icon(
                              imageVector = if (screenRotationLocked) Icons.Default.ScreenRotation else Icons.Default.ScreenLockRotation,
