@@ -438,14 +438,15 @@ fun PhotoEditor(
                      IconButton(
                          onClick = { screenRotationLocked = !screenRotationLocked },
                          modifier = Modifier
-                             .size(64.dp)
-                             .background(MaterialTheme.colorScheme.primary)
+                             .size(56.dp)
+                             .clip(RoundedCornerShape(16.dp))
+                             .background(MaterialTheme.colorScheme.surfaceVariant)
                      ) {
                          Icon(
                              imageVector = if (screenRotationLocked) Icons.Default.ScreenLockRotation else Icons.Default.ScreenRotation,
                              contentDescription = "Screen Rotation Toggle",
-                             tint = MaterialTheme.colorScheme.onPrimary,
-                             modifier = Modifier.size(32.dp)
+                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                             modifier = Modifier.size(24.dp)
                          )
                      }
                      
