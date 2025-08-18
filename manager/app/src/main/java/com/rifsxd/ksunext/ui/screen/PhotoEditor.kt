@@ -424,19 +424,19 @@ fun PhotoEditor(
                     }
                 }
                 
-                // Redesigned Control Bar with improved spacing and layout
+                // Control Bar with consistent button sizing and precise container fit
                 Row(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 4.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        .wrapContentWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     // Screen Rotation Toggle - Consistent sizing
                     IconButton(
                         onClick = { screenRotationLocked = !screenRotationLocked },
                         modifier = Modifier
-                            .size(52.dp)
+                            .size(56.dp)
                             .clip(RoundedCornerShape(16.dp))
                             .background(MaterialTheme.colorScheme.surfaceVariant)
                     ) {
@@ -448,7 +448,7 @@ fun PhotoEditor(
                         )
                     }
                     
-                    // Reset button - Flexible width with consistent height
+                    // Reset button - Consistent sizing
                     IconButton(
                         onClick = {
                             // Close any open menus
@@ -484,8 +484,7 @@ fun PhotoEditor(
                                 .apply()
                         },
                         modifier = Modifier
-                            .weight(1f)
-                            .height(52.dp)
+                            .size(56.dp)
                             .clip(RoundedCornerShape(16.dp))
                             .background(MaterialTheme.colorScheme.surfaceVariant)
                     ) {
@@ -497,22 +496,22 @@ fun PhotoEditor(
                         )
                     }
                     
-                    // Confirm button - Prominent primary action
+                    // Confirm button - Consistent sizing with primary styling
                     IconButton(
                         onClick = {
                             activeMenu = null
                             onSave()
                         },
                         modifier = Modifier
-                            .size(60.dp)
-                            .clip(RoundedCornerShape(18.dp))
+                            .size(56.dp)
+                            .clip(RoundedCornerShape(16.dp))
                             .background(MaterialTheme.colorScheme.primary)
                     ) {
                         Icon(
                             imageVector = Icons.Default.Check,
                             contentDescription = "Confirm",
                             tint = MaterialTheme.colorScheme.onPrimary,
-                            modifier = Modifier.size(28.dp)
+                            modifier = Modifier.size(24.dp)
                         )
                     }
                 }
