@@ -498,4 +498,3 @@ fun PhotoEditor(
             }
         }
     }
-}
