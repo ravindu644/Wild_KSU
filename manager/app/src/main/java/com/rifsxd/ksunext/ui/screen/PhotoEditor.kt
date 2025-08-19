@@ -56,7 +56,7 @@ import coil.request.ImageRequest
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import com.rifsxd.ksunext.ui.util.BackgroundUtils
+import com.rifsxd.ksunext.ui.util.BackgroundCustomization
 import com.rifsxd.ksunext.ui.util.BackgroundTransformation
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -70,11 +70,11 @@ fun PhotoEditorScreen(
     
     // Reset background transparency and blur settings to 0% when entering photo editor
     LaunchedEffect(Unit) {
-        BackgroundUtils.resetBackgroundEffects(context)
+        BackgroundCustomization.resetBackgroundEffects(context)
     }
     
     val saveFunction = { scale: Float, offsetX: Float, offsetY: Float, rotation: Float ->
-        // Save transform settings using BackgroundUtils
+        // Save transform settings using BackgroundCustomization
         val transformation = BackgroundTransformation(
             scale = scale,
             offsetX = offsetX,
@@ -83,7 +83,7 @@ fun PhotoEditorScreen(
         )
         
         println("PhotoEditor: Saving transformation: $transformation")
-        BackgroundUtils.saveBackgroundSettings(context, imageUri, transformation)
+        BackgroundCustomization.saveBackgroundSettings(context, imageUri, transformation)
         println("PhotoEditor: All settings saved, navigating back")
         navigator.popBackStack()
         Unit
@@ -302,7 +302,7 @@ fun PhotoEditor(
                             freeFormEditing = true
                             
                             // Reset UI transparency to 0% when reset button is pressed
-                            BackgroundUtils.resetUITransparency(context)
+                            BackgroundCustomization.resetUITransparency(context)
                             
                             // Update transformations (local state only)
                             onTransformChange(currentScale, currentOffsetX, currentOffsetY, currentRotation)
