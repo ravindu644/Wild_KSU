@@ -32,26 +32,13 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.ui.unit.IntOffset
 import kotlin.math.roundToInt
-import androidx.compose.material.icons.filled.RotateLeft
-import androidx.compose.material.icons.filled.RotateRight
-import androidx.compose.material.icons.filled.ZoomIn
-import androidx.compose.material.icons.filled.ZoomOut
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ScreenRotation
 import androidx.compose.material.icons.filled.ScreenLockRotation
-import androidx.compose.material.icons.filled.FlipToBack
-import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.filled.SwapVert
-import androidx.compose.material.icons.filled.Tune
-import androidx.compose.material.icons.filled.Palette
-import androidx.compose.material.icons.filled.Transform
-import androidx.compose.material.icons.filled.Crop
 import androidx.compose.foundation.clickable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.material3.*
 
 import androidx.compose.runtime.*
@@ -90,17 +77,9 @@ fun PhotoEditorScreen(
         // Preserve existing background_transparency setting instead of overriding it
         val currentTransparency = prefs.getFloat("background_transparency", 0.0f)
         
-        // Get current flip and color states from main background preferences
-        val flipHorizontal = prefs.getBoolean("background_flip_horizontal", false)
-        val flipVertical = prefs.getBoolean("background_flip_vertical", false)
-        val brightness = prefs.getFloat("background_brightness", 1.0f)
-        val contrast = prefs.getFloat("background_contrast", 1.0f)
-        val saturation = prefs.getFloat("background_saturation", 1.0f)
-        val hue = prefs.getFloat("background_hue", 0f)
+
         
         println("PhotoEditor: Saving with scale=$scale, offsetX=$offsetX, offsetY=$offsetY, rotation=$rotation")
-        println("PhotoEditor: Flip states - horizontal=$flipHorizontal, vertical=$flipVertical")
-        println("PhotoEditor: Color adjustments - brightness=$brightness, contrast=$contrast, saturation=$saturation, hue=$hue")
         
         prefs.edit()
             .putString("background_image_uri", imageUri)
@@ -110,14 +89,6 @@ fun PhotoEditorScreen(
             .putFloat("background_rotation", rotation)
             .putFloat("background_transparency", currentTransparency)
             .putString("background_fit_mode", "fit")
-            // Save flip states to main background settings
-            .putBoolean("background_flip_horizontal", flipHorizontal)
-            .putBoolean("background_flip_vertical", flipVertical)
-            // Save color adjustments to main background settings
-            .putFloat("background_brightness", brightness)
-            .putFloat("background_contrast", contrast)
-            .putFloat("background_saturation", saturation)
-            .putFloat("background_hue", hue)
             .apply()
         println("PhotoEditor: All settings saved, navigating back")
         navigator.popBackStack()
@@ -130,38 +101,15 @@ fun PhotoEditorScreen(
     var offsetY by remember { mutableFloatStateOf(0f) }
     var rotation by remember { mutableFloatStateOf(0f) }
     
-    // Load existing settings for this specific image
+    // Always start with default settings - no automatic loading of previous settings
     LaunchedEffect(imageUri) {
-        val existingUri = prefs.getString("background_image_uri", "")
-        if (existingUri == imageUri) {
-            // Load existing transform settings for this image
-            scale = prefs.getFloat("background_scale_x", 1f)
-            offsetX = prefs.getFloat("background_pos_x", 0f)
-            offsetY = prefs.getFloat("background_pos_y", 0f)
-            rotation = prefs.getFloat("background_rotation", 0f)
-            
-            // Load flip and color states from main background settings
-            val flipHorizontal = prefs.getBoolean("background_flip_horizontal", false)
-            val flipVertical = prefs.getBoolean("background_flip_vertical", false)
-            val brightness = prefs.getFloat("background_brightness", 1.0f)
-            val contrast = prefs.getFloat("background_contrast", 1.0f)
-            val saturation = prefs.getFloat("background_saturation", 1.0f)
-            val hue = prefs.getFloat("background_hue", 0f)
-            
-            println("PhotoEditor: Loaded existing settings for image: scale=$scale, offsetX=$offsetX, offsetY=$offsetY, rotation=$rotation")
-            println("PhotoEditor: Loaded flip states - horizontal=$flipHorizontal, vertical=$flipVertical")
-            println("PhotoEditor: Loaded color adjustments - brightness=$brightness, contrast=$contrast, saturation=$saturation, hue=$hue")
-        } else {
-            // Reset to defaults for new image
-            scale = 1f
-            offsetX = 0f
-            offsetY = 0f
-            rotation = 0f
-            
-            // Settings will use defaults from main background preferences
-            
-            println("PhotoEditor: New image, using default transform settings")
-        }
+        // Always reset to defaults when entering photo editor
+        scale = 1f
+        offsetX = 0f
+        offsetY = 0f
+        rotation = 0f
+        
+        println("PhotoEditor: Starting with default transform settings for image: $imageUri")
     }
     
     PhotoEditor(
@@ -210,25 +158,9 @@ fun PhotoEditor(
     // Additional states for advanced controls
     var activeMenu by remember { mutableStateOf<String?>(null) }
 
-    var flipHorizontal by remember { mutableStateOf(false) }
-    var flipVertical by remember { mutableStateOf(false) }
-    var brightness by remember { mutableFloatStateOf(1.0f) }
-    var contrast by remember { mutableFloatStateOf(1.0f) }
-    var saturation by remember { mutableFloatStateOf(1.0f) }
-    var hue by remember { mutableFloatStateOf(0f) }
     var freeFormEditing by remember { mutableStateOf(true) }
     
     var screenRotationLocked by remember { mutableStateOf(false) }
-    
-    // Load existing color settings from main background preferences
-    LaunchedEffect(imageUri) {
-        brightness = prefs.getFloat("background_brightness", 1.0f)
-        contrast = prefs.getFloat("background_contrast", 1.0f)
-        saturation = prefs.getFloat("background_saturation", 1.0f)
-        hue = prefs.getFloat("background_hue", 0f)
-        flipHorizontal = prefs.getBoolean("background_flip_horizontal", false)
-        flipVertical = prefs.getBoolean("background_flip_vertical", false)
-    }
     
     // Update local state when props change
     LaunchedEffect(scale, offsetX, offsetY, rotation) {
@@ -254,49 +186,6 @@ fun PhotoEditor(
         Image(
             painter = painter,
             contentDescription = "Photo to edit",
-            colorFilter = ColorFilter.colorMatrix(
-                ColorMatrix().apply {
-                    // Start with identity matrix
-                    reset()
-                    
-                    // Apply brightness (1.0 = normal, 0.0 = black, 2.0 = very bright)
-                    if (brightness != 1.0f) {
-                        val brightnessMatrix = ColorMatrix(floatArrayOf(
-                            1f, 0f, 0f, 0f, (brightness - 1f) * 255f,
-                            0f, 1f, 0f, 0f, (brightness - 1f) * 255f,
-                            0f, 0f, 1f, 0f, (brightness - 1f) * 255f,
-                            0f, 0f, 0f, 1f, 0f
-                        ))
-                        this.timesAssign(brightnessMatrix)
-                    }
-                    
-                    // Apply contrast (1.0 = normal, 0.0 = gray, 2.0 = high contrast)
-                    if (contrast != 1.0f) {
-                        val contrastMatrix = ColorMatrix(floatArrayOf(
-                            contrast, 0f, 0f, 0f, 128f * (1f - contrast),
-                            0f, contrast, 0f, 0f, 128f * (1f - contrast),
-                            0f, 0f, contrast, 0f, 128f * (1f - contrast),
-                            0f, 0f, 0f, 1f, 0f
-                        ))
-                        this.timesAssign(contrastMatrix)
-                    }
-                    
-                    // Apply saturation (1.0 = normal)
-                    if (saturation != 1.0f) {
-                        val saturationMatrix = ColorMatrix().apply {
-                            setToSaturation(saturation)
-                        }
-                        this.timesAssign(saturationMatrix)
-                    }
-                    
-                    // Apply hue rotation (0.0 = normal)
-                    if (hue != 0f) {
-                        val hueMatrix = ColorMatrix()
-                        hueMatrix.setToRotateRed(hue)
-                        this.timesAssign(hueMatrix)
-                    }
-                }
-            ),
             modifier = Modifier
                 .fillMaxSize()
                 .pointerInput(freeFormEditing) {
@@ -316,21 +205,15 @@ fun PhotoEditor(
                             // Notify parent of transform changes
                             onTransformChange(newScale, newOffsetX, newOffsetY, newRotation)
                             
-                            // Save to preferences immediately for real-time updates
-                            println("PhotoEditor: Gesture update - scale=$newScale, offsetX=$newOffsetX, offsetY=$newOffsetY, rotation=$newRotation")
-                            prefs.edit()
-                                .putFloat("background_scale_x", newScale)
-                                .putFloat("background_pos_x", newOffsetX)
-                                .putFloat("background_pos_y", newOffsetY)
-                                .putFloat("background_rotation", newRotation)
-                                .apply()
+                            // Note: Transform changes are now only saved when user explicitly saves
+                            // This allows proper cancellation without persisting temporary changes
                             Unit
                         }
                     }
                 }
                 .graphicsLayer(
-                    scaleX = currentScale * (if (flipHorizontal) -1f else 1f),
-                    scaleY = currentScale * (if (flipVertical) -1f else 1f),
+                    scaleX = currentScale,
+                    scaleY = currentScale,
                     translationX = currentOffsetX,
                     translationY = currentOffsetY,
                     rotationZ = currentRotation,
@@ -417,34 +300,17 @@ fun PhotoEditor(
                             // Close any open menus
                             activeMenu = null
                             
-                            // Reset all settings
-                            currentScale = 1.0f
+                            // Reset all settings to defaults (local state only)
+                            currentScale = 1f
                             currentOffsetX = 0f
                             currentOffsetY = 0f
                             currentRotation = 0f
-                            brightness = 1.0f
-                            contrast = 1.0f
-                            saturation = 1.0f
-                            hue = 0f
-                            flipHorizontal = false
-                            flipVertical = false
                             freeFormEditing = true
                             
-                            // Update transformations
+                            // Update transformations (local state only)
                             onTransformChange(currentScale, currentOffsetX, currentOffsetY, currentRotation)
                             
-                            // Clear preferences
-                            val imageUriString = imageUri.toString()
-                            prefs.edit()
-                                .remove("background_scale")
-                                .remove("background_rotation")
-                                .remove("${imageUriString}_brightness")
-                                .remove("${imageUriString}_contrast")
-                                .remove("${imageUriString}_saturation")
-                                .remove("${imageUriString}_hue")
-                                .remove("${imageUriString}_flip_horizontal")
-                                .remove("${imageUriString}_flip_vertical")
-                                .apply()
+                            // Note: Reset only affects local state - user must save to persist changes
                         },
                         modifier = Modifier
                             .size(56.dp)
