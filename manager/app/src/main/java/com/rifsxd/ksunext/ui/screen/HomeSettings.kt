@@ -118,6 +118,32 @@ fun HomeSettingsScreen(
     var showSelinuxStatus by rememberSaveable {
         mutableStateOf<Boolean>(prefs.getBoolean("info_card_show_selinux_status", true))
     }
+    
+    // App name customization state
+    var selectedAppName by rememberSaveable {
+        mutableStateOf(prefs.getString("selected_app_name", "kernelsu_next") ?: "kernelsu_next")
+    }
+    var customAppName by rememberSaveable {
+        mutableStateOf(prefs.getString("custom_app_name", "") ?: "")
+    }
+    
+    // Dialog states
+    val appNameDialog = rememberCustomDialog { dismiss ->
+        AppNameSelectionDialog(
+            selectedAppName = selectedAppName,
+            customAppName = customAppName,
+            onAppNameSelected = { newAppName ->
+                selectedAppName = newAppName
+                prefs.edit().putString("selected_app_name", newAppName).apply()
+                hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+            },
+            onCustomAppNameChanged = { newCustomName ->
+                customAppName = newCustomName
+                prefs.edit().putString("custom_app_name", newCustomName).apply()
+            },
+            onDismiss = dismiss
+        )
+    }
 
     // InfoCard items data class
     data class InfoCardItem(
@@ -464,7 +490,58 @@ fun HomeSettingsScreen(
                 }
             }
 
-            // Help Card Toggle (moved to second position)
+            // App Name Customization
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainer
+                    )
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(20.dp)
+                            .clickable {
+                                appNameDialog.show()
+                            },
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Title,
+                            contentDescription = null,
+                            modifier = Modifier.padding(end = 16.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Column(
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.app_name_customization),
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = FontWeight.Medium
+                            )
+                            Text(
+                                text = when (selectedAppName) {
+                                    "kernelsu_next" -> stringResource(R.string.app_name_kernelsu_next)
+                                    "wild_ksu" -> stringResource(R.string.app_name_wild_ksu)
+                                    "custom" -> if (customAppName.isNotEmpty()) customAppName else stringResource(R.string.app_name_custom)
+                                    else -> stringResource(R.string.app_name_kernelsu_next)
+                                },
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                            contentDescription = "Navigate to settings",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+
+            // Help Card Toggle (moved to third position)
             item {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -720,7 +797,123 @@ fun HomeSettingsScreen(
     }
 }
 
-
+@Composable
+fun AppNameSelectionDialog(
+    selectedAppName: String,
+    customAppName: String,
+    onAppNameSelected: (String) -> Unit,
+    onCustomAppNameChanged: (String) -> Unit,
+    onDismiss: () -> Unit
+) {
+    var showCustomDialog by remember { mutableStateOf(false) }
+    var tempCustomName by remember { mutableStateOf(customAppName) }
+    
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(stringResource(R.string.app_name_dialog_title))
+        },
+        text = {
+            Column {
+                val options = listOf(
+                    "kernelsu_next" to stringResource(R.string.app_name_kernelsu_next),
+                    "wild_ksu" to stringResource(R.string.app_name_wild_ksu),
+                    "custom" to stringResource(R.string.app_name_custom)
+                )
+                
+                options.forEach { (value, display) ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                if (value == "custom") {
+                                    showCustomDialog = true
+                                } else {
+                                    onAppNameSelected(value)
+                                    onDismiss()
+                                }
+                            }
+                            .padding(vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(
+                            selected = selectedAppName == value,
+                            onClick = {
+                                if (value == "custom") {
+                                    showCustomDialog = true
+                                } else {
+                                    onAppNameSelected(value)
+                                    onDismiss()
+                                }
+                            }
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = if (value == "custom" && selectedAppName == "custom" && customAppName.isNotEmpty()) {
+                                "$display: $customAppName"
+                            } else {
+                                display
+                            },
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    )
+    
+    if (showCustomDialog) {
+        AlertDialog(
+            onDismissRequest = { showCustomDialog = false },
+            title = {
+                Text(stringResource(R.string.app_name_custom_dialog_title))
+            },
+            text = {
+                Column {
+                    Text(
+                        text = stringResource(R.string.app_name_custom_dialog_message),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    OutlinedTextField(
+                        value = tempCustomName,
+                        onValueChange = { 
+                            if (it.length <= 20) {
+                                tempCustomName = it
+                            }
+                        },
+                        label = { Text(stringResource(R.string.app_name_custom_hint)) },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        onCustomAppNameChanged(tempCustomName)
+                        onAppNameSelected("custom")
+                        showCustomDialog = false
+                        onDismiss()
+                    },
+                    enabled = tempCustomName.isNotBlank()
+                ) {
+                    Text("OK")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showCustomDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+}
 
 @Preview
 @Composable
