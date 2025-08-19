@@ -87,8 +87,20 @@ fun PhotoEditorScreen(
         )
         
         println("PhotoEditor: Saving transformation: $transformation")
-        // Save transformation settings and URI to preferences when user confirms
-        BackgroundCustomization.saveBackgroundSettings(context, imageUri, transformation, saveUri = true)
+        
+        // Copy the image to internal storage if it's not already there
+        val uri = Uri.parse(imageUri)
+        val internalPath = BackgroundCustomization.copyImageToInternalStorage(context, uri)
+        if (internalPath != null) {
+            val internalUri = BackgroundCustomization.filePathToUri(internalPath)
+            // Save transformation settings and URI to preferences when user confirms
+            BackgroundCustomization.saveBackgroundSettings(context, internalUri, transformation, saveUri = true)
+            println("PhotoEditor: Image copied to internal storage and settings saved")
+        } else {
+            // Fallback to original URI if copy fails
+            BackgroundCustomization.saveBackgroundSettings(context, imageUri, transformation, saveUri = true)
+            println("PhotoEditor: Failed to copy to internal storage, using original URI")
+        }
         
         println("PhotoEditor: All settings saved, navigating back")
         navigator.popBackStack()
