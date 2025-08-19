@@ -1,4 +1,4 @@
-package com.rifsxd.ksunext.ui.component
+package com.rifsxd.ksunext.ui.screen
 
 import android.content.Context
 import androidx.compose.foundation.Image

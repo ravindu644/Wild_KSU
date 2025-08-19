@@ -19,7 +19,7 @@ import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.rifsxd.ksunext.R
 import com.rifsxd.ksunext.ui.component.SwitchItem
-import com.rifsxd.ksunext.ui.component.IconThemeManagerDialog
+import com.rifsxd.ksunext.ui.screen.IconThemeManagerDialog
 import com.rifsxd.ksunext.ui.util.IconPackHelper
 import com.rifsxd.ksunext.ui.util.IconPack
 
