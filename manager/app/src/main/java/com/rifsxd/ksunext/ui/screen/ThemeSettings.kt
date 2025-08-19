@@ -10,13 +10,16 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.clickable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AspectRatio
-import androidx.compose.material.icons.filled.Blur
+
 import androidx.compose.material.icons.filled.Crop
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Opacity
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -24,9 +27,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import com.maxkeppeker.sheets.core.models.base.Header
 import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
 import com.maxkeppeler.sheets.list.ListDialog
@@ -124,25 +129,15 @@ fun ThemeSettingsScreen(
                     val currentThemeDisplay = themeOptions.find { it.first == themeMode }?.second ?: "System Default"
                     
                     val themeDialog = rememberCustomDialog { dismiss ->
-                        val options = themeOptions.map { (value, display) ->
-                            ListOption(
-                                titleText = display,
-                                selected = value == themeMode
-                            )
-                        }
-                        
-                        ListDialog(
-                            state = rememberUseCaseState(visible = true, onCloseRequest = { dismiss() }),
-                            header = Header.Default(title = "Theme Mode"),
-                            selection = ListSelection.Single(
-                                showRadioButtons = true,
-                                options = options
-                            ) { index, _ ->
-                                val selectedTheme = themeOptions[index].first
+                        ThemeSelectionDialog(
+                            themeOptions = themeOptions,
+                            currentTheme = themeMode,
+                            onThemeSelected = { selectedTheme ->
                                 prefs.edit().putString("theme_mode", selectedTheme).commit()
                                 themeMode = selectedTheme
                                 dismiss()
-                            }
+                            },
+                            onDismiss = { dismiss() }
                         )
                     }
                     
@@ -297,7 +292,7 @@ fun ThemeSettingsScreen(
                             Spacer(modifier = Modifier.height(16.dp))
                             
                             ListItem(
-                                leadingContent = { Icon(Icons.Filled.Blur, "Background Blur") },
+                                leadingContent = { Icon(Icons.Filled.Tune, "Background Blur") },
                                 headlineContent = { 
                                     Text(
                                         text = "Background Blur",
@@ -573,4 +568,32 @@ fun ThemeSettingsScreen(
                 }
             }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ThemeSelectionDialog(
+    themeOptions: List<Pair<String, String>>,
+    currentTheme: String,
+    onThemeSelected: (String) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val options = themeOptions.map { (value, display) ->
+        ListOption(
+            titleText = display,
+            selected = value == currentTheme
+        )
+    }
+    
+    ListDialog(
+        state = rememberUseCaseState(visible = true, onCloseRequest = { onDismiss() }),
+        header = Header.Default(title = "Theme Mode"),
+        selection = ListSelection.Single(
+            showRadioButtons = true,
+            options = options
+        ) { index, _ ->
+            val selectedTheme = themeOptions[index].first
+            onThemeSelected(selectedTheme)
+        }
+    )
 }
