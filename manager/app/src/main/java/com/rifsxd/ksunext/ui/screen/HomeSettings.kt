@@ -61,45 +61,9 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.rifsxd.ksunext.R
 import com.rifsxd.ksunext.ui.component.rememberCustomDialog
+import com.rifsxd.ksunext.ui.util.IconUtils
 
-// Get seasonal icon based on current month
-private fun getSeasonalIcon(): ImageVector {
-    val calendar = Calendar.getInstance()
-    return when (calendar.get(Calendar.MONTH)) {
-        Calendar.DECEMBER, Calendar.JANUARY, Calendar.FEBRUARY -> Icons.Filled.AcUnit // Winter
-        Calendar.MARCH, Calendar.APRIL, Calendar.MAY -> Icons.Filled.Spa // Spring
-        Calendar.JUNE, Calendar.JULY, Calendar.AUGUST -> Icons.Filled.WbSunny // Summer
-        else -> Icons.Filled.Forest // Fall
-    }
-}
-
-// Get seasonal icon name for display
-private fun getSeasonalIconName(): String {
-    val calendar = Calendar.getInstance()
-    return when (calendar.get(Calendar.MONTH)) {
-        Calendar.DECEMBER, Calendar.JANUARY, Calendar.FEBRUARY -> "Winter"
-        Calendar.MARCH, Calendar.APRIL, Calendar.MAY -> "Spring"
-        Calendar.JUNE, Calendar.JULY, Calendar.AUGUST -> "Summer"
-        else -> "Fall"
-    }
-}
-
-// Get icon based on type and season
-@Composable
-private fun getIcon(iconType: String): Any {
-    return when (iconType) {
-        "OFF" -> Icons.Filled.VisibilityOff
-        "SEASONAL" -> getSeasonalIcon()
-        "WINTER" -> Icons.Filled.AcUnit
-        "SPRING" -> Icons.Filled.Spa
-        "SUMMER" -> Icons.Filled.WbSunny
-        "FALL" -> Icons.Filled.Forest
-        "KSU_NEXT" -> painterResource(R.drawable.ic_ksu_next)
-        "CANNABIS" -> painterResource(R.drawable.ic_cannabis)
-        "AMOGUS_SUSFS" -> painterResource(R.drawable.ic_sus)
-        else -> getSeasonalIcon()
-    }
-}
+// Icon helper functions moved to IconUtils
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Destination<RootGraph>
@@ -373,7 +337,7 @@ fun HomeSettingsScreen(
                                         ),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    val icon = getIcon(value)
+                                    val icon = IconUtils.getIcon(value)
                                     when (icon) {
                                         is ImageVector -> Icon(
                                             imageVector = icon,
@@ -399,7 +363,7 @@ fun HomeSettingsScreen(
                                     )
                                     if (value == "SEASONAL") {
                                         Text(
-                                            text = "Currently: ${getSeasonalIconName()}",
+                                            text = "Currently: ${IconUtils.getSeasonalIconName()}",
                                             style = MaterialTheme.typography.bodySmall,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
@@ -461,7 +425,7 @@ fun HomeSettingsScreen(
                                 .padding(end = 16.dp),
                             contentAlignment = Alignment.Center
                         ) {
-                            val currentIcon = getIcon(selectedIconType)
+                            val currentIcon = IconUtils.getIcon(selectedIconType)
                             when (currentIcon) {
                                 is ImageVector -> Icon(
                                     imageVector = currentIcon,

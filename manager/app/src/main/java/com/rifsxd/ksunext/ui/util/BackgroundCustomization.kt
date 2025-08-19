@@ -24,7 +24,7 @@ data class BackgroundTransformation(
     val rotation: Float = 0f
 )
 
-object Background {
+object BackgroundCustomization {
     private const val TAG = "Background"
     private const val TRANSFORMED_BACKGROUND_FILENAME = "custom_background_transformed.jpg"
     private const val BACKGROUND_IMAGE_FILENAME = "background_image.jpg"
