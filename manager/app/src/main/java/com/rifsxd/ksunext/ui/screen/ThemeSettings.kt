@@ -75,6 +75,12 @@ fun ThemeSettingsScreen(
     var backgroundImageUri by rememberSaveable {
         mutableStateOf(prefs.getString("background_image_uri", null))
     }
+    
+    // Sync state with actual saved preferences when returning from other screens
+    LaunchedEffect(Unit) {
+        // Reset to actual saved value when screen loads/resumes
+        backgroundImageUri = prefs.getString("background_image_uri", null)
+    }
 
     // Image picker launcher
     val selectImageLauncher = rememberLauncherForActivityResult(
@@ -87,6 +93,8 @@ fun ThemeSettingsScreen(
                     val savedPath = BackgroundCustomization.copyImageToInternalStorage(context, uri)
                     if (savedPath != null) {
                         val savedUri = BackgroundCustomization.filePathToUri(savedPath)
+                        // Update state to show buttons, but don't save to preferences yet
+                        backgroundImageUri = savedUri.toString()
                         // Navigate to photo editor with temp URI - settings will be saved only when user confirms
                         navigator.navigate(PhotoEditorScreenDestination(imageUri = savedUri.toString()))
                     }
