@@ -9,9 +9,30 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.clickable
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AspectRatio
+import androidx.compose.material.icons.filled.Blur
+import androidx.compose.material.icons.filled.Crop
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.Opacity
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.Text
+import com.maxkeppeker.sheets.core.models.base.Header
+import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
+import com.maxkeppeler.sheets.list.ListDialog
+import com.maxkeppeler.sheets.list.models.ListOption
+import com.maxkeppeler.sheets.list.models.ListSelection
+import com.rifsxd.ksunext.ui.component.rememberCustomDialog
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -39,6 +60,11 @@ fun ThemeSettingsScreen(
     val context = LocalContext.current
     val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
 
+    // Theme mode state
+    var themeMode by rememberSaveable {
+        mutableStateOf(prefs.getString("theme_mode", "system_default") ?: "system_default")
+    }
+
     // Background image state
     var backgroundImageUri by rememberSaveable {
         mutableStateOf(prefs.getString("background_image_uri", null))
@@ -65,25 +91,78 @@ fun ThemeSettingsScreen(
         }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Theme Settings") },
-                navigationIcon = {
-                    IconButton(onClick = { navigator.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        // Theme Mode Section
+        item {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer
+                )
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text(
+                        text = "Theme Mode",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+
+                    val themeOptions = listOf(
+                        "system_default" to "System Default",
+                        "light" to "Light Mode",
+                        "dark" to "Dark Mode",
+                        "amoled" to "AMOLED Dark"
+                    )
+                    
+                    val currentThemeDisplay = themeOptions.find { it.first == themeMode }?.second ?: "System Default"
+                    
+                    val themeDialog = rememberCustomDialog { dismiss ->
+                        val options = themeOptions.map { (value, display) ->
+                            ListOption(
+                                titleText = display,
+                                selected = value == themeMode
+                            )
+                        }
+                        
+                        ListDialog(
+                            state = rememberUseCaseState(visible = true, onCloseRequest = { dismiss() }),
+                            header = Header.Default(title = "Theme Mode"),
+                            selection = ListSelection.Single(
+                                showRadioButtons = true,
+                                options = options
+                            ) { index, _ ->
+                                val selectedTheme = themeOptions[index].first
+                                prefs.edit().putString("theme_mode", selectedTheme).commit()
+                                themeMode = selectedTheme
+                                dismiss()
+                            }
+                        )
                     }
+                    
+                    ListItem(
+                        leadingContent = { Icon(Icons.Filled.Palette, "Theme Mode") },
+                        headlineContent = { Text(
+                            text = "Theme Mode",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold,
+                        ) },
+                        supportingContent = { Text("Current: $currentThemeDisplay") },
+                        modifier = Modifier
+                            .clickable {
+                                themeDialog.show()
+                            }
+                    )
                 }
-            )
+            }
         }
-    ) { paddingValues ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
+
             // Background Image Section
             item {
                 Card(
@@ -200,6 +279,64 @@ fun ThemeSettingsScreen(
                                         }
                                         Text(
                                             text = "${(backgroundTransparency * 100).toInt()}%",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.primary,
+                                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                                        )
+                                    }
+                                }
+                            )
+                            
+                            // Background Blur Slider
+                            var backgroundBlur by rememberSaveable {
+                                mutableFloatStateOf(
+                                    prefs.getFloat("background_blur", 0.0f)
+                                )
+                            }
+                            
+                            Spacer(modifier = Modifier.height(16.dp))
+                            
+                            ListItem(
+                                leadingContent = { Icon(Icons.Filled.Blur, "Background Blur") },
+                                headlineContent = { 
+                                    Text(
+                                        text = "Background Blur",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.SemiBold,
+                                    ) 
+                                },
+                                supportingContent = { 
+                                    Column {
+                                        Text("Adjust the blur effect on the background image")
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            modifier = Modifier.fillMaxWidth()
+                                        ) {
+                                            Text(
+                                                text = "0px",
+                                                style = MaterialTheme.typography.bodySmall,
+                                                modifier = Modifier.width(32.dp)
+                                            )
+                                            Slider(
+                                                value = backgroundBlur,
+                                                onValueChange = { value ->
+                                                    backgroundBlur = value
+                                                    prefs.edit().putFloat("background_blur", value).commit()
+                                                },
+                                                valueRange = 0.0f..25.0f,
+                                                modifier = Modifier.weight(1f),
+                                                colors = SliderDefaults.colors()
+                                            )
+                                            Text(
+                                                text = "25px",
+                                                style = MaterialTheme.typography.bodySmall,
+                                                modifier = Modifier.width(32.dp),
+                                                textAlign = TextAlign.End
+                                            )
+                                        }
+                                        Text(
+                                            text = "${backgroundBlur.toInt()}px",
                                             style = MaterialTheme.typography.bodySmall,
                                             color = MaterialTheme.colorScheme.primary,
                                             modifier = Modifier.align(Alignment.CenterHorizontally)
@@ -435,6 +572,5 @@ fun ThemeSettingsScreen(
                     }
                 }
             }
-        }
     }
 }

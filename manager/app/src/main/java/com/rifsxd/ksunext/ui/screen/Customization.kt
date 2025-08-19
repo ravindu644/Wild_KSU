@@ -299,51 +299,6 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                 )
             }
             
-            val themeOptions = listOf(
-                "system_default" to "System Default",
-                "light" to "Light Mode",
-                "dark" to "Dark Mode",
-                "amoled" to "AMOLED Dark"
-            )
-            
-            val currentThemeDisplay = themeOptions.find { it.first == themeMode }?.second ?: "System Default"
-            
-            val themeDialog = rememberCustomDialog { dismiss ->
-                val options = themeOptions.map { (value, display) ->
-                    ListOption(
-                        titleText = display,
-                        selected = value == themeMode
-                    )
-                }
-                
-                ListDialog(
-                    state = rememberUseCaseState(visible = true, onCloseRequest = { dismiss() }),
-                    header = Header.Default(title = "Theme Mode"),
-                    selection = ListSelection.Single(
-                        showRadioButtons = true,
-                        options = options
-                    ) { index, _ ->
-                        val selectedTheme = themeOptions[index].first
-                        prefs.edit().putString("theme_mode", selectedTheme).commit()
-                        themeMode = selectedTheme
-                        dismiss()
-                    }
-                )
-            }
-            
-            ListItem(
-                leadingContent = { Icon(Icons.Filled.Palette, "Theme Mode") },
-                headlineContent = { Text(
-                    text = "Theme Mode",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                ) },
-                supportingContent = { Text("Current: $currentThemeDisplay") },
-                modifier = Modifier
-                    .clickable {
-                        themeDialog.show()
-                    }
-            )
 
 
 
@@ -355,39 +310,6 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
 
 
 
-            // Home Settings (System Info Card Settings)
-            ListItem(
-                leadingContent = { 
-                    Icon(
-                        imageVector = Icons.Filled.Info,
-                        contentDescription = "Home Settings"
-                    ) 
-                },
-                headlineContent = {
-                    Text(
-                        text = stringResource(R.string.info_card_customization),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                    )
-                },
-                supportingContent = {
-                    Text(
-                        text = stringResource(R.string.info_card_customization_summary),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                },
-                trailingContent = {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                        contentDescription = "Navigate to home settings",
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                },
-                modifier = Modifier.clickable { 
-                    navigator.navigate(HomeSettingsScreenDestination)
-                }
-            )
 
             // Theme Settings
             ListItem(
@@ -420,6 +342,40 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                 },
                 modifier = Modifier.clickable { 
                     navigator.navigate(ThemeSettingsScreenDestination)
+                }
+            )
+
+            // Home Settings (System Info Card Settings)
+            ListItem(
+                leadingContent = { 
+                    Icon(
+                        imageVector = Icons.Filled.Info,
+                        contentDescription = "Home Settings"
+                    ) 
+                },
+                headlineContent = {
+                    Text(
+                        text = stringResource(R.string.info_card_customization),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                },
+                supportingContent = {
+                    Text(
+                        text = stringResource(R.string.info_card_customization_summary),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                },
+                trailingContent = {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                        contentDescription = "Navigate to home settings",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                },
+                modifier = Modifier.clickable { 
+                    navigator.navigate(HomeSettingsScreenDestination)
                 }
             )
 
