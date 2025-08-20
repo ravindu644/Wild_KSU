@@ -289,7 +289,7 @@ fun ThemeSettingsScreen(
                                     value = backgroundTransparency,
                                     onValueChange = { value ->
                                         backgroundTransparency = value
-                                        prefs.edit().putFloat("background_transparency", value).commit()
+                                        prefs.edit().putFloat("background_transparency", value).apply()
                                     },
                                     valueRange = 0.0f..1.0f,
                                     modifier = Modifier.fillMaxWidth()
@@ -344,7 +344,7 @@ fun ThemeSettingsScreen(
                                     value = backgroundBlur,
                                     onValueChange = { value ->
                                         backgroundBlur = value
-                                        prefs.edit().putFloat("background_blur", value).commit()
+                                        prefs.edit().putFloat("background_blur", value).apply()
                                     },
                                     valueRange = 0.0f..50.0f,
                                     modifier = Modifier.fillMaxWidth()

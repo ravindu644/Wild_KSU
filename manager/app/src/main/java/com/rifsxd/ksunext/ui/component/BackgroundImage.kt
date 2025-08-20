@@ -48,10 +48,10 @@ fun BackgroundImageWrapper(
     // Debug logging
     Log.d("BackgroundImage", "URI: $backgroundImageUri, FitMode: $backgroundFitMode, Transparency: $backgroundTransparency, Blur: $backgroundBlur")
     
-    // State for blurred image - moved outside to prevent recreation on recomposition
-    // Reset when backgroundImageUri changes
-    var blurredPainter by remember(backgroundImageUri) { mutableStateOf<BitmapPainter?>(null) }
-    var isProcessingBlur by remember(backgroundImageUri) { mutableStateOf(false) }
+    // State for blurred image - reset when backgroundImageUri or backgroundBlur changes
+    var blurredPainter by remember(backgroundImageUri, backgroundBlur) { mutableStateOf<BitmapPainter?>(null) }
+    var isProcessingBlur by remember(backgroundImageUri, backgroundBlur) { mutableStateOf(false) }
+    var lastProcessedBlur by remember(backgroundImageUri) { mutableStateOf(-1f) }
     
     Box(modifier = Modifier.fillMaxSize()) {
         // Display background image if available
@@ -91,12 +91,16 @@ fun BackgroundImageWrapper(
                     if (backgroundBlur <= 0f && blurredPainter != null) {
                         Log.d("BackgroundImage", "Clearing blur - backgroundBlur: $backgroundBlur")
                         blurredPainter = null
+                        lastProcessedBlur = -1f
                     }
                 }
                 
-                // Apply blur effect only when needed
+                // Apply blur effect only when needed and blur value has actually changed
                 LaunchedEffect(backgroundBlur, originalPainter.state) {
-                    if (backgroundBlur > 0f && originalPainter.state is AsyncImagePainter.State.Success) {
+                    if (backgroundBlur > 0f && 
+                        originalPainter.state is AsyncImagePainter.State.Success && 
+                        lastProcessedBlur != backgroundBlur &&
+                        !isProcessingBlur) {
                         Log.d("BackgroundImage", "LaunchedEffect triggered - backgroundBlur: $backgroundBlur, painter state: ${originalPainter.state}")
                         Log.d("BackgroundImage", "Starting blur processing with radius: $backgroundBlur")
                         isProcessingBlur = true
@@ -110,6 +114,7 @@ fun BackgroundImageWrapper(
                                     BackgroundCustomization.applyBlur(bitmap, backgroundBlur)
                                 }
                                 blurredPainter = BitmapPainter(blurredBitmap.asImageBitmap())
+                                lastProcessedBlur = backgroundBlur
                                 Log.d("BackgroundImage", "Blur processing completed successfully")
                             } else {
                                 Log.w("BackgroundImage", "Drawable is not BitmapDrawable: ${drawable::class.java.simpleName}")
