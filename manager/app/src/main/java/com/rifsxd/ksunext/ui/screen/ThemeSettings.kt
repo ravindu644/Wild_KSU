@@ -663,8 +663,7 @@ fun ThemeSettingsScreen(
                                 ) {
                                     Icon(
                                         imageVector = Icons.Filled.Clear,
-                                        contentDescription = "Reset DPI",
-                                        tint = MaterialTheme.colorScheme.secondary
+                                        contentDescription = "Reset DPI"
                                     )
                                 }
                                 
@@ -676,8 +675,7 @@ fun ThemeSettingsScreen(
                                     ) {
                                         Icon(
                                             imageVector = Icons.Filled.Tune,
-                                            contentDescription = "DPI Presets",
-                                            tint = MaterialTheme.colorScheme.tertiary
+                                            contentDescription = "DPI Presets"
                                         )
                                     }
                                     
@@ -718,8 +716,7 @@ fun ThemeSettingsScreen(
                                 ) {
                                     Icon(
                                         imageVector = Icons.Filled.Check,
-                                        contentDescription = "Confirm DPI",
-                                        tint = if (tempDpi != savedDpi) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                                        contentDescription = "Confirm DPI"
                                     )
                                 }
                             }

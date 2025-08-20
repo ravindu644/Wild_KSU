@@ -428,11 +428,6 @@ fun HomeSettingsScreen(
                         // Show current icon preview
                         Box(
                             modifier = Modifier
-                                .size(40.dp)
-                                .background(
-                                    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-                                    CircleShape
-                                )
                                 .padding(end = 16.dp),
                             contentAlignment = Alignment.Center
                         ) {
