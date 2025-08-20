@@ -242,12 +242,20 @@ object BackgroundCustomization {
             return bitmap
         }
         
-        val width = bitmap.width
-        val height = bitmap.height
+        // Convert HARDWARE bitmap to software bitmap if needed
+        val workingBitmap = if (bitmap.config == Bitmap.Config.HARDWARE) {
+            Log.d(TAG, "Converting HARDWARE bitmap to ARGB_8888 for processing")
+            bitmap.copy(Bitmap.Config.ARGB_8888, false)
+        } else {
+            bitmap
+        }
+        
+        val width = workingBitmap.width
+        val height = workingBitmap.height
         val pixels = IntArray(width * height)
         val blurredPixels = IntArray(width * height)
         
-        bitmap.getPixels(pixels, 0, width, 0, 0, width, height)
+        workingBitmap.getPixels(pixels, 0, width, 0, 0, width, height)
         
         val r = radius.toInt().coerceAtMost(25)
         
