@@ -16,23 +16,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.painter.BitmapPainter
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalDensity
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
-import com.rifsxd.ksunext.ui.util.BackgroundCustomization
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import android.graphics.Bitmap
-import android.graphics.drawable.BitmapDrawable
-import coil.compose.AsyncImagePainter
 
 @Composable
 fun BackgroundImageWrapper(
@@ -50,10 +35,7 @@ fun BackgroundImageWrapper(
         Log.d("BackgroundImage", "URI: $backgroundImageUri, FitMode: $backgroundFitMode, Transparency: $backgroundTransparency, Blur: $backgroundBlur")
     }
     
-    // State for blurred image - reset when backgroundImageUri or backgroundBlur changes
-    var blurredPainter by remember(backgroundImageUri, backgroundBlur) { mutableStateOf<BitmapPainter?>(null) }
-    var isProcessingBlur by remember(backgroundImageUri, backgroundBlur) { mutableStateOf(false) }
-    var lastProcessedBlur by remember(backgroundImageUri) { mutableStateOf(-1f) }
+
     
     Box(modifier = Modifier.fillMaxSize()) {
         // Display background image if available
@@ -98,58 +80,8 @@ fun BackgroundImageWrapper(
                     }
                 )
                 
-                // Clear blur immediately when backgroundBlur becomes 0
-                LaunchedEffect(backgroundBlur) {
-                    if (backgroundBlur <= 0f && blurredPainter != null) {
-                        Log.d("BackgroundImage", "Clearing blur - backgroundBlur: $backgroundBlur")
-                        blurredPainter = null
-                        lastProcessedBlur = -1f
-                    }
-                }
-                
-                // Apply blur effect only when needed and blur value has actually changed
-                LaunchedEffect(backgroundBlur, uriString) {
-                    if (backgroundBlur > 0f && 
-                        originalPainter.state is AsyncImagePainter.State.Success && 
-                        lastProcessedBlur != backgroundBlur &&
-                        !isProcessingBlur) {
-                        Log.d("BackgroundImage", "LaunchedEffect triggered - backgroundBlur: $backgroundBlur, painter state: ${originalPainter.state}")
-                        Log.d("BackgroundImage", "Starting blur processing with radius: $backgroundBlur")
-                        isProcessingBlur = true
-                        try {
-                            val drawable = (originalPainter.state as AsyncImagePainter.State.Success).result.drawable
-                            if (drawable is BitmapDrawable) {
-                                val bitmap = drawable.bitmap
-                                Log.d("BackgroundImage", "Bitmap size: ${bitmap.width}x${bitmap.height}")
-                                Log.d("BackgroundImage", "Applying simple blur with radius: $backgroundBlur")
-                                val blurredBitmap = withContext(Dispatchers.Default) {
-                                    BackgroundCustomization.applyBlur(bitmap, backgroundBlur)
-                                }
-                                blurredPainter = BitmapPainter(blurredBitmap.asImageBitmap())
-                                lastProcessedBlur = backgroundBlur
-                                Log.d("BackgroundImage", "Blur processing completed successfully")
-                            } else {
-                                Log.w("BackgroundImage", "Drawable is not BitmapDrawable: ${drawable::class.java.simpleName}")
-                            }
-                        } catch (e: Exception) {
-                            Log.e("BackgroundImage", "Failed to apply blur: ${e.message}", e)
-                            blurredPainter = null
-                        } finally {
-                            isProcessingBlur = false
-                        }
-                    }
-                }
-                
-                // Use blurred painter if available, otherwise use original - memoized to prevent continuous logging
-                val painter = remember(backgroundBlur, blurredPainter, originalPainter) {
-                    if (backgroundBlur > 0f && blurredPainter != null) {
-                        Log.d("BackgroundImage", "Using blurred painter")
-                        blurredPainter!!
-                    } else {
-                        Log.d("BackgroundImage", "Using original painter - backgroundBlur: $backgroundBlur, blurredPainter: $blurredPainter")
-                        originalPainter
-                    }
-                }
+                // Use original painter - blur will be applied via Compose modifier
+                val painter = originalPainter
                 
                 // Load transform settings from SharedPreferences - remember to prevent continuous reads
                 val scale = remember { prefs.getFloat("background_scale_x", 1f) }
@@ -159,9 +91,10 @@ fun BackgroundImageWrapper(
                 val flipHorizontal = remember { prefs.getBoolean("background_flip_horizontal", false) }
                 val flipVertical = remember { prefs.getBoolean("background_flip_vertical", false) }
                 
-                // Apply transformations (blur is now handled by custom painter)
+                // Apply transformations with built-in blur modifier
                 val imageModifier = Modifier
                     .fillMaxSize()
+                    .blur(radius = backgroundBlur.dp)
                     .graphicsLayer {
                         scaleX = scale * (if (flipHorizontal) -1f else 1f)
                         scaleY = scale * (if (flipVertical) -1f else 1f)
