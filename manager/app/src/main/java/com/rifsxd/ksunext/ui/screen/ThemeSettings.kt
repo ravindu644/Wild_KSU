@@ -154,19 +154,39 @@ fun ThemeSettingsScreen(
                         )
                     }
                     
-                    ListItem(
-                        leadingContent = { Icon(Icons.Filled.Palette, "Theme Mode") },
-                        headlineContent = { Text(
-                            text = "Theme Mode",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold,
-                        ) },
-                        supportingContent = { Text("Current: $currentThemeDisplay") },
+                    Column(
                         modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(20.dp)
                             .clickable {
                                 themeDialog.show()
                             }
-                    )
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Palette,
+                                contentDescription = null,
+                                modifier = Modifier.padding(end = 16.dp),
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                            Column(
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text(
+                                    text = "Theme Mode",
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    fontWeight = FontWeight.Medium
+                                )
+                                Text(
+                                    text = "Current: $currentThemeDisplay",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -191,17 +211,41 @@ fun ThemeSettingsScreen(
                         )
 
                         // Background Image Selection
-                        ListItem(
-                            leadingContent = { Icon(Icons.Filled.Image, stringResource(R.string.settings_background_image)) },
-                            headlineContent = { 
-                                Text(
-                                    text = stringResource(R.string.settings_background_image),
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.SemiBold,
-                                ) 
-                            },
-                            supportingContent = { Text(stringResource(R.string.settings_background_image_summary)) },
-                            trailingContent = {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(20.dp)
+                                .clickable {
+                                    val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+                                        type = "image/*"
+                                        addCategory(Intent.CATEGORY_OPENABLE)
+                                    }
+                                    selectImageLauncher.launch(intent)
+                                }
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Image,
+                                    contentDescription = null,
+                                    modifier = Modifier.padding(end = 16.dp),
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                                Column(
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    Text(
+                                        text = stringResource(R.string.settings_background_image),
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        fontWeight = FontWeight.Medium
+                                    )
+                                    Text(
+                                        text = stringResource(R.string.settings_background_image_summary),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
                                 Row {
                                     // Use the saved background image for buttons
                                     val activeImageUri = backgroundImageUri
@@ -229,16 +273,8 @@ fun ThemeSettingsScreen(
                                         }
                                     }
                                 }
-                            },
-                            modifier = Modifier
-                                .clickable {
-                                    val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
-                                        type = "image/*"
-                                        addCategory(Intent.CATEGORY_OPENABLE)
-                                    }
-                                    selectImageLauncher.launch(intent)
-                                }
-                        )
+                            }
+                        }
 
                         // Background Transparency Slider (only show when background image is enabled)
                         if (backgroundImageUri != null) { // Only show sliders for actually saved background
@@ -471,24 +507,42 @@ fun ThemeSettingsScreen(
                         }
                         var tempDpi by remember { mutableIntStateOf(savedDpi) }
 
-                        ListItem(
-                            leadingContent = { Icon(Icons.Filled.AspectRatio, stringResource(R.string.dpi_scale_settings)) },
-                            headlineContent = { 
-                                Text(
-                                    text = stringResource(R.string.dpi_scale_settings),
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.SemiBold,
-                                ) 
-                            },
-                            supportingContent = { Text(stringResource(R.string.dpi_scale_settings_summary, savedDpi)) },
-                            trailingContent = {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(20.dp)
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.AspectRatio,
+                                    contentDescription = null,
+                                    modifier = Modifier.padding(end = 16.dp),
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                                Column(
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    Text(
+                                        text = stringResource(R.string.dpi_scale_settings),
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        fontWeight = FontWeight.Medium
+                                    )
+                                    Text(
+                                        text = stringResource(R.string.dpi_scale_settings_summary, savedDpi),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
                                 Text(
                                     text = "${tempDpi}dpi",
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.primary
                                 )
                             }
-                        )
+                            Spacer(modifier = Modifier.height(16.dp))
+                        }
                         
                         Column(
                             modifier = Modifier
