@@ -86,10 +86,18 @@ fun BackgroundImageWrapper(
                         .build()
                 )
                 
-                // Apply blur effect when needed
+                // Clear blur immediately when backgroundBlur becomes 0
+                LaunchedEffect(backgroundBlur) {
+                    if (backgroundBlur <= 0f && blurredPainter != null) {
+                        Log.d("BackgroundImage", "Clearing blur - backgroundBlur: $backgroundBlur")
+                        blurredPainter = null
+                    }
+                }
+                
+                // Apply blur effect only when needed
                 LaunchedEffect(backgroundBlur, originalPainter.state) {
-                    Log.d("BackgroundImage", "LaunchedEffect triggered - backgroundBlur: $backgroundBlur, painter state: ${originalPainter.state}")
                     if (backgroundBlur > 0f && originalPainter.state is AsyncImagePainter.State.Success) {
+                        Log.d("BackgroundImage", "LaunchedEffect triggered - backgroundBlur: $backgroundBlur, painter state: ${originalPainter.state}")
                         Log.d("BackgroundImage", "Starting blur processing with radius: $backgroundBlur")
                         isProcessingBlur = true
                         try {
@@ -112,9 +120,6 @@ fun BackgroundImageWrapper(
                         } finally {
                             isProcessingBlur = false
                         }
-                    } else {
-                        Log.d("BackgroundImage", "Clearing blur - backgroundBlur: $backgroundBlur, state success: ${originalPainter.state is AsyncImagePainter.State.Success}")
-                        blurredPainter = null
                     }
                 }
                 
