@@ -408,7 +408,7 @@ fun HomeSettingsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues),
-            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 16.dp),
+            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // Home Screen & Info Card Settings
@@ -427,7 +427,7 @@ fun HomeSettingsScreen(
                             text = stringResource(R.string.home_screen_settings),
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(bottom = 20.dp)
+                            modifier = Modifier.padding(bottom = 16.dp)
                         )
 
                         // Home Screen Icon Style
