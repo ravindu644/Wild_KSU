@@ -38,11 +38,9 @@ jobs:
           # Calculate hash of all files except manager directory
           HASH=$(find . -type f \
             -not -path "./manager/*" \
-            -not -path "./.git/*" \
-            -not -path "./.github/workflows/build-manager-spoofed.yml" \
             -exec sha256sum {} \; | sort | sha256sum | cut -d' ' -f1)
-          echo "cache-key=artifacts-spoofed-$HASH" >> $GITHUB_OUTPUT
-          echo "Generated cache key: artifacts-spoofed-$HASH"
+          echo "cache-key=artifacts-$HASH" >> $GITHUB_OUTPUT
+          echo "Generated cache key: artifacts-$HASH"
 
       - name: Check for cached artifacts
         id: cache-artifacts
