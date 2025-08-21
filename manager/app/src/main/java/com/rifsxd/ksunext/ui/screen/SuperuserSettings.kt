@@ -3,6 +3,7 @@ package com.rifsxd.ksunext.ui.screen
 import android.content.Context
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -89,6 +90,10 @@ fun SuperuserSettingsScreen(navigator: DestinationsNavigator) {
                             )
                         }
 
+)
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
                         // Individual App Cards Setting
                         var useIndividualCards by rememberSaveable {
                             mutableStateOf(
@@ -105,6 +110,8 @@ fun SuperuserSettingsScreen(navigator: DestinationsNavigator) {
                             prefs.edit().putBoolean("use_individual_app_cards", it).apply()
                             useIndividualCards = it
                         }
+
+                        Spacer(modifier = Modifier.height(8.dp))
 
                         // Enable Favorite Button
                         var enableFavoriteButton by rememberSaveable {
