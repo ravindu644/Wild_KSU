@@ -299,4 +299,8 @@
     <string name="info_card_settings">Info Card Settings</string>
     <string name="info_card_order_management">Info Card Order Management</string>
     <string name="info_card_order_description">Tap to move items up/down one position, or long press to move to top/bottom. Use the toggle to enable/disable items.</string>
+    
+    <!-- Individual App Cards Settings -->
+    <string name="individual_app_cards">Individual App Cards</string>
+    <string name="individual_app_cards_summary">Show each app in its own card instead of a list</string>
 </resources>
