@@ -29,6 +29,8 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.MaterialTheme
@@ -50,6 +52,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.unit.dp
 
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -169,28 +172,45 @@ private fun AppProfileInner(
 ) {
     val isRootGranted = profile.allowSu
 
-    Column(modifier = modifier) {
-        AppMenuBox(packageName) {
-            ListItem(
-                headlineContent = { Text(
-                    text = appLabel,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold
-                ) },
-                supportingContent = { Text(packageName) },
-                leadingContent = appIcon,
+    Column(
+        modifier = modifier.padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Card(
+            shape = RoundedCornerShape(12.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainer
+            )
+        ) {
+            AppMenuBox(packageName) {
+                ListItem(
+                    headlineContent = { Text(
+                        text = appLabel,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold
+                    ) },
+                    supportingContent = { Text(packageName) },
+                    leadingContent = appIcon,
+                )
+            }
+        }
+
+        Card(
+            shape = RoundedCornerShape(12.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainer
+            )
+        ) {
+            SwitchItem(
+                icon = Icons.Filled.AdminPanelSettings,
+                title = stringResource(id = R.string.superuser),
+                checked = isRootGranted,
+                onCheckedChange = { onProfileChange(profile.copy(allowSu = it)) },
             )
         }
 
-        SwitchItem(
-            icon = Icons.Filled.AdminPanelSettings,
-            title = stringResource(id = R.string.superuser),
-            checked = isRootGranted,
-            onCheckedChange = { onProfileChange(profile.copy(allowSu = it)) },
-        )
-
         Crossfade(targetState = isRootGranted, label = "") { current ->
-            Column {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (current) {
                     val initialMode = if (profile.rootUseDefault) {
                         Mode.Default
@@ -202,12 +222,19 @@ private fun AppProfileInner(
                     var mode by rememberSaveable {
                         mutableStateOf(initialMode)
                     }
-                    ProfileBox(mode, true) {
-                        // template mode shouldn't change profile here!
-                        if (it == Mode.Default || it == Mode.Custom) {
-                            onProfileChange(profile.copy(rootUseDefault = it == Mode.Default))
+                    Card(
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceContainer
+                        )
+                    ) {
+                        ProfileBox(mode, true) {
+                            // template mode shouldn't change profile here!
+                            if (it == Mode.Default || it == Mode.Custom) {
+                                onProfileChange(profile.copy(rootUseDefault = it == Mode.Default))
+                            }
+                            mode = it
                         }
-                        mode = it
                     }
                     Crossfade(targetState = mode, label = "") { currentMode ->
                         if (currentMode == Mode.Template) {
@@ -227,8 +254,15 @@ private fun AppProfileInner(
                     }
                 } else {
                     val mode = if (profile.nonRootUseDefault) Mode.Default else Mode.Custom
-                    ProfileBox(mode, false) {
-                        onProfileChange(profile.copy(nonRootUseDefault = (it == Mode.Default)))
+                    Card(
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceContainer
+                        )
+                    ) {
+                        ProfileBox(mode, false) {
+                            onProfileChange(profile.copy(nonRootUseDefault = (it == Mode.Default)))
+                        }
                     }
                     Crossfade(targetState = mode, label = "") { currentMode ->
                         val modifyEnabled = currentMode == Mode.Custom

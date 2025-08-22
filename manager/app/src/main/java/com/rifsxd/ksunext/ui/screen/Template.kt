@@ -30,6 +30,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -54,6 +56,7 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.dropUnlessResumed
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -143,8 +146,8 @@ fun AppProfileTemplateScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .nestedScroll(scrollBehavior.nestedScrollConnection),
-                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 80.dp),
-                verticalArrangement = Arrangement.spacedBy(0.dp)
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(viewModel.templateList, key = { it.id }) { app ->
                     TemplateItem(navigator, app)
@@ -189,11 +192,17 @@ private fun TemplateItem(
     navigator: DestinationsNavigator,
     template: TemplateViewModel.TemplateInfo
 ) {
-    ListItem(
+    Card(
         modifier = Modifier
             .clickable {
                 navigator.navigate(TemplateEditorScreenDestination(template, !template.local))
             },
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer
+        )
+    ) {
+        ListItem(
         headlineContent = { Text(
             text = template.name,
             style = MaterialTheme.typography.titleMedium,
@@ -224,5 +233,6 @@ private fun TemplateItem(
                 }
             }
         },
-    )
+        )
+    }
 }
