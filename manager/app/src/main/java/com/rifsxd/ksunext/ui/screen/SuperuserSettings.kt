@@ -51,7 +51,7 @@ fun SuperuserSettingsScreen(navigator: DestinationsNavigator) {
                     )
                 ) {
                     Column(
-                        modifier = Modifier.padding(20.dp)
+                        modifier = Modifier.padding(16.dp)
                     ) {
                         // Icon Theme Selection
                         var showIconThemeManager by remember { mutableStateOf(false) }
@@ -90,7 +90,7 @@ fun SuperuserSettingsScreen(navigator: DestinationsNavigator) {
                             )
                         }
 
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
 
                         // Individual App Cards Setting
                         var useIndividualCards by rememberSaveable {
@@ -109,7 +109,7 @@ fun SuperuserSettingsScreen(navigator: DestinationsNavigator) {
                             useIndividualCards = it
                         }
 
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
 
                         // Enable Favorite Button
                         var enableFavoriteButton by rememberSaveable {

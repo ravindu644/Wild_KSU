@@ -435,7 +435,7 @@ fun HomeSettingsScreen(
                                 .clickable {
                                     showIconDialog = true
                                 }
-                                .padding(20.dp)
+                                .padding(16.dp)
                         ) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically
@@ -490,7 +490,7 @@ fun HomeSettingsScreen(
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(20.dp)
+                                .padding(16.dp)
                         ) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically
@@ -537,7 +537,7 @@ fun HomeSettingsScreen(
                                     prefs.edit().putBoolean("show_help_card", newValue).apply()
                                     showHelpCard = newValue
                                 }
-                                .padding(20.dp)
+                                .padding(16.dp)
                         ) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically
@@ -578,7 +578,7 @@ fun HomeSettingsScreen(
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(20.dp)
+                                .padding(16.dp)
                         ) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically

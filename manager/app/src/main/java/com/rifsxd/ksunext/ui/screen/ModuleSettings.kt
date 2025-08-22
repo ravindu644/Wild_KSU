@@ -52,7 +52,7 @@ fun ModuleSettingsScreen(
                     )
                 ) {
                     Column(
-                        modifier = Modifier.padding(20.dp)
+                        modifier = Modifier.padding(16.dp)
                     ) {
                         // Module Cards Always Expanded Setting
                         var keepModulesExpanded by rememberSaveable {
@@ -70,7 +70,7 @@ fun ModuleSettingsScreen(
                             keepModulesExpanded = it
                         }
 
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
 
                         // Banner Toggle Setting
                         var useBanner by rememberSaveable {
@@ -88,7 +88,7 @@ fun ModuleSettingsScreen(
                             useBanner = it
                         }
 
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
 
                         // Hide Module Details Text Setting
                         var hideModuleDetails by rememberSaveable {
