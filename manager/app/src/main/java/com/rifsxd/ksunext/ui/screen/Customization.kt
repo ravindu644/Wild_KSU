@@ -119,37 +119,27 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
     val isManager = Natives.becomeManager(ksuApp.packageName)
     val ksuVersion = if (isManager) Natives.version else null
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainer
-            )
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp)
-            ) {
 
-            val context = LocalContext.current
-            val scope = rememberCoroutineScope()
+        val context = LocalContext.current
+        val scope = rememberCoroutineScope()
 
-            val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+        val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
 
-            // Track language state with current app locale
-            var currentAppLocale by remember { mutableStateOf(LocaleHelper.getCurrentAppLocale(context)) }
-            
-            // Listen for preference changes
-            LaunchedEffect(Unit) {
-                currentAppLocale = LocaleHelper.getCurrentAppLocale(context)
-            }
+        // Track language state with current app locale
+        var currentAppLocale by remember { mutableStateOf(LocaleHelper.getCurrentAppLocale(context)) }
+        
+        // Listen for preference changes
+        LaunchedEffect(Unit) {
+            currentAppLocale = LocaleHelper.getCurrentAppLocale(context)
+        }
 
-            // Language setting with selection dialog
-            val languageDialog = rememberCustomDialog { dismiss ->
+        // Language setting with selection dialog
+        val languageDialog = rememberCustomDialog { dismiss ->
                 // Check if should use system language settings
                 if (LocaleHelper.useSystemLanguageSettings) {
                     // Android 13+ - Jump to system settings
@@ -275,18 +265,27 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                 }
             }
 
-            val language = stringResource(id = R.string.settings_language)
-            
-            // Compute display name based on current app locale (similar to the reference implementation)
-            val currentLanguageDisplay = remember(currentAppLocale) {
-                val locale = currentAppLocale
-                if (locale != null) {
-                    locale.getDisplayName(locale)
-                } else {
-                    context.getString(R.string.system_default)
-                }
+        val language = stringResource(id = R.string.settings_language)
+        
+        // Compute display name based on current app locale (similar to the reference implementation)
+        val currentLanguageDisplay = remember(currentAppLocale) {
+            val locale = currentAppLocale
+            if (locale != null) {
+                locale.getDisplayName(locale)
+            } else {
+                context.getString(R.string.system_default)
             }
-            
+        }
+        
+        // Language Settings Item
+        item {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer
+                )
+            ) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -320,31 +319,18 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                         }
                     }
                 }
-
-                Spacer(modifier = Modifier.height(16.dp))
-                HorizontalDivider()
-                Spacer(modifier = Modifier.height(16.dp))
-
-            // Theme Mode Selection
-            var themeMode by rememberSaveable {
-                mutableStateOf(
-                    prefs.getString("theme_mode", "system_default") ?: "system_default"
-                )
             }
-            
+        }
 
-
-
-
-
-
-
-
-
-
-
-
-                // Theme Settings
+        // Theme Settings Item
+        item {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer
+                )
+            ) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -384,12 +370,18 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                         )
                     }
                 }
+            }
+        }
 
-                Spacer(modifier = Modifier.height(16.dp))
-                HorizontalDivider()
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Home Settings (System Info Card Settings)
+        // Home Settings Item
+        item {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer
+                )
+            ) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -429,57 +421,18 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                         )
                     }
                 }
+            }
+        }
 
-                Spacer(modifier = Modifier.height(16.dp))
-                HorizontalDivider()
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Superuser Settings
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            navigator.navigate(SuperuserSettingsScreenDestination)
-                        }
-                        .padding(16.dp)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.SupervisorAccount,
-                            contentDescription = "Superuser Settings",
-                            modifier = Modifier.size(24.dp)
-                        )
-                        Spacer(modifier = Modifier.width(16.dp))
-                        Column(
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Text(
-                                text = "Superuser Settings",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                            Text(
-                                text = "Customize superuser app display and behavior",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                            contentDescription = "Navigate to superuser settings",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-                HorizontalDivider()
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Module Settings
+        // Module Settings Item
+        item {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer
+                )
+            ) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -521,6 +474,58 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                 }
             }
         }
+
+        // Superuser Settings Item
+        item {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer
+                )
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            navigator.navigate(SuperuserSettingsScreenDestination)
+                        }
+                        .padding(16.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.SupervisorAccount,
+                            contentDescription = "Superuser Settings",
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Column(
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text(
+                                text = "Superuser Settings",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                            Text(
+                                text = "Customize superuser app display and behavior",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                            contentDescription = "Navigate to superuser settings",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                }
+            }
+        }
+
     }
 }
 
