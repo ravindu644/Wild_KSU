@@ -973,42 +973,7 @@ private fun InfoCardContent(
             }
         }
 
-@Composable
-fun NextCard() {
-    val context = LocalContext.current
-    val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
-    val cardBackgroundEnabled = prefs.getBoolean("card_background_enabled", true)
-    val uriHandler = LocalUriHandler.current
-    val url = stringResource(R.string.home_next_kernelsu_repo)
 
-    if (cardBackgroundEnabled) {
-        StandardCard(
-            cardType = CardType.SURFACE,
-            modifier = Modifier.clickable {
-                uriHandler.openUri(url)
-            }
-        ) {
-            CardTextContent(
-                title = stringResource(R.string.home_next_kernelsu),
-                body = stringResource(R.string.home_next_kernelsu_body)
-            )
-        }
-    } else {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(CardConstants.CARD_PADDING_LARGE)
-                .clickable {
-                    uriHandler.openUri(url)
-                }
-        ) {
-            CardTextContent(
-                title = stringResource(R.string.home_next_kernelsu),
-                body = stringResource(R.string.home_next_kernelsu_body)
-            )
-        }
-    }
-}
 
 
 
