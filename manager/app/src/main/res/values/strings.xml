@@ -19,18 +19,18 @@
     <string name="home_module_update_count">Updates: %d</string>
     <string name="home_failure">KernelSU Next v2 signature not found in kernel! [ !KSU_NEXT || != size/hash ]</string>
     <string name="home_failure_tip">Ask your kernel developer to integrate KernelSU Next!</string>
-    <string name="home_kernel">Kernel version</string>
-    <string name="hook_mode">Hook mode</string>
+    <string name="home_kernel">Kernel Version</string>
+    <string name="hook_mode">Hook Mode</string>
     <string name="enable">Enable</string>
     <string name="disable">Disable</string>
     <string name="enabled">Enabled</string>
     <string name="disabled">Disabled</string>
     <string name="susfs_supported">Supported</string>
     <string name="home_susfs">SuSFS: %s</string>
-    <string name="home_susfs_version">SuSFS version</string>
+    <string name="home_susfs_version">SuSFS Version</string>
     <string name="home_susfs_sus_su">SuS SU</string>
-    <string name="home_android">Android version</string>
-    <string name="home_manager_version">Manager version</string>
+    <string name="home_android">Android Version</string>
+    <string name="home_manager_version">Manager Version</string>
     <string name="home_abi">ABI</string>
     <string name="home_selinux_status">SELinux status</string>
     <string name="selinux_status_disabled">Disabled</string>
@@ -82,7 +82,7 @@
     <string name="safe_mode">Safe mode</string>
     <string name="reboot_to_apply">Reboot to take effect</string>
     <string name="module_magisk_conflict">Modules are unavailable due to a conflict with Magisk!</string>
-    <string name="home_mount_system">Mount system</string>
+    <string name="home_mount_system">Mount System</string>
     <string name="home_magic_mount">Magic Mount</string>
     <string name="home_overlayfs_mount">OverlayFS</string>
     <string name="unavailable">Unavailable</string>
@@ -223,7 +223,7 @@
     <string name="developer">Developer</string>
     <string name="sucompat_disabled">SUCOMPAT DISABLED</string>
     <string name="zygisk_required">Zygisk required</string>
-    <string name="zygisk_status">Zygisk injection</string>
+    <string name="zygisk_status">Zygisk Injection</string>
     <string name="home_superuser_count_singular">Superuser</string>
     <string name="home_superuser_count_plural">Superusers</string>
     <string name="home_module_count_singular">Module</string>
