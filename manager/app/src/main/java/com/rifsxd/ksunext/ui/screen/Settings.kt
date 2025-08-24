@@ -98,6 +98,8 @@ import com.rifsxd.ksunext.ui.component.rememberLoadingDialog
 import com.rifsxd.ksunext.ui.component.StandardCard
 import com.rifsxd.ksunext.ui.component.CardType
 import com.rifsxd.ksunext.ui.component.CardConstants
+import com.rifsxd.ksunext.ui.component.CardRowContent
+import com.rifsxd.ksunext.ui.component.CardItemSpacer
 import com.rifsxd.ksunext.ui.util.LocalSnackbarHost
 import com.rifsxd.ksunext.ui.util.getBugreportFile
 import com.rifsxd.ksunext.ui.util.*
@@ -163,20 +165,15 @@ fun SettingScreen(navigator: DestinationsNavigator) {
 
             val profileTemplate = stringResource(id = R.string.settings_profile_template)
             if (ksuVersion != null) {
-                ListItem(
-                    leadingContent = { Icon(Icons.Filled.Fence, profileTemplate) },
-                    headlineContent = { Text(
-                        text = profileTemplate,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold
-                    ) },
-                    supportingContent = { Text(stringResource(id = R.string.settings_profile_template_summary)) },
-                    modifier = Modifier
-                        .clickable {
-                            navigator.navigate(AppProfileTemplateScreenDestination)
-                        }
+                CardRowContent(
+                    text = profileTemplate,
+                    subtitle = stringResource(id = R.string.settings_profile_template_summary),
+                    icon = Icons.Filled.Fence,
+                    modifier = Modifier.clickable {
+                        navigator.navigate(AppProfileTemplateScreenDestination)
+                    }
                 )
-                Spacer(modifier = Modifier.height(CardConstants.ITEM_SPACING_SMALL))
+                CardItemSpacer()
             }
 
             var umountChecked by rememberSaveable {
@@ -194,7 +191,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                         umountChecked = it
                     }
                 }
-                Spacer(modifier = Modifier.height(CardConstants.ITEM_SPACING_SMALL))
+                CardItemSpacer()
             }
 
             if (ksuVersion != null) {
@@ -213,7 +210,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                             isSuDisabled = !shouldEnable
                         }
                     }
-                    Spacer(modifier = Modifier.height(CardConstants.ITEM_SPACING_SMALL))
+                    CardItemSpacer()
                 }
                 
                 SwitchItem(
@@ -232,7 +229,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                         isGlobalNamespaceEnabled = it
                     }
                 )
-                Spacer(modifier = Modifier.height(CardConstants.ITEM_SPACING_SMALL))
+                CardItemSpacer()
             }
 
             val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
@@ -256,7 +253,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                         }
                         prefs.edit().putBoolean("enable_sus_su", it).apply()
                     }
-                    Spacer(modifier = Modifier.height(CardConstants.ITEM_SPACING_SMALL))
+                    CardItemSpacer()
                 }
             }
 
@@ -284,7 +281,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                     if (isManager) install()
                     showRebootDialog = true
                 }
-                Spacer(modifier = Modifier.height(CardConstants.ITEM_SPACING_SMALL))
+                CardItemSpacer()
             }
 
             if (showRebootDialog) {
@@ -322,23 +319,14 @@ fun SettingScreen(navigator: DestinationsNavigator) {
             ) {
                 prefs.edit().putBoolean("check_update", it).apply()
             }
-            Spacer(modifier = Modifier.height(CardConstants.ITEM_SPACING_SMALL))
+            CardItemSpacer()
 
             if (isOverlayAvailable && useOverlayFs) {
                 val shrink = stringResource(id = R.string.shrink_sparse_image)
                 val shrinkMessage = stringResource(id = R.string.shrink_sparse_image_message)
-                ListItem(
-                    leadingContent = {
-                        Icon(
-                            Icons.Filled.Compress,
-                            shrink
-                        )
-                    },
-                    headlineContent = { Text(
-                        text = shrink,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold
-                    ) },
+                CardRowContent(
+                    text = shrink,
+                    icon = Icons.Filled.Compress,
                     modifier = Modifier.clickable {
                         scope.launch {
                             val result = shrinkDialog.awaitConfirm(title = shrink, content = shrinkMessage)
@@ -350,68 +338,41 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                         }
                     }
                 )
-                Spacer(modifier = Modifier.height(CardConstants.ITEM_SPACING_SMALL))
+                CardItemSpacer()
             }
 
             val customization = stringResource(id = R.string.customization)
-            ListItem(
-                leadingContent = {
-                    Icon(
-                        Icons.Filled.Palette,
-                        customization
-                    )
-                },
-                headlineContent = { Text(
-                    text = customization,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold
-                ) },
+            CardRowContent(
+                text = customization,
+                icon = Icons.Filled.Palette,
                 modifier = Modifier.clickable {
                     navigator.navigate(CustomizationScreenDestination)
                 }
             )
-            Spacer(modifier = Modifier.height(CardConstants.ITEM_SPACING_SMALL))
+            CardItemSpacer()
 
             if (ksuVersion != null) {
                 val backupRestore = stringResource(id = R.string.backup_restore)
-                ListItem(
-                    leadingContent = {
-                        Icon(
-                            Icons.Filled.Backup,
-                            backupRestore
-                        )
-                    },
-                    headlineContent = { Text(
-                        text = backupRestore,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold
-                    ) },
+                CardRowContent(
+                    text = backupRestore,
+                    icon = Icons.Filled.Backup,
                     modifier = Modifier.clickable {
                         navigator.navigate(BackupRestoreScreenDestination)
                     }
                 )
-                Spacer(modifier = Modifier.height(CardConstants.ITEM_SPACING_SMALL))
+                CardItemSpacer()
             }
 
             val developer = stringResource(id = R.string.developer)
             if (ksuVersion != null) {
-                ListItem(
-                    leadingContent = {
-                        Icon(
-                            Icons.Filled.DeveloperBoard,
-                            developer
-                        )
-                    },
-                    headlineContent = { Text(
-                        text = developer,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold
-                    ) },
+                CardRowContent(
+                    text = developer,
+                    icon = Icons.Filled.DeveloperBoard,
                     modifier = Modifier.clickable {
                         navigator.navigate(DeveloperScreenDestination)
                     }
                 )
-                Spacer(modifier = Modifier.height(CardConstants.ITEM_SPACING_SMALL))
+                CardItemSpacer()
             }
 
             val lkmMode = Natives.version >= Natives.MINIMAL_SUPPORTED_KERNEL_LKM && Natives.isLkmMode
@@ -419,28 +380,19 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                 UninstallItem(navigator) {
                     loadingDialog.withLoading(it)
                 }
-                Spacer(modifier = Modifier.height(CardConstants.ITEM_SPACING_SMALL))
+                CardItemSpacer()
             }
 
             var showBottomsheet by remember { mutableStateOf(false) }
 
-            ListItem(
-                leadingContent = {
-                    Icon(
-                        Icons.Filled.BugReport,
-                        stringResource(id = R.string.export_log)
-                    )
-                },
-                headlineContent = { Text(
-                    text = stringResource(id = R.string.export_log),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold
-                ) },
+            CardRowContent(
+                text = stringResource(id = R.string.export_log),
+                icon = Icons.Filled.BugReport,
                 modifier = Modifier.clickable {
                     showBottomsheet = true
                 }
             )
-            Spacer(modifier = Modifier.height(CardConstants.ITEM_SPACING_SMALL))
+            CardItemSpacer()
             if (showBottomsheet) {
                 ModalBottomSheet(
                     onDismissRequest = { showBottomsheet = false },
@@ -537,18 +489,9 @@ fun SettingScreen(navigator: DestinationsNavigator) {
             }
 
             val about = stringResource(id = R.string.about)
-            ListItem(
-                leadingContent = {
-                    Icon(
-                        Icons.Filled.ContactPage,
-                        about
-                    )
-                },
-                headlineContent = { Text(
-                    text = about,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold
-                ) },
+            CardRowContent(
+                text = about,
+                icon = Icons.Filled.ContactPage,
                 modifier = Modifier.clickable {
                     aboutDialog.show()
                 }
