@@ -1010,79 +1010,7 @@ fun NextCard() {
     }
 }
 
-@Composable
-fun EXperimentalCard() {
-    val context = LocalContext.current
-    val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
-    val cardBackgroundEnabled = prefs.getBoolean("card_background_enabled", true)
-    /*val uriHandler = LocalUriHandler.current
-    val url = stringResource(R.string.home_experimental_kernelsu_repo)
-    */
 
-    if (cardBackgroundEnabled) {
-        StandardCard(cardType = CardType.SURFACE) {
-            Column {
-                Text(
-                    text = stringResource(R.string.home_experimental_kernelsu),
-                    style = MaterialTheme.typography.titleSmall
-                )
-                Spacer(Modifier.height(CardConstants.ITEM_SPACING_SMALL))
-                Text(
-                    text = stringResource(R.string.home_experimental_kernelsu_body),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                Spacer(Modifier.height(CardConstants.ITEM_SPACING_SMALL))
-                Text(
-                    text = stringResource(R.string.home_experimental_kernelsu_body_point_1),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                Spacer(Modifier.height(CardConstants.ITEM_SPACING_EXTRA_SMALL))
-                Text(
-                    text = stringResource(R.string.home_experimental_kernelsu_body_point_2),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                Spacer(Modifier.height(CardConstants.ITEM_SPACING_EXTRA_SMALL))
-                Text(
-                    text = stringResource(R.string.home_experimental_kernelsu_body_point_3),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
-        }
-    } else {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(CardConstants.CARD_PADDING_LARGE)
-        ) {
-            Column {
-                Text(
-                    text = stringResource(R.string.home_experimental_kernelsu),
-                    style = MaterialTheme.typography.titleSmall
-                )
-                Spacer(Modifier.height(CardConstants.ITEM_SPACING_SMALL))
-                Text(
-                    text = stringResource(R.string.home_experimental_kernelsu_body),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                Spacer(Modifier.height(CardConstants.ITEM_SPACING_SMALL))
-                Text(
-                    text = stringResource(R.string.home_experimental_kernelsu_body_point_1),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                Spacer(Modifier.height(CardConstants.ITEM_SPACING_EXTRA_SMALL))
-                Text(
-                    text = stringResource(R.string.home_experimental_kernelsu_body_point_2),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                Spacer(Modifier.height(CardConstants.ITEM_SPACING_EXTRA_SMALL))
-                Text(
-                    text = stringResource(R.string.home_experimental_kernelsu_body_point_3),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
-        }
-    }
-}
 
 // Icon helper functions moved to IconUtils
 
