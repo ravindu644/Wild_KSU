@@ -133,7 +133,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
         modifier = Modifier
             .fillMaxSize()
             .nestedScroll(scrollBehavior.nestedScrollConnection),
-        contentPadding = PaddingValues(CardConstants.CARD_PADDING_LARGE),
+        contentPadding = PaddingValues(CardConstants.CARD_PADDING_MEDIUM),
         verticalArrangement = Arrangement.spacedBy(CardConstants.ITEM_SPACING_LARGE)
     ) {
         item {
