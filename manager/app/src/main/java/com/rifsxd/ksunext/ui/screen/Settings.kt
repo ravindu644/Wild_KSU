@@ -171,110 +171,254 @@ fun SettingScreen(navigator: DestinationsNavigator) {
             var umountChecked by rememberSaveable {
                 mutableStateOf(Natives.isDefaultUmountModules())
             }
-            if (ksuVersion != null) {
-                CardSwitchContent(
-                    icon = Icons.Filled.FolderDelete,
-                    title = stringResource(id = R.string.settings_umount_modules_default),
-                    subtitle = stringResource(id = R.string.settings_umount_modules_default_summary),
-                    checked = umountChecked
-                ) {
-                    if (Natives.setDefaultUmountModules(it)) {
-                        umountChecked = it
-                    }
-                }
-                CardItemSpacer()
-            }
-
-            if (ksuVersion != null) {
-                if (Natives.version >= Natives.MINIMAL_SUPPORTED_SU_COMPAT) {
-                    var isSuDisabled by rememberSaveable {
-                        mutableStateOf(!Natives.isSuEnabled())
-                    }
+            
+            val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+            val useOverlayFs by observePreferenceAsState(prefs, "use_overlay_fs", false)
+            var showRebootDialog by remember { mutableStateOf(false) }
+            val isOverlayAvailable = overlayFsAvailable()
+            
+            // First Card: Core Settings
+            StandardCard {
+                if (ksuVersion != null) {
                     CardSwitchContent(
-                        icon = Icons.Filled.RemoveModerator,
-                        title = stringResource(id = R.string.settings_disable_su),
-                        subtitle = stringResource(id = R.string.settings_disable_su_summary),
-                        checked = isSuDisabled
-                    ) { checked ->
-                        val shouldEnable = !checked
-                        if (Natives.setSuEnabled(shouldEnable)) {
-                            isSuDisabled = !shouldEnable
+                        icon = Icons.Filled.FolderDelete,
+                        title = stringResource(id = R.string.settings_umount_modules_default),
+                        subtitle = stringResource(id = R.string.settings_umount_modules_default_summary),
+                        checked = umountChecked
+                    ) {
+                        if (Natives.setDefaultUmountModules(it)) {
+                            umountChecked = it
                         }
                     }
+                    CardItemSpacer()
+                }
+
+                if (ksuVersion != null && isOverlayAvailable) {
+                    CardSwitchContent(
+                        icon = Icons.Filled.Build,
+                        title = stringResource(id = R.string.use_overlay_fs),
+                        subtitle = stringResource(id = R.string.use_overlay_fs_summary),
+                        checked = useOverlayFs
+                    ) {
+                        prefs.edit().putBoolean("use_overlay_fs", it).apply()
+                        if (it) {
+                            moduleBackup()
+                            updateMountSystemFile(true)
+                        } else {
+                            moduleMigration()
+                            updateMountSystemFile(false)
+                        }
+                        if (isManager) install()
+                        showRebootDialog = true
+                    }
+                    if (ksuVersion != null) CardItemSpacer()
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            // Second Card: Other Settings
+            StandardCard {
+                if (ksuVersion != null) {
+                    if (Natives.version >= Natives.MINIMAL_SUPPORTED_SU_COMPAT) {
+                        var isSuDisabled by rememberSaveable {
+                            mutableStateOf(!Natives.isSuEnabled())
+                        }
+                        CardSwitchContent(
+                            icon = Icons.Filled.RemoveModerator,
+                            title = stringResource(id = R.string.settings_disable_su),
+                            subtitle = stringResource(id = R.string.settings_disable_su_summary),
+                            checked = isSuDisabled
+                        ) { checked ->
+                            val shouldEnable = !checked
+                            if (Natives.setSuEnabled(shouldEnable)) {
+                                isSuDisabled = !shouldEnable
+                            }
+                        }
+                        CardItemSpacer()
+                    }
+                    
+                    CardSwitchContent(
+                        icon = Icons.Filled.Engineering,
+                        title = stringResource(id = R.string.settings_global_namespace_mode),
+                        subtitle = stringResource(id = R.string.settings_global_namespace_mode_summary),
+                        checked = isGlobalNamespaceEnabled,
+                        onCheckedChange = {
+                            setGlobalNamespaceEnabled(
+                                if (isGlobalNamespaceEnabled) {
+                                    "0"
+                                } else {
+                                    "1"
+                                }
+                            )
+                            isGlobalNamespaceEnabled = it
+                        }
+                    )
+                    CardItemSpacer()
+                }
+
+                val suSFS = getSuSFS()
+                val isSUS_SU = hasSuSFs_SUS_SU() == "Supported"
+                if (suSFS == "Supported") {
+                    if (isSUS_SU) {
+                        val isEnabled by observePreferenceAsState(prefs, "enable_sus_su", false)
+
+                        CardSwitchContent(
+                            icon = Icons.Filled.VisibilityOff,
+                            title = stringResource(id = R.string.settings_susfs_toggle),
+                            subtitle = stringResource(id = R.string.settings_susfs_toggle_summary),
+                            checked = isEnabled
+                        ) {
+                            if (it) {
+                                susfsSUS_SU_2()
+                            } else {
+                                susfsSUS_SU_0()
+                            }
+                            prefs.edit().putBoolean("enable_sus_su", it).apply()
+                        }
+                        CardItemSpacer()
+                    }
+                }
+
+                if (isOverlayAvailable && useOverlayFs) {
+                    val shrink = stringResource(id = R.string.shrink_sparse_image)
+                    val shrinkMessage = stringResource(id = R.string.shrink_sparse_image_message)
+                    CardRowContent(
+                        text = shrink,
+                        icon = Icons.Filled.Compress,
+                        modifier = Modifier.clickable {
+                            scope.launch {
+                                val result = shrinkDialog.awaitConfirm(title = shrink, content = shrinkMessage)
+                                if (result == ConfirmResult.Confirmed) {
+                                    loadingDialog.withLoading {
+                                        shrinkModules()
+                                    }
+                                }
+                            }
+                        }
+                    )
                     CardItemSpacer()
                 }
                 
+                val lkmMode = Natives.version >= Natives.MINIMAL_SUPPORTED_KERNEL_LKM && Natives.isLkmMode
+                if (lkmMode) {
+                    UninstallItem(navigator) {
+                        loadingDialog.withLoading(it)
+                    }
+                    if (ksuVersion != null) CardItemSpacer()
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            // Third Card: App Settings
+            StandardCard {
+                val checkUpdate by observePreferenceAsState(prefs, "check_update", false)
                 CardSwitchContent(
-                    icon = Icons.Filled.Engineering,
-                    title = stringResource(id = R.string.settings_global_namespace_mode),
-                    subtitle = stringResource(id = R.string.settings_global_namespace_mode_summary),
-                    checked = isGlobalNamespaceEnabled,
-                    onCheckedChange = {
-                        setGlobalNamespaceEnabled(
-                            if (isGlobalNamespaceEnabled) {
-                                "0"
-                            } else {
-                                "1"
-                            }
-                        )
-                        isGlobalNamespaceEnabled = it
+                    icon = Icons.Filled.Update,
+                    title = stringResource(id = R.string.settings_check_update),
+                    subtitle = stringResource(id = R.string.settings_check_update_summary),
+                    checked = checkUpdate
+                ) {
+                    prefs.edit().putBoolean("check_update", it).apply()
+                }
+                CardItemSpacer()
+
+                val customization = stringResource(id = R.string.customization)
+                CardRowContent(
+                    text = customization,
+                    icon = Icons.Filled.Palette,
+                    modifier = Modifier.clickable {
+                        navigator.navigate(CustomizationScreenDestination)
                     }
                 )
                 CardItemSpacer()
-            }
 
-            val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
-
-            val suSFS = getSuSFS()
-            val isSUS_SU = hasSuSFs_SUS_SU() == "Supported"
-            if (suSFS == "Supported") {
-                if (isSUS_SU) {
-                    val isEnabled by observePreferenceAsState(prefs, "enable_sus_su", false)
-
-                    CardSwitchContent(
-                        icon = Icons.Filled.VisibilityOff,
-                        title = stringResource(id = R.string.settings_susfs_toggle),
-                        subtitle = stringResource(id = R.string.settings_susfs_toggle_summary),
-                        checked = isEnabled
-                    ) {
-                        if (it) {
-                            susfsSUS_SU_2()
-                        } else {
-                            susfsSUS_SU_0()
+                if (ksuVersion != null) {
+                    val backupRestore = stringResource(id = R.string.backup_restore)
+                    CardRowContent(
+                        text = backupRestore,
+                        icon = Icons.Filled.Backup,
+                        modifier = Modifier.clickable {
+                            navigator.navigate(BackupRestoreScreenDestination)
                         }
-                        prefs.edit().putBoolean("enable_sus_su", it).apply()
-                    }
+                    )
                     CardItemSpacer()
                 }
-            }
 
-            val useOverlayFs by observePreferenceAsState(prefs, "use_overlay_fs", false)
-
-            var showRebootDialog by remember { mutableStateOf(false) }
-
-            val isOverlayAvailable = overlayFsAvailable()
-
-            if (ksuVersion != null && isOverlayAvailable) {
-                CardSwitchContent(
-                    icon = Icons.Filled.Build,
-                    title = stringResource(id = R.string.use_overlay_fs),
-                    subtitle = stringResource(id = R.string.use_overlay_fs_summary),
-                    checked = useOverlayFs
-                ) {
-                    prefs.edit().putBoolean("use_overlay_fs", it).apply()
-                    if (it) {
-                        moduleBackup()
-                        updateMountSystemFile(true)
-                    } else {
-                        moduleMigration()
-                        updateMountSystemFile(false)
-                    }
-                    if (isManager) install()
-                    showRebootDialog = true
+                val developer = stringResource(id = R.string.developer)
+                if (ksuVersion != null) {
+                    CardRowContent(
+                        text = developer,
+                        icon = Icons.Filled.DeveloperBoard,
+                        modifier = Modifier.clickable {
+                            navigator.navigate(DeveloperScreenDestination)
+                        }
+                    )
+                    CardItemSpacer()
                 }
-                CardItemSpacer()
-            }
 
+                val exportLogsDialog = rememberCustomDialog { dismiss ->
+                    ExportLogsDialog(
+                        onSaveLog = {
+                            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH_mm")
+                            val current = LocalDateTime.now().format(formatter)
+                            exportBugreportLauncher.launch("KernelSU_Next_bugreport_${current}.tar.gz")
+                            dismiss()
+                        },
+                        onShareLog = {
+                            scope.launch {
+                                val bugreport = loadingDialog.withLoading {
+                                    withContext(Dispatchers.IO) {
+                                        getBugreportFile(context)
+                                    }
+                                }
+
+                                val uri: Uri =
+                                    FileProvider.getUriForFile(
+                                        context,
+                                        "${BuildConfig.APPLICATION_ID}.fileprovider",
+                                        bugreport
+                                    )
+
+                                val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                                    putExtra(Intent.EXTRA_STREAM, uri)
+                                    setDataAndType(uri, "application/gzip")
+                                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                }
+
+                                context.startActivity(
+                                    Intent.createChooser(
+                                        shareIntent,
+                                        context.getString(R.string.send_log)
+                                    )
+                                )
+                            }
+                            dismiss()
+                        },
+                        onDismiss = dismiss
+                    )
+                }
+
+                CardRowContent(
+                    text = stringResource(id = R.string.export_log),
+                    icon = Icons.Filled.BugReport,
+                    modifier = Modifier.clickable {
+                        exportLogsDialog.show()
+                    }
+                )
+                CardItemSpacer()
+
+                val about = stringResource(id = R.string.about)
+                CardRowContent(
+                    text = about,
+                    icon = Icons.Filled.ContactPage,
+                    modifier = Modifier.clickable {
+                        aboutDialog.show()
+                    }
+                )
+            }
+            
             if (showRebootDialog) {
                 AlertDialog(
                     onDismissRequest = { showRebootDialog = false },
@@ -299,140 +443,6 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                     }
                 )
             }
-
-
-            val checkUpdate by observePreferenceAsState(prefs, "check_update", false)
-            CardSwitchContent(
-                icon = Icons.Filled.Update,
-                title = stringResource(id = R.string.settings_check_update),
-                subtitle = stringResource(id = R.string.settings_check_update_summary),
-                checked = checkUpdate
-            ) {
-                prefs.edit().putBoolean("check_update", it).apply()
-            }
-            CardItemSpacer()
-
-            if (isOverlayAvailable && useOverlayFs) {
-                val shrink = stringResource(id = R.string.shrink_sparse_image)
-                val shrinkMessage = stringResource(id = R.string.shrink_sparse_image_message)
-                CardRowContent(
-                    text = shrink,
-                    icon = Icons.Filled.Compress,
-                    modifier = Modifier.clickable {
-                        scope.launch {
-                            val result = shrinkDialog.awaitConfirm(title = shrink, content = shrinkMessage)
-                            if (result == ConfirmResult.Confirmed) {
-                                loadingDialog.withLoading {
-                                    shrinkModules()
-                                }
-                            }
-                        }
-                    }
-                )
-                CardItemSpacer()
-            }
-
-            val customization = stringResource(id = R.string.customization)
-            CardRowContent(
-                text = customization,
-                icon = Icons.Filled.Palette,
-                modifier = Modifier.clickable {
-                    navigator.navigate(CustomizationScreenDestination)
-                }
-            )
-            CardItemSpacer()
-
-            if (ksuVersion != null) {
-                val backupRestore = stringResource(id = R.string.backup_restore)
-                CardRowContent(
-                    text = backupRestore,
-                    icon = Icons.Filled.Backup,
-                    modifier = Modifier.clickable {
-                        navigator.navigate(BackupRestoreScreenDestination)
-                    }
-                )
-                CardItemSpacer()
-            }
-
-            val developer = stringResource(id = R.string.developer)
-            if (ksuVersion != null) {
-                CardRowContent(
-                    text = developer,
-                    icon = Icons.Filled.DeveloperBoard,
-                    modifier = Modifier.clickable {
-                        navigator.navigate(DeveloperScreenDestination)
-                    }
-                )
-                CardItemSpacer()
-            }
-
-            val lkmMode = Natives.version >= Natives.MINIMAL_SUPPORTED_KERNEL_LKM && Natives.isLkmMode
-            if (lkmMode) {
-                UninstallItem(navigator) {
-                    loadingDialog.withLoading(it)
-                }
-                CardItemSpacer()
-            }
-
-            val exportLogsDialog = rememberCustomDialog { dismiss ->
-                ExportLogsDialog(
-                    onSaveLog = {
-                        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH_mm")
-                        val current = LocalDateTime.now().format(formatter)
-                        exportBugreportLauncher.launch("KernelSU_Next_bugreport_${current}.tar.gz")
-                        dismiss()
-                    },
-                    onShareLog = {
-                        scope.launch {
-                            val bugreport = loadingDialog.withLoading {
-                                withContext(Dispatchers.IO) {
-                                    getBugreportFile(context)
-                                }
-                            }
-
-                            val uri: Uri =
-                                FileProvider.getUriForFile(
-                                    context,
-                                    "${BuildConfig.APPLICATION_ID}.fileprovider",
-                                    bugreport
-                                )
-
-                            val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                                putExtra(Intent.EXTRA_STREAM, uri)
-                                setDataAndType(uri, "application/gzip")
-                                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                            }
-
-                            context.startActivity(
-                                Intent.createChooser(
-                                    shareIntent,
-                                    context.getString(R.string.send_log)
-                                )
-                            )
-                        }
-                        dismiss()
-                    },
-                    onDismiss = dismiss
-                )
-            }
-
-            CardRowContent(
-                text = stringResource(id = R.string.export_log),
-                icon = Icons.Filled.BugReport,
-                modifier = Modifier.clickable {
-                    exportLogsDialog.show()
-                }
-            )
-            CardItemSpacer()
-
-            val about = stringResource(id = R.string.about)
-            CardRowContent(
-                text = about,
-                icon = Icons.Filled.ContactPage,
-                modifier = Modifier.clickable {
-                    aboutDialog.show()
-                }
-            )
                 }
             }
         }
