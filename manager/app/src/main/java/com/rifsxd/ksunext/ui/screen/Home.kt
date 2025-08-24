@@ -665,6 +665,11 @@ private fun InfoCard(autoExpand: Boolean = false) {
         showSelinuxStatus
     ).count { it }
 
+    // Don't render the card if no options are enabled
+    if (enabledOptionsCount == 0) {
+        return
+    }
+
     LaunchedEffect(autoExpand, alwaysExpanded) {
         if (autoExpand || alwaysExpanded) {
             expanded = true
