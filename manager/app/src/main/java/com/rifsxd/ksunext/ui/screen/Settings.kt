@@ -177,7 +177,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
             var showRebootDialog by remember { mutableStateOf(false) }
             val isOverlayAvailable = overlayFsAvailable()
             
-            // First Card: Core Settings
+            // Core & Other Settings Card
             StandardCard {
                 if (ksuVersion != null) {
                     CardSwitchContent(
@@ -214,11 +214,6 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                     if (ksuVersion != null) CardItemSpacer()
                 }
             }
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            // Second Card: Other Settings
-            StandardCard {
                 if (ksuVersion != null) {
                     if (Natives.version >= Natives.MINIMAL_SUPPORTED_SU_COMPAT) {
                         var isSuDisabled by rememberSaveable {
@@ -307,7 +302,6 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                     }
                     if (ksuVersion != null) CardItemSpacer()
                 }
-            }
             
             Spacer(modifier = Modifier.height(16.dp))
             
