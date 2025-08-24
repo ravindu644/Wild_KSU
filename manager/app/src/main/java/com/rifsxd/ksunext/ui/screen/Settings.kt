@@ -76,7 +76,7 @@ import com.maxkeppeler.sheets.list.models.ListOption
 import com.maxkeppeler.sheets.list.models.ListSelection
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
-import com.ramcosta.composedestinations.generated.destinations.AppProfileTemplateScreenDestination
+
 import com.ramcosta.composedestinations.generated.destinations.FlashScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.BackupRestoreScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.CustomizationScreenDestination
@@ -166,18 +166,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                 }
             }
 
-            val profileTemplate = stringResource(id = R.string.settings_profile_template)
-            if (ksuVersion != null) {
-                CardRowContent(
-                    text = profileTemplate,
-                    subtitle = stringResource(id = R.string.settings_profile_template_summary),
-                    icon = Icons.Filled.Fence,
-                    modifier = Modifier.clickable {
-                        navigator.navigate(AppProfileTemplateScreenDestination)
-                    }
-                )
-                CardItemSpacer()
-            }
+
 
             var umountChecked by rememberSaveable {
                 mutableStateOf(Natives.isDefaultUmountModules())

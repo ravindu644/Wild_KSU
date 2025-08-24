@@ -978,6 +978,13 @@ private fun SuperUserTopBar(superUserViewModel: SuperUserViewModel, navigator: D
                             showDropdown = false
                         }
                     )
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.settings_profile_template)) }, 
+                        onClick = {
+                            navigator.navigate(AppProfileTemplateScreenDestination)
+                            showDropdown = false
+                        }
+                    )
                 }
             }
         }
