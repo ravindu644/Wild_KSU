@@ -95,6 +95,9 @@ import com.rifsxd.ksunext.ui.component.SwitchItem
 import com.rifsxd.ksunext.ui.component.rememberConfirmDialog
 import com.rifsxd.ksunext.ui.component.rememberCustomDialog
 import com.rifsxd.ksunext.ui.component.rememberLoadingDialog
+import com.rifsxd.ksunext.ui.component.StandardCard
+import com.rifsxd.ksunext.ui.component.CardType
+import com.rifsxd.ksunext.ui.component.CardConstants
 import com.rifsxd.ksunext.ui.util.LocalSnackbarHost
 import com.rifsxd.ksunext.ui.util.getBugreportFile
 import com.rifsxd.ksunext.ui.util.*
@@ -130,15 +133,12 @@ fun SettingScreen(navigator: DestinationsNavigator) {
         modifier = Modifier
             .fillMaxSize()
             .nestedScroll(scrollBehavior.nestedScrollConnection),
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        contentPadding = PaddingValues(CardConstants.CARD_PADDING_LARGE),
+        verticalArrangement = Arrangement.spacedBy(CardConstants.ITEM_SPACING_LARGE)
     ) {
         item {
-            Card(
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainer
-                )
+            StandardCard(
+                cardType = CardType.SURFACE
             ) {
                 Column {
 
@@ -176,7 +176,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                             navigator.navigate(AppProfileTemplateScreenDestination)
                         }
                 )
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(CardConstants.ITEM_SPACING_SMALL))
             }
 
             var umountChecked by rememberSaveable {
@@ -194,7 +194,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                         umountChecked = it
                     }
                 }
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(CardConstants.ITEM_SPACING_SMALL))
             }
 
             if (ksuVersion != null) {
@@ -213,7 +213,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                             isSuDisabled = !shouldEnable
                         }
                     }
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(CardConstants.ITEM_SPACING_SMALL))
                 }
                 
                 SwitchItem(
@@ -232,7 +232,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                         isGlobalNamespaceEnabled = it
                     }
                 )
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(CardConstants.ITEM_SPACING_SMALL))
             }
 
             val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
@@ -256,7 +256,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                         }
                         prefs.edit().putBoolean("enable_sus_su", it).apply()
                     }
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(CardConstants.ITEM_SPACING_SMALL))
                 }
             }
 
@@ -284,7 +284,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                     if (isManager) install()
                     showRebootDialog = true
                 }
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(CardConstants.ITEM_SPACING_SMALL))
             }
 
             if (showRebootDialog) {
@@ -322,7 +322,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
             ) {
                 prefs.edit().putBoolean("check_update", it).apply()
             }
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(CardConstants.ITEM_SPACING_SMALL))
 
             if (isOverlayAvailable && useOverlayFs) {
                 val shrink = stringResource(id = R.string.shrink_sparse_image)
@@ -350,7 +350,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                         }
                     }
                 )
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(CardConstants.ITEM_SPACING_SMALL))
             }
 
             val customization = stringResource(id = R.string.customization)
@@ -370,7 +370,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                     navigator.navigate(CustomizationScreenDestination)
                 }
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(CardConstants.ITEM_SPACING_SMALL))
 
             if (ksuVersion != null) {
                 val backupRestore = stringResource(id = R.string.backup_restore)
@@ -390,7 +390,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                         navigator.navigate(BackupRestoreScreenDestination)
                     }
                 )
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(CardConstants.ITEM_SPACING_SMALL))
             }
 
             val developer = stringResource(id = R.string.developer)
@@ -411,7 +411,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                         navigator.navigate(DeveloperScreenDestination)
                     }
                 )
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(CardConstants.ITEM_SPACING_SMALL))
             }
 
             val lkmMode = Natives.version >= Natives.MINIMAL_SUPPORTED_KERNEL_LKM && Natives.isLkmMode
@@ -419,7 +419,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                 UninstallItem(navigator) {
                     loadingDialog.withLoading(it)
                 }
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(CardConstants.ITEM_SPACING_SMALL))
             }
 
             var showBottomsheet by remember { mutableStateOf(false) }
@@ -440,7 +440,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                     showBottomsheet = true
                 }
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(CardConstants.ITEM_SPACING_SMALL))
             if (showBottomsheet) {
                 ModalBottomSheet(
                     onDismissRequest = { showBottomsheet = false },
@@ -454,7 +454,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                             Box {
                                 Column(
                                     modifier = Modifier
-                                        .padding(16.dp)
+                                        .padding(CardConstants.CARD_PADDING_LARGE)
                                         .clickable {
                                             val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH_mm")
                                             val current = LocalDateTime.now().format(formatter)
@@ -469,7 +469,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                                     )
                                     Text(
                                         text = stringResource(id = R.string.save_log),
-                                        modifier = Modifier.padding(top = 16.dp),
+                                        modifier = Modifier.padding(top = CardConstants.CARD_PADDING_LARGE),
                                         textAlign = TextAlign.Center.also {
                                             LineHeightStyle(
                                                 alignment = LineHeightStyle.Alignment.Center,
@@ -483,7 +483,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                             Box {
                                 Column(
                                     modifier = Modifier
-                                        .padding(16.dp)
+                                        .padding(CardConstants.CARD_PADDING_LARGE)
                                         .clickable {
                                             scope.launch {
                                                 val bugreport = loadingDialog.withLoading {
@@ -521,7 +521,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                                     )
                                     Text(
                                         text = stringResource(id = R.string.send_log),
-                                        modifier = Modifier.padding(top = 16.dp),
+                                        modifier = Modifier.padding(top = CardConstants.CARD_PADDING_LARGE),
                                         textAlign = TextAlign.Center.also {
                                             LineHeightStyle(
                                                 alignment = LineHeightStyle.Alignment.Center,
