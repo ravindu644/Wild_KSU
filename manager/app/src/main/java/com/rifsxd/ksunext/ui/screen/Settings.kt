@@ -298,10 +298,6 @@ fun SettingScreen(navigator: DestinationsNavigator) {
             }
         }
         
-        item {
-            Spacer(modifier = Modifier.height(16.dp))
-        }
-        
         // Second Card: App Settings
         item {
             StandardCard {
