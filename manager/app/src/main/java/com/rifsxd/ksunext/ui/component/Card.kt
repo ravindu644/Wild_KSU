@@ -291,7 +291,7 @@ fun CardSwitchContent(
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
-        verticalAlignment = if (subtitle != null) Alignment.Top else Alignment.CenterVertically
+        verticalAlignment = Alignment.Top
     ) {
         if (icon != null) {
             Icon(
@@ -299,39 +299,56 @@ fun CardSwitchContent(
                 contentDescription = null,
                 modifier = Modifier.padding(
                     end = CardConstants.ICON_TO_TEXT_SPACING_SMALL,
-                    top = if (subtitle != null) 2.dp else 0.dp
+                    top = 2.dp
                 )
             )
         }
         
-        Column(
-            modifier = Modifier.weight(1f)
-        ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Medium
-            )
-            
-            if (subtitle != null) {
+        if (subtitle != null) {
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
                 Text(
-                    text = subtitle,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    text = title,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Medium
+                )
+                
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = subtitle,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.weight(1f)
+                    )
+                    
+                    Switch(
+                        checked = checked,
+                        enabled = enabled,
+                        onCheckedChange = onCheckedChange
+                    )
+                }
+            }
+        } else {
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Medium
                 )
             }
+            
+            Switch(
+                checked = checked,
+                enabled = enabled,
+                onCheckedChange = onCheckedChange
+            )
         }
-        
-        Switch(
-            checked = checked,
-            enabled = enabled,
-            onCheckedChange = onCheckedChange,
-            modifier = if (subtitle != null) {
-                Modifier.padding(top = 8.dp)
-            } else {
-                Modifier
-            }
-        )
     }
 }
 
