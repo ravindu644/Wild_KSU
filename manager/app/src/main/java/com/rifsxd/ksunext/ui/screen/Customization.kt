@@ -29,15 +29,9 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.TopAppBarScrollBehavior
-import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.OutlinedCard
@@ -59,7 +53,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
+
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -119,7 +113,7 @@ import java.util.Locale
 @Composable
 fun CustomizationScreen(navigator: DestinationsNavigator) {
     val snackBarHost = LocalSnackbarHost.current
-    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
+
 
     val isManager = Natives.becomeManager(ksuApp.packageName)
     val ksuVersion = if (isManager) Natives.version else null
@@ -276,25 +270,12 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
         }
     }
     
-    Scaffold(
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize(),
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.settings_customization)) },
-                scrollBehavior = scrollBehavior
-            )
-        },
-        snackbarHost = { SnackbarHost(snackBarHost) },
-        contentWindowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal)
-    ) { innerPadding ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .nestedScroll(scrollBehavior.nestedScrollConnection),
-            contentPadding = PaddingValues(CardConstants.CARD_PADDING_MEDIUM),
-            verticalArrangement = Arrangement.spacedBy(CardConstants.ITEM_SPACING_LARGE)
-        ) {
+        contentPadding = PaddingValues(CardConstants.CARD_PADDING_MEDIUM),
+        verticalArrangement = Arrangement.spacedBy(CardConstants.ITEM_SPACING_LARGE)
+    ) {
         // Customization Settings Card
         item {
             StandardCard {
@@ -356,7 +337,6 @@ fun CustomizationScreen(navigator: DestinationsNavigator) {
                     }
                 )
             }
-        }
         }
     }
 }
