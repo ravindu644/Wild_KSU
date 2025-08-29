@@ -318,254 +318,202 @@ fun ThemeSettingsScreen(
 
             // DPI Scale Section
             item {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainer
+                // DPI Scale Settings
+                val systemDpi = remember { 
+                    // Store original system DPI on first run
+                    if (!prefs.contains("original_system_dpi")) {
+                        val originalDpi = context.resources.displayMetrics.densityDpi
+                        prefs.edit().putInt("original_system_dpi", originalDpi).commit()
+                        originalDpi
+                    } else {
+                        prefs.getInt("original_system_dpi", 160) // 160 is default Android DPI
+                    }
+                }
+                var savedDpi by remember { 
+                    mutableIntStateOf(
+                        if (prefs.contains("app_dpi")) {
+                            prefs.getInt("app_dpi", systemDpi)
+                        } else {
+                            systemDpi
+                        }
                     )
+                }
+                var tempDpi by remember { mutableIntStateOf(savedDpi) }
+                
+                StandardCard(
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp)
-                    ) {
-                        Text(
-                            text = "Display",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(bottom = 16.dp)
-                        )
+                    Text(
+                        text = "Display",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                    
+                    CardItemSpacer()
 
-                        // DPI Scale Settings
-                        val systemDpi = remember { 
-                            // Store original system DPI on first run
-                            if (!prefs.contains("original_system_dpi")) {
-                                val originalDpi = context.resources.displayMetrics.densityDpi
-                                prefs.edit().putInt("original_system_dpi", originalDpi).commit()
-                                originalDpi
-                            } else {
-                                prefs.getInt("original_system_dpi", 160) // 160 is default Android DPI
-                            }
+                    CardSliderContent(
+                        title = stringResource(R.string.dpi_scale_settings),
+                        subtitle = stringResource(R.string.dpi_scale_settings_summary, savedDpi),
+                        icon = Icons.Filled.AspectRatio,
+                        value = tempDpi.toFloat(),
+                        valueRange = 100f..800f,
+                        valueDisplay = "${tempDpi}dpi",
+                        iconTint = Color.White,
+                        onValueChange = { value ->
+                            tempDpi = value.toInt()
                         }
-                        var savedDpi by remember { 
-                            mutableIntStateOf(
-                                if (prefs.contains("app_dpi")) {
-                                    prefs.getInt("app_dpi", systemDpi)
-                                } else {
-                                    systemDpi
+                    )
+                    
+                    CardItemSpacer()
+                            
+                    // DPI Preset Values
+                    val dpiPresets = listOf(
+                        120 to "LDPI (120)",
+                        160 to "MDPI (160)",
+                        240 to "HDPI (240)",
+                        320 to "XHDPI (320)",
+                        480 to "XXHDPI (480)",
+                        640 to "XXXHDPI (640)"
+                    )
+                    
+                    // Dropdown menu state
+                    var showDpiDropdown by remember { mutableStateOf(false) }
+                    
+                    // Custom DPI Input Dialog
+                    var showCustomDpiDialog by remember { mutableStateOf(false) }
+                    var customDpiText by remember { mutableStateOf("") }
+                            
+                    if (showCustomDpiDialog) {
+                        AlertDialog(
+                            onDismissRequest = { showCustomDpiDialog = false },
+                            title = { Text("Set Custom DPI") },
+                            text = {
+                                Column {
+                                    Text(
+                                        text = "Enter a DPI value between 100 and 800:",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        modifier = Modifier.padding(bottom = 16.dp)
+                                    )
+                                    OutlinedTextField(
+                                        value = customDpiText,
+                                        onValueChange = { newValue ->
+                                            // Only allow numeric input
+                                            if (newValue.all { it.isDigit() } && newValue.length <= 3) {
+                                                customDpiText = newValue
+                                            }
+                                        },
+                                        label = { Text("DPI Value") },
+                                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                        singleLine = true,
+                                        modifier = Modifier.fillMaxWidth()
+                                    )
                                 }
-                            )
-                        }
-                        var tempDpi by remember { mutableIntStateOf(savedDpi) }
-
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(20.dp)
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.AspectRatio,
-                                    contentDescription = null,
-                                    modifier = Modifier.padding(end = 16.dp),
-                                    tint = MaterialTheme.colorScheme.primary
-                                )
-                                Column(
-                                    modifier = Modifier.weight(1f)
+                            },
+                            confirmButton = {
+                                TextButton(
+                                    onClick = {
+                                        val dpiValue = customDpiText.toIntOrNull()
+                                        if (dpiValue != null && dpiValue in 100..800) {
+                                            tempDpi = dpiValue
+                                            savedDpi = dpiValue
+                                            prefs.edit().putInt("app_dpi", dpiValue).commit()
+                                            showCustomDpiDialog = false
+                                            customDpiText = ""
+                                        }
+                                    },
+                                    enabled = {
+                                        val dpiValue = customDpiText.toIntOrNull()
+                                        dpiValue != null && dpiValue in 100..800
+                                    }()
                                 ) {
-                                    Text(
-                                        text = stringResource(R.string.dpi_scale_settings),
-                                        style = MaterialTheme.typography.bodyLarge,
-                                        fontWeight = FontWeight.Medium
-                                    )
-                                    Text(
-                                        text = stringResource(R.string.dpi_scale_settings_summary, savedDpi),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
+                                    Text("Set")
                                 }
-                                Text(
-                                    text = "${tempDpi}dpi",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
+                            },
+                            dismissButton = {
+                                TextButton(
+                                    onClick = {
+                                        showCustomDpiDialog = false
+                                        customDpiText = ""
+                                    }
+                                ) {
+                                    Text("Cancel")
+                                }
                             }
-                            Spacer(modifier = Modifier.height(16.dp))
+                        )
+                    }
+                    
+                    CardRowContent(
+                        text = "DPI Actions",
+                        subtitle = "Reset, presets, or confirm changes",
+                        icon = Icons.Filled.Settings
+                    ) {
+                        // Reset button with Clear icon
+                        IconButton(
+                            onClick = {
+                                tempDpi = systemDpi
+                                savedDpi = systemDpi
+                                prefs.edit().putInt("app_dpi", systemDpi).commit()
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Clear,
+                                contentDescription = "Reset DPI",
+                                tint = Color.White
+                            )
                         }
                         
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 20.dp)
-                        ) {
-                            Slider(
-                                 value = tempDpi.toFloat(),
-                                 onValueChange = { newValue ->
-                                     tempDpi = newValue.toInt()
-                                 },
-                                 valueRange = 100f..800f,
-                                 modifier = Modifier.fillMaxWidth()
-                             )
-                            
-                            Spacer(modifier = Modifier.height(16.dp))
-                            
-                            // DPI Preset Values
-                            val dpiPresets = listOf(
-                                120 to "LDPI (120)",
-                                160 to "MDPI (160)",
-                                240 to "HDPI (240)",
-                                320 to "XHDPI (320)",
-                                480 to "XXHDPI (480)",
-                                640 to "XXXHDPI (640)"
-                            )
-                            
-                            // Dropdown menu state
-                            var showDpiDropdown by remember { mutableStateOf(false) }
-                            
-                            // Custom DPI Input Dialog
-                            var showCustomDpiDialog by remember { mutableStateOf(false) }
-                            var customDpiText by remember { mutableStateOf("") }
-                            
-                            if (showCustomDpiDialog) {
-                                AlertDialog(
-                                    onDismissRequest = { showCustomDpiDialog = false },
-                                    title = { Text("Set Custom DPI") },
-                                    text = {
-                                        Column {
-                                            Text(
-                                                text = "Enter a DPI value between 100 and 800:",
-                                                style = MaterialTheme.typography.bodyMedium,
-                                                modifier = Modifier.padding(bottom = 16.dp)
-                                            )
-                                            OutlinedTextField(
-                                                value = customDpiText,
-                                                onValueChange = { newValue ->
-                                                    // Only allow numeric input
-                                                    if (newValue.all { it.isDigit() } && newValue.length <= 3) {
-                                                        customDpiText = newValue
-                                                    }
-                                                },
-                                                label = { Text("DPI Value") },
-                                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                                singleLine = true,
-                                                modifier = Modifier.fillMaxWidth()
-                                            )
-                                        }
-                                    },
-                                    confirmButton = {
-                                        TextButton(
-                                            onClick = {
-                                                val dpiValue = customDpiText.toIntOrNull()
-                                                if (dpiValue != null && dpiValue in 100..800) {
-                                                    tempDpi = dpiValue
-                                                    savedDpi = dpiValue
-                                                    prefs.edit().putInt("app_dpi", dpiValue).commit()
-                                                    showCustomDpiDialog = false
-                                                    customDpiText = ""
-                                                }
-                                            },
-                                            enabled = {
-                                                val dpiValue = customDpiText.toIntOrNull()
-                                                dpiValue != null && dpiValue in 100..800
-                                            }()
-                                        ) {
-                                            Text("Set")
-                                        }
-                                    },
-                                    dismissButton = {
-                                        TextButton(
-                                            onClick = {
-                                                showCustomDpiDialog = false
-                                                customDpiText = ""
-                                            }
-                                        ) {
-                                            Text("Cancel")
-                                        }
-                                    }
+                        // Custom/Preset button with Tune icon
+                        Box {
+                            IconButton(
+                                onClick = { showDpiDropdown = true }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Tune,
+                                    contentDescription = "DPI Presets",
+                                    tint = Color.White
                                 )
                             }
                             
-
-                            
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceAround,
-                                verticalAlignment = Alignment.CenterVertically
+                            DropdownMenu(
+                                expanded = showDpiDropdown,
+                                onDismissRequest = { showDpiDropdown = false }
                             ) {
-                                // Reset button with Clear icon
-                                IconButton(
-                                    onClick = {
-                                        tempDpi = systemDpi
-                                        savedDpi = systemDpi
-                                        prefs.edit().putInt("app_dpi", systemDpi).commit()
-                                    },
-                                    modifier = Modifier.padding(4.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Filled.Clear,
-                                        contentDescription = "Reset DPI"
-                                    )
-                                }
-                                
-                                // Custom/Preset button with Tune icon
-                                Box {
-                                    IconButton(
-                                        onClick = { showDpiDropdown = true },
-                                        modifier = Modifier.padding(4.dp)
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Filled.Tune,
-                                            contentDescription = "DPI Presets"
-                                        )
-                                    }
-                                    
-                                    DropdownMenu(
-                                        expanded = showDpiDropdown,
-                                        onDismissRequest = { showDpiDropdown = false }
-                                    ) {
-                                        dpiPresets.forEach { (dpi, label) ->
-                                            DropdownMenuItem(
-                                                text = { Text(label) },
-                                                onClick = {
-                                                    tempDpi = dpi
-                                                    savedDpi = dpi
-                                                    prefs.edit().putInt("app_dpi", dpi).commit()
-                                                    showDpiDropdown = false
-                                                }
-                                            )
+                                dpiPresets.forEach { (dpi, label) ->
+                                    DropdownMenuItem(
+                                        text = { Text(label) },
+                                        onClick = {
+                                            tempDpi = dpi
+                                            savedDpi = dpi
+                                            prefs.edit().putInt("app_dpi", dpi).commit()
+                                            showDpiDropdown = false
                                         }
-                                        DropdownMenuItem(
-                                            text = { Text("Custom...") },
-                                            onClick = {
-                                                customDpiText = tempDpi.toString()
-                                                showCustomDpiDialog = true
-                                                showDpiDropdown = false
-                                            }
-                                        )
-                                    }
-                                }
-                                
-                                // Confirm button with Check icon
-                                IconButton(
-                                    onClick = {
-                                        savedDpi = tempDpi
-                                        prefs.edit().putInt("app_dpi", savedDpi).commit()
-                                    },
-                                    enabled = tempDpi != savedDpi,
-                                    modifier = Modifier.padding(4.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Filled.Check,
-                                        contentDescription = "Confirm DPI"
                                     )
                                 }
+                                DropdownMenuItem(
+                                    text = { Text("Custom...") },
+                                    onClick = {
+                                        customDpiText = tempDpi.toString()
+                                        showCustomDpiDialog = true
+                                        showDpiDropdown = false
+                                    }
+                                )
                             }
                         }
-
-
-
-
+                        
+                        // Confirm button with Check icon
+                        IconButton(
+                            onClick = {
+                                savedDpi = tempDpi
+                                prefs.edit().putInt("app_dpi", savedDpi).commit()
+                            },
+                            enabled = tempDpi != savedDpi
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Check,
+                                contentDescription = "Confirm DPI",
+                                tint = Color.White
+                            )
+                        }
                     }
                 }
             }
