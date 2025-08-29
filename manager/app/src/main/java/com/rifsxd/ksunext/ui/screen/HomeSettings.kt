@@ -443,38 +443,26 @@ fun HomeSettingsScreen(
                     
                     // Home Screen Icon Style
                     CardRowContent(
-                        icon = {
-                            val currentIcon = IconUtils.getIcon(selectedIconType)
-                            when (currentIcon) {
-                                is ImageVector -> Icon(
-                                    imageVector = currentIcon,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(20.dp),
-                                    tint = Color.White
-                                )
-                                is Painter -> Icon(
-                                    painter = currentIcon,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(20.dp),
-                                    tint = Color.White
-                                )
-                            }
-                        },
+                        icon = Icons.Filled.Palette,
                         text = stringResource(R.string.home_screen_icon_style),
                         subtitle = stringResource(R.string.home_screen_icon_style_summary) + ". " + stringResource(R.string.home_screen_icon_current, currentIconDisplay),
-                        trailingIcon = Icons.AutoMirrored.Filled.ArrowForward,
                         modifier = Modifier.clickable {
                             showIconDialog = true
                         }
-                    )
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                            contentDescription = null,
+                            tint = Color.White
+                        )
+                    }
                     
                     CardItemSpacer()
                     
                     // App Name Toggle
                     CardSwitchContent(
                         icon = Icons.Filled.Title,
-                        iconTint = Color.White,
-                        text = stringResource(R.string.app_name_customization),
+                        title = stringResource(R.string.app_name_customization),
                         subtitle = "Switch to Wild KSU",
                         checked = selectedAppName == "wild_ksu",
                         onCheckedChange = { isChecked ->
@@ -488,8 +476,7 @@ fun HomeSettingsScreen(
                     // Card Background Toggle
                     CardSwitchContent(
                         icon = Icons.Filled.CropFree,
-                        iconTint = Color.White,
-                        text = "Card Background",
+                        title = "Card Background",
                         subtitle = "Toggle card background and padding for expanded layout",
                         checked = cardBackgroundEnabled,
                         onCheckedChange = {
@@ -503,8 +490,7 @@ fun HomeSettingsScreen(
                     // Help Card Toggle
                     CardSwitchContent(
                         icon = Icons.AutoMirrored.Filled.HelpOutline,
-                        iconTint = Color.White,
-                        text = stringResource(R.string.help_card_customization),
+                        title = stringResource(R.string.help_card_customization),
                         subtitle = stringResource(R.string.help_card_customization_summary),
                         checked = showHelpCard,
                         onCheckedChange = {
@@ -518,8 +504,7 @@ fun HomeSettingsScreen(
                     // Always Expanded Toggle
                     CardSwitchContent(
                         icon = Icons.Filled.ExpandMore,
-                        iconTint = Color.White,
-                        text = stringResource(R.string.info_card_always_expanded),
+                        title = stringResource(R.string.info_card_always_expanded),
                         subtitle = stringResource(R.string.info_card_always_expanded_summary),
                         checked = infoCardAlwaysExpanded,
                         onCheckedChange = {
