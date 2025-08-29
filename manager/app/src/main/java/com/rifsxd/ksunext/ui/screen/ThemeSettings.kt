@@ -282,77 +282,37 @@ fun ThemeSettingsScreen(
 
             // UI Transparency Section
             item {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainer
+                // UI Transparency Slider
+                var uiTransparency by rememberSaveable {
+                    mutableFloatStateOf(
+                        prefs.getFloat("ui_transparency", 0.0f)
                     )
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp)
-                    ) {
-                        Text(
-                            text = "Interface",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(bottom = 16.dp)
-                        )
-
-                        // UI Transparency Slider
-                        var uiTransparency by rememberSaveable {
-                            mutableFloatStateOf(
-                                prefs.getFloat("ui_transparency", 0.0f)
-                            )
-                        }
-                        
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(20.dp)
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.Tune,
-                                    contentDescription = null,
-                                    modifier = Modifier.padding(end = 16.dp),
-                                    tint = MaterialTheme.colorScheme.primary
-                                )
-                                Column(
-                                    modifier = Modifier.weight(1f)
-                                ) {
-                                    Text(
-                                        text = "UI Transparency",
-                                        style = MaterialTheme.typography.bodyLarge,
-                                        fontWeight = FontWeight.Medium
-                                    )
-                                    Text(
-                                        text = "Adjust the transparency of UI elements",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                                Text(
-                                    text = "${(uiTransparency * 100).toInt()}%",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                            }
-                            Spacer(modifier = Modifier.height(16.dp))
-                            Slider(
-                                value = uiTransparency,
-                                onValueChange = { value ->
-                                    uiTransparency = value
-                                    prefs.edit().putFloat("ui_transparency", value).commit()
-                                },
-                                valueRange = 0.0f..1.0f,
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        }
-                    }
                 }
+                
+                StandardCard(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = "Interface",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                    
+                    CardItemSpacer()
+                    
+                    CardSliderContent(
+                        title = "UI Transparency",
+                        subtitle = "Adjust the transparency of UI elements",
+                        icon = Icons.Filled.Tune,
+                        value = uiTransparency,
+                        valueRange = 0.0f..1.0f,
+                        valueDisplay = "${(uiTransparency * 100).toInt()}%",
+                        iconTint = Color.White,
+                        onValueChange = { value ->
+                            uiTransparency = value
+                            prefs.edit().putFloat("ui_transparency", value).commit()
+                        }
+                    )
             }
 
             // DPI Scale Section
