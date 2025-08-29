@@ -170,7 +170,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
             .fillMaxSize()
             .nestedScroll(scrollBehavior.nestedScrollConnection),
         contentPadding = PaddingValues(CardConstants.CARD_PADDING_MEDIUM),
-        verticalArrangement = Arrangement.spacedBy(CardConstants.ITEM_SPACING_MEDIUM)
+        verticalArrangement = Arrangement.spacedBy(CardConstants.CARD_PADDING_MEDIUM)
     ) {
         
         // First Card: Core Settings
@@ -190,6 +190,8 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                 }
 
                 if (ksuVersion != null && isOverlayAvailable) {
+                    CardItemSpacer(CardConstants.CARD_PADDING_MEDIUM)
+                    
                     CardSwitchContent(
                         icon = Icons.Filled.Build,
                         title = stringResource(id = R.string.use_overlay_fs),
@@ -210,6 +212,8 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                 }
 
                 if (ksuVersion != null) {
+                    CardItemSpacer(CardConstants.CARD_PADDING_MEDIUM)
+                    
                     if (Natives.version >= Natives.MINIMAL_SUPPORTED_SU_COMPAT) {
                         var isSuDisabled by rememberSaveable {
                             mutableStateOf(!Natives.isSuEnabled())
@@ -225,6 +229,8 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                                 isSuDisabled = !shouldEnable
                             }
                         }
+                        
+                        CardItemSpacer(CardConstants.CARD_PADDING_MEDIUM)
                     }
                     
                     CardSwitchContent(
@@ -249,6 +255,8 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                 val isSUS_SU = hasSuSFs_SUS_SU() == "Supported"
                 if (suSFS == "Supported") {
                     if (isSUS_SU) {
+                        CardItemSpacer(CardConstants.CARD_PADDING_MEDIUM)
+                        
                         val isEnabled by observePreferenceAsState(prefs, "enable_sus_su", false)
 
                         CardSwitchContent(
@@ -347,14 +355,10 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                             indication = null
                         )
                     )
-                }
-
-                if (ksuVersion != null) {
+                    
                     CardItemSpacer(CardConstants.CARD_PADDING_MEDIUM)
-                }
-
-                val developer = stringResource(id = R.string.developer)
-                if (ksuVersion != null) {
+                    
+                    val developer = stringResource(id = R.string.developer)
                     CardRowContent(
                         text = developer,
                         icon = Icons.Filled.DeveloperBoard,
@@ -364,9 +368,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                             indication = null
                         )
                     )
-                }
-
-                if (ksuVersion != null) {
+                    
                     CardItemSpacer(CardConstants.CARD_PADDING_MEDIUM)
                 }
 
