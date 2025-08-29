@@ -130,7 +130,6 @@ fun StandardCard(
                     horizontal = CardConstants.CARD_PADDING_MEDIUM,
                     vertical = CardConstants.CARD_PADDING_MEDIUM
                 ),
-            verticalArrangement = Arrangement.spacedBy(CardConstants.CARD_PADDING_MEDIUM),
             content = content
         )
     }
@@ -390,7 +389,7 @@ fun CardTextContent(
  * Spacer component for consistent spacing between card items
  */
 @Composable
-fun CardItemSpacer(size: Dp = CardConstants.ITEM_SPACING_SMALL) {
+fun CardItemSpacer(size: Dp = CardConstants.CARD_PADDING_MEDIUM) {
     Spacer(modifier = Modifier.height(size))
 }
 
