@@ -390,7 +390,7 @@ fun CardTextContent(
  * Spacer component for consistent spacing between card items
  */
 @Composable
-fun CardItemSpacer(size: Dp = CardConstants.ITEM_SPACING_MEDIUM) {
+fun CardItemSpacer(size: Dp = CardConstants.ITEM_SPACING_SMALL) {
     Spacer(modifier = Modifier.height(size))
 }
 
