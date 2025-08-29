@@ -513,10 +513,21 @@ fun HomeSettingsScreen(
 
             // Info Card Order Management
             item {
-                StandardCard(
-                    title = stringResource(R.string.info_card_order_management),
-                    subtitle = stringResource(R.string.info_card_order_description)
-                ) {
+                StandardCard {
+                    Text(
+                        text = stringResource(R.string.info_card_order_management),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                    
+                    Text(
+                        text = stringResource(R.string.info_card_order_description),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.White.copy(alpha = 0.7f),
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
 
                         // Info card items with tap to move up/down and hold to move to top/bottom
                         itemOrder.forEachIndexed { index, itemKey ->
