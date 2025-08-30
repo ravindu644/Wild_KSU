@@ -23,7 +23,7 @@ import kotlinx.parcelize.Parcelize
 import com.twj.wksu.IKsuInterface
 import com.twj.wksu.Natives
 import com.twj.wksu.ksuApp
-import com.twj.wksu.ui.KsuService
+import com.twj.wksu.KsuService
 import com.twj.wksu.ui.util.HanziToPinyin
 import com.twj.wksu.ui.util.KsuCli
 import kotlinx.coroutines.delay
