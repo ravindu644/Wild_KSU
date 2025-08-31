@@ -294,7 +294,7 @@
     <!-- App Name Customization -->
     <string name="app_name_customization">App Name</string>
     <string name="app_name_customization_summary">Change the app name displayed in the interface</string>
-    <string name="app_name_kernelsu_next">Wild KSU</string>
+    <string name="app_name_kernelsu_next">KernelSU Next</string>
     <string name="app_name_wild_ksu">Wild KSU</string>
     <string name="app_name_custom">Custom</string>
     <string name="app_name_custom_hint">Enter custom app name</string>
