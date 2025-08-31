@@ -267,36 +267,7 @@ fun CustomizationResetDialog(
     }
 }
 
-@Composable
-fun SuperuserSettingsResetDialog(
-    showDialog: Boolean,
-    onDismissRequest: () -> Unit,
-    onConfirm: () -> Unit,
-    prefs: SharedPreferences,
-    navigator: DestinationsNavigator
-) {
-    if (showDialog) {
-        AlertDialog(
-            onDismissRequest = onDismissRequest,
-            title = { Text("Reset Superuser Settings") },
-            text = { Text("Are you sure you want to reset all superuser settings to default? This will reset icon theme, app card display, favorite settings, and button visibility. This action cannot be undone.") },
-            confirmButton = {
-                TextButton(
-                    onClick = onConfirm
-                ) {
-                    Text("Reset")
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = onDismissRequest
-                ) {
-                    Text("Cancel")
-                }
-            }
-        )
-    }
-}
+
 
 @Composable
 fun ModuleSettingsResetDialog(
@@ -1283,44 +1254,7 @@ fun RegularTopBar(
                 )
             }
             
-            // Show reset button for SuperuserSettings screen
-            if (currentDestination?.route == SuperuserSettingsScreenDestination.route) {
-                var showSuperuserResetDialog by remember { mutableStateOf(false) }
-                
-                IconButton(
-                    onClick = {
-                        showSuperuserResetDialog = true
-                    }
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Refresh,
-                        contentDescription = "Reset superuser settings"
-                    )
-                }
-                
-                // Confirmation dialog for superuser settings reset
-                SuperuserSettingsResetDialog(
-                    showDialog = showSuperuserResetDialog,
-                    onDismissRequest = { showSuperuserResetDialog = false },
-                    onConfirm = {
-                        showSuperuserResetDialog = false
-                        // Reset all superuser settings to default
-                        val editor = prefs.edit()
-                        editor.remove("selected_icon_pack") // Reset to default icon theme
-                        editor.putBoolean("use_individual_app_cards", true) // Default to enabled
-                        editor.putBoolean("enable_favorite_button", false) // Default off
-                        editor.putBoolean("disable_favorite_button", true) // Opposite of enable
-                        editor.putBoolean("disable_favorite_sorting", true) // Opposite of enable
-                        editor.apply()
 
-                        // Navigate back and forward to refresh the screen
-                        navigator.navigateUp()
-                        navigator.navigate(SuperuserSettingsScreenDestination)
-                    },
-                    prefs = prefs,
-                    navigator = navigator
-                )
-            }
             
             // Show reset button for ModuleSettings screen
             if (currentDestination?.route == ModuleSettingsScreenDestination.route) {
