@@ -1016,16 +1016,16 @@ fun MiuixStatusCard(
         else -> 0.5f to 0.5f  // 50% each for square mode
     }
     
-    // Horizontal layout: Main card on left, two smaller cards on right, both sides centered
+    // Horizontal layout: Main card on left, two smaller cards on right, both sides aligned to top
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(CardConstants.CARD_SPACING),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.Top
     ) {
         // Main status card - responsive width based on layout mode
         Box(
             modifier = Modifier.weight(mainCardWeight),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.TopCenter
         ) {
             Card(
                 modifier = Modifier
@@ -1105,7 +1105,7 @@ fun MiuixStatusCard(
         // Right side: Two smaller cards stacked vertically - responsive to available space
         Box(
             modifier = Modifier.weight(sideCardWeight),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.TopCenter
         ) {
             Column(
                 verticalArrangement = Arrangement.spacedBy(CardConstants.CARD_SPACING),
