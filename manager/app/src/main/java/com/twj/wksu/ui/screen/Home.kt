@@ -1060,33 +1060,34 @@ fun MiuixStatusCard(
                             .fillMaxSize()
                             .padding(all = 16.dp)
                     ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        val labelStyle = LabelItemDefaults.style
+                        TextRow(
+                            trailingContent = {
+                                LabelItem(
+                                    icon = if (Natives.isSafeMode) {
+                                        {
+                                            Icon(
+                                                tint = labelStyle.contentColor,
+                                                imageVector = Icons.Filled.Security,
+                                                contentDescription = null
+                                            )
+                                        }
+                                    } else {
+                                        null
+                                    },
+                                    text = {
+                                        Text(
+                                            text = workingMode,
+                                            style = labelStyle.textStyle.copy(color = labelStyle.contentColor),
+                                        )
+                                    }
+                                )
+                            }
                         ) {
                             Text(
                                 text = workingText,
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                            if (Natives.isSafeMode) {
-                                Icon(
-                                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                                    imageVector = Icons.Filled.Security,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(16.dp)
-                                )
-                            }
-                            Text(
-                                text = workingMode,
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Medium,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.SemiBold
                             )
                         }
                         Spacer(Modifier.height(4.dp))
