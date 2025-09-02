@@ -1031,70 +1031,66 @@ fun MiuixStatusCard(
             modifier = Modifier.weight(mainCardWeight),
             contentAlignment = Alignment.TopCenter
         ) {
-            Card(
+            StandardCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(squareSize), // Perfect square
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer
-                )
+                cardType = CardType.CUSTOM,
+                customColor = MaterialTheme.colorScheme.primaryContainer,
+                onClick = { /* Handle main card click */ }
             ) {
-                Box(
-                    modifier = Modifier.fillMaxSize()
+                Row(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .offset(15.dp, 20.dp),
-                        contentAlignment = Alignment.BottomEnd
-                    ) {
-                        Icon(
-                            modifier = Modifier.size(70.dp),
-                            imageVector = Icons.Rounded.CheckCircleOutline,
-                            tint = Color(0xFF36D167),
-                            contentDescription = null
-                        )
-                    }
+                    Icon(
+                        imageVector = Icons.Filled.CheckCircle,
+                        contentDescription = stringResource(R.string.home_working),
+                        tint = Color(0xFF36D167),
+                        modifier = Modifier.size(48.dp)
+                    )
                     Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(all = 16.dp)
+                        modifier = Modifier.padding(start = CardConstants.ICON_TO_TEXT_SPACING),
+                        verticalArrangement = Arrangement.spacedBy(CardConstants.ITEM_SPACING_SMALL)
                     ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        val labelStyle = LabelItemDefaults.style
+                        TextRow(
+                            trailingContent = {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(CardConstants.ACTION_SPACING)
+                                ) {
+                                    LabelItem(
+                                        icon = if (Natives.isSafeMode) {
+                                            {
+                                                Icon(
+                                                    tint = labelStyle.contentColor,
+                                                    imageVector = Icons.Filled.Security,
+                                                    contentDescription = null
+                                                )
+                                            }
+                                        } else {
+                                            null
+                                        },
+                                        text = {
+                                            Text(
+                                                text = workingMode,
+                                                style = labelStyle.textStyle.copy(color = labelStyle.contentColor),
+                                            )
+                                        }
+                                    )
+                                }
+                            }
                         ) {
                             Text(
-                                text = workingText,
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                            if (Natives.isSafeMode) {
-                                Icon(
-                                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                                    imageVector = Icons.Filled.Security,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(16.dp)
-                                )
-                            }
-                            Text(
-                                text = workingMode,
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Medium,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
+                                text = stringResource(id = R.string.home_working),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.SemiBold
                             )
                         }
-                        Spacer(Modifier.height(4.dp))
                         Text(
-                            modifier = Modifier.fillMaxWidth(),
                             text = stringResource(R.string.home_working_version, ksuVersion),
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Medium,
+                            style = MaterialTheme.typography.bodySmall
                         )
                     }
                 }
