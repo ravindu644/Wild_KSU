@@ -1072,28 +1072,23 @@ fun MiuixStatusCard(
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
-                        }
-                        Spacer(Modifier.height(4.dp))
-                        val labelStyle = LabelItemDefaults.style
-                        LabelItem(
-                            icon = if (Natives.isSafeMode) {
-                                {
-                                    Icon(
-                                        tint = labelStyle.contentColor,
-                                        imageVector = Icons.Filled.Security,
-                                        contentDescription = null
-                                    )
-                                }
-                            } else {
-                                null
-                            },
-                            text = {
-                                Text(
-                                    text = workingMode,
-                                    style = labelStyle.textStyle.copy(color = labelStyle.contentColor),
+                            if (Natives.isSafeMode) {
+                                Icon(
+                                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                                    imageVector = Icons.Filled.Security,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(16.dp)
                                 )
                             }
-                        )
+                            Text(
+                                text = workingMode,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
                         Spacer(Modifier.height(4.dp))
                         Text(
                             modifier = Modifier.fillMaxWidth(),
