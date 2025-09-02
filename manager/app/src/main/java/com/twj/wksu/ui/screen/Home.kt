@@ -135,7 +135,7 @@ fun HomeScreen(navigator: DestinationsNavigator) {
             item {
                 CardItemsColumn {
                     if (ksuVersion != null && rootAvailable()) {
-                        if (selectedLayoutType == "MIUIX") {
+                        if (selectedLayoutType == "MIUIX_SQUARE" || selectedLayoutType == "MIUIX_RECTANGLE" || selectedLayoutType == "MIUIX") {
                             // MIUIX Layout: Custom StatusCard design
                             val lkmMode = ksuVersion.let {
                                 if (it >= Natives.MINIMAL_SUPPORTED_KERNEL_LKM && kernelVersion.isGKI()) Natives.isLkmMode else null
@@ -144,6 +144,7 @@ fun HomeScreen(navigator: DestinationsNavigator) {
                                 ksuVersion = ksuVersion,
                                 kernelVersion = kernelVersion,
                                 lkmMode = lkmMode,
+                                layoutMode = selectedLayoutType,
 
                                 onClickSuperuser = {
                                     navigator.navigate(SuperUserScreenDestination) {
@@ -989,6 +990,7 @@ fun MiuixStatusCard(
     ksuVersion: Int,
     kernelVersion: KernelVersion,
     lkmMode: Boolean?,
+    layoutMode: String = "MIUIX_SQUARE",
     onClickSuperuser: () -> Unit = {},
     onClickModule: () -> Unit = {},
 ) {
@@ -1008,20 +1010,27 @@ fun MiuixStatusCard(
     
     val workingText = "${stringResource(id = R.string.home_working)}$safeMode"
     
-    // Horizontal layout: Square main card on left, two smaller cards on right, both sides centered
+    // Calculate weights based on layout mode
+    val (mainCardWeight, sideCardWeight) = when (layoutMode) {
+        "MIUIX_RECTANGLE" -> 0.75f to 0.25f  // 75% main card, 25% side cards
+        else -> 0.5f to 0.5f  // 50% each (square mode)
+    }
+    
+    // Horizontal layout: Main card on left, two smaller cards on right, both sides centered
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(CardConstants.CARD_SPACING),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Main status card (square) - centered on left side
+        // Main status card - responsive width based on layout mode
         Box(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(mainCardWeight),
             contentAlignment = Alignment.Center
         ) {
             Card(
                 modifier = Modifier
-                    .size(180.dp), // Fixed square size
+                    .fillMaxWidth()
+                    .aspectRatio(if (layoutMode == "MIUIX_RECTANGLE") 2.5f else 1f), // Rectangle or square aspect ratio
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer
                 )
@@ -1093,9 +1102,9 @@ fun MiuixStatusCard(
             }
         }
         
-        // Right side: Two smaller cards stacked vertically - centered on right side
+        // Right side: Two smaller cards stacked vertically - responsive to available space
         Box(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(sideCardWeight),
             contentAlignment = Alignment.Center
         ) {
             Column(
@@ -1103,7 +1112,9 @@ fun MiuixStatusCard(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Card(
-                    modifier = Modifier.size(85.dp), // Smaller square cards
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(1f), // Keep square aspect ratio but scale to available width
                     onClick = onClickSuperuser
                 ) {
                     Column(
@@ -1132,7 +1143,9 @@ fun MiuixStatusCard(
                 }
                 
                 Card(
-                    modifier = Modifier.size(85.dp), // Smaller square cards
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(1f), // Keep square aspect ratio but scale to available width
                     onClick = onClickModule
                 ) {
                     Column(
