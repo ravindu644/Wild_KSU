@@ -306,13 +306,6 @@ jobs:
 
       - name: Send APKs to Telegram
         run: |
-          # Check if required secrets are available
-          if [ -z "${{ secrets.TELEGRAM_BOT_TOKEN }}" ] || [ -z "${{ secrets.TELEGRAM_CHAT_ID }}" ]; then
-            echo "⚠️ Telegram secrets not configured - skipping upload"
-            echo "Required: TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID"
-            exit 0
-          fi
-          
           VERSION=$(git rev-list --count HEAD)
           
           # Upload Normal APK
