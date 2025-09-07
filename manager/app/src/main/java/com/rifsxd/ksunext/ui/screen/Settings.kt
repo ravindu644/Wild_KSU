@@ -68,6 +68,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
     var isGlobalNamespaceEnabled by rememberSaveable { mutableStateOf(false) }
     isGlobalNamespaceEnabled = isGlobalNamespaceEnabled()
 
+    val context = LocalContext.current
     val isManager = Natives.becomeManager(context.packageName)
     val ksuVersion = if (isManager) Natives.version else null
 
@@ -76,8 +77,6 @@ fun SettingScreen(navigator: DestinationsNavigator) {
     }
     val loadingDialog = rememberLoadingDialog()
     val shrinkDialog = rememberConfirmDialog()
-
-    val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
     val exportBugreportLauncher = rememberLauncherForActivityResult(
