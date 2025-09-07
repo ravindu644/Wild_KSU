@@ -16,10 +16,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.content.edit
 import androidx.lifecycle.ViewModel
-import com.rifsxd.ksunext.IKsuInterface
+import com.rifsxd.ksunext.KsuService
 import com.rifsxd.ksunext.Natives
 import com.rifsxd.ksunext.ksuApp
-import com.rifsxd.ksunext.ui.KsuService
+import com.twj.wksu.IKsuInterface
 import com.rifsxd.ksunext.ui.util.HanziToPinyin
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
