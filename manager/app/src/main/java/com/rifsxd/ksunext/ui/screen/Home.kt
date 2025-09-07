@@ -1,6 +1,7 @@
 package com.rifsxd.ksunext.ui.screen
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Build
 import android.os.PowerManager
 import android.system.Os
@@ -30,8 +31,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalUriHandler
 
 import androidx.compose.ui.res.painterResource
@@ -55,9 +58,15 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.rifsxd.ksunext.*
 import com.rifsxd.ksunext.R
 import com.rifsxd.ksunext.ui.component.CardConstants
+import com.rifsxd.ksunext.ui.component.CardItem
+import com.rifsxd.ksunext.ui.component.CardItemSpacer
 import com.rifsxd.ksunext.ui.component.CardItemsColumn
 import com.rifsxd.ksunext.ui.component.CardRow
 import com.rifsxd.ksunext.ui.component.CardRowContent
+import com.rifsxd.ksunext.ui.component.CardType
+import com.rifsxd.ksunext.ui.component.CenteredCardContent
+import com.rifsxd.ksunext.ui.component.CompactCard
+import com.rifsxd.ksunext.ui.component.StandardCard
 import com.rifsxd.ksunext.ui.component.rememberConfirmDialog
 import com.rifsxd.ksunext.ui.util.*
 import com.rifsxd.ksunext.ui.util.module.LatestVersionInfo
