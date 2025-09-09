@@ -282,15 +282,15 @@ fun CardRowContent(
             if (title != null) {
                 Text(
                     text = title,
-                    style = MaterialTheme.typography.titleMedium.copy(lineHeight = 20.sp),
-                    fontWeight = FontWeight.Medium
+                    style = MaterialTheme.typography.titleLarge.copy(lineHeight = 24.sp),
+                    fontWeight = FontWeight.SemiBold
                 )
             }
             
             Text(
                 text = text,
-                style = MaterialTheme.typography.titleMedium.copy(lineHeight = 20.sp),
-                fontWeight = FontWeight.Medium
+                style = MaterialTheme.typography.bodyMedium.copy(lineHeight = 20.sp),
+                fontWeight = FontWeight.Normal
             )
             
             if (subtitle != null) {
