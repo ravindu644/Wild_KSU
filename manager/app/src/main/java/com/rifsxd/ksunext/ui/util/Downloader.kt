@@ -68,6 +68,17 @@ fun checkNewVersion(): LatestVersionInfo {
     val url = "https://api.github.com/repos/WildKernels/Wild_KSU/releases/latest"
     // default null value if failed
     val defaultValue = LatestVersionInfo()
+    
+    // Get current manager version to determine if it's spoofed
+    val context = ksuApp.applicationContext
+    val currentVersionName = try {
+        val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
+        packageInfo.versionName ?: ""
+    } catch (e: Exception) {
+        ""
+    }
+    val isSpoofed = currentVersionName.contains("-spoofed")
+    
     runCatching {
         ksuApp.okhttpClient.newCall(okhttp3.Request.Builder().url(url).build()).execute()
             .use { response ->
@@ -79,6 +90,9 @@ fun checkNewVersion(): LatestVersionInfo {
                 val changelog = json.optString("body")
 
                 val assets = json.getJSONArray("assets")
+                var regularApk: Triple<Int, String, String>? = null
+                var spoofedApk: Triple<Int, String, String>? = null
+                
                 for (i in 0 until assets.length()) {
                     val asset = assets.getJSONObject(i)
                     val name = asset.getString("name")
@@ -92,14 +106,23 @@ fun checkNewVersion(): LatestVersionInfo {
                     val versionName = matchResult.groupValues[1]
                     val versionCode = matchResult.groupValues[2].toInt()
                     val downloadUrl = asset.getString("browser_download_url")
-
+                    
+                    if (versionName.contains("-spoofed")) {
+                        spoofedApk = Triple(versionCode, downloadUrl, versionName)
+                    } else {
+                        regularApk = Triple(versionCode, downloadUrl, versionName)
+                    }
+                }
+                
+                // Select appropriate APK based on current manager type
+                val selectedApk = if (isSpoofed) spoofedApk else regularApk
+                selectedApk?.let { (versionCode, downloadUrl, _) ->
                     return LatestVersionInfo(
                         versionCode,
                         downloadUrl,
                         changelog
                     )
                 }
-
             }
     }
     return defaultValue
